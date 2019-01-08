@@ -1,0 +1,34 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+   
+	
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-3 success"></div>
+
+    <div class="col-md-6 success">
+      <h3>תודה רבה על המשוב</h3>
+      <div class="space">
+      <p></p>
+      <p></p>
+      </div>
+      <hr>
+      <p></p>
+      <p></p>
+      <div class="space">
+      <p></p>
+      <p></p>
+      </div>
+      </p>
+      <p class="lead">
+        <a class="btn btn-primary btn-sm" href="{% url  'tour:home'  %}" role="button">בחזרה לדף הבית</a>
+      </p>
+      
+    </div>
+    <div class="col-md-3 success"></div>
+</div>
+
+{% endblock %}

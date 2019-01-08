@@ -1,0 +1,39 @@
+<!--- Meet the team -->
+{% extends 'tour/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+    <div class="col-12">
+        <h1 class="display-4">הסיורים שלנו</h1>
+    </div>
+    <hr>
+</div>
+</div>
+<!--- Cards -->
+
+<div class="container-fluid padding">
+<div class="row padding">
+ {% for card in ourTours %}
+    <div class="col-md-4">
+     <h4 class="card-title">{{card.title}}</h4>
+           
+            <img class="card-img-top" src="{{card.img.url}}">
+            <div class="card-body">
+                
+                
+                <h5 class="card-title">{{card.headerShort1}}</h5>
+                <p class="card-text">{{card.descriptionShort1}}</p>
+                <p class="card-text">{{card.headerShort2}}</p>
+                <p class="card-text">{{card.descriptionShort2}}</p>
+                <a href="{% url  'tour:find_your_day' card.trip_type %}" class="btn btn-runner"> להרשמה</a>
+            </div>
+    </div>
+    {% endfor %}
+   
+</div>
+</div>
+
+
+{% endblock %}

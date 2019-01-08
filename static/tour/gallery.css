@@ -1,0 +1,23 @@
+.btn:focus, .btn:active, button:focus, button:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#image-gallery .modal-footer{
+  display: block;
+  height:110px;
+}
+
+.thumb{
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.thumb h5{
+    text-align:right;
+    color:blue;
+}
+
+.thumb p{
+    text-align:right;
+}

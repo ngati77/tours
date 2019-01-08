@@ -1,0 +1,133 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Navigation -->
+
+
+<!--- Image Slider -->
+<div class="container-fluid">
+    <div id="slides" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'tour/images/home/kings_college.jpg' %}">
+            </div>
+        </div>
+    </div>
+<!--- Jumbotron -->
+    <div class="jumbotron row  text-center ">
+        <div class="col-sm-12 col-md-4 col-lg-3 disapear_sm runner">
+            <div class="row">
+                 <a href="{% url  'tour:gallery'  %}"><button type="button" class="btn btn-runner">גלריה<i class="fa fa-chevron-circle-left arrow1 arrow"></i></button></a>
+            </div>
+            
+            <div class="row">
+                <hr class="light">
+            </div>
+            <div class="row">
+                  <div class="title2">
+     המלצות
+                  </div>
+    
+            </div>
+            
+            {% for review in reviewes %}
+            <div class="review">
+                
+                
+               
+                <div class="review_header">
+                     <i class="fa fa-quote-right" aria-hidden="true"></i>
+                    <div class="row review_header" ><p>{{review.title}}</p> </div>
+                </div>
+                <div class="row review_text">
+                    <p>{{review.review_text}}</p>
+                    
+                </div>
+               
+                <div class="review_name">
+                     <i class="fa fa-quote-left" aria-hidden="true"></i>
+                    <p>{{review.first_name}}</p>
+                   
+                </div>
+                
+                
+               
+            </div>
+            {% endfor %}
+            
+      <div class="row">
+                 <a href="{% url  'tour:reviewes' %}"><button type="button" class="btn btn-runner">עוד המלצות
+                 <i class="fa fa-chevron-circle-left arrow arrow2"></i></button></a>
+            </div>
+            
+        </div><!-- col-md-3 col-lg-4 disapear_sm runner -->
+    
+    
+        <div class="col-sm-12 col-md-7 col-lg-8">
+            <p class="title1">זהו הזמן לגלות את קיימברידג', אחת הערים היפות והמיוחדות באירופה. </p>
+            <p class="text1">
+            הצטרפו לסיור המודרך בעברית ותהנו מיום בילוי מקסים וחוויתי. במרחק של כ-50 דק' נסיעה ברכבת מלונדון, מחכה לכם פנינה אמיתית. יחד נגלה את העיר העתיקה ומבני הקולג'ים הנהדרים של אוניברסיטה, נשמע סיפורים על בני מלוכה ואנשים מעניינים בהיסטוריה ונחצה גשרים על נהר שבו סירות עץ משייטות לאיטן.        
+            </p>
+                   
+   
+            <div class="row tips-row">
+                <div class="col-sm-12 col-lg-3 tips  ">
+                    <i class="fa fa-star  circle-icon "  style="color:white; font-size: 13px;"></i>
+                    <p>בנינו עבורכם מסלול מעניין ביותר, העובר במקומות נפלאים בעיר.</p>
+                </div>
+                <div class="col-sm-12 col-lg-3 tips  ">
+                    <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
+                    <p>אין צורך להתלבט ולהסתבך - שאלו אותנו, אנחנו יודעים!</p>
+                </div>
+                <div class="col-sm-12 col-lg-3 tips  ">
+                    <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
+                    <p>הכי כיף לדבר עם המדריך ולהבין כל מילה - אין כמו עברית!</p>
+                </div>
+                <div class="col-sm-12 col-lg-3 tips  ">
+                    <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
+                    <p>ההדרכה מתבצעת בקבוצות קטנות ואינטימיות.</p>
+                </div>
+            </div>
+     
+           <hr class="short">
+                 
+           <div class="display-4">הסיורים שלנו</div>
+                    
+
+<!--- Our tours row -->
+
+            {% for card in ourTours %}
+                <div class="row ">
+                    <div class="col-md-4 col-lg-4">
+                         <h4 class="card-title">{{card.title}}</h4>
+                         <img class="card-img-top" src="{{card.img.url}}">
+                    </div>
+                    <div class="col-md-5 col-lg-5">
+                        <div class="card-body">
+                            <p><b>{{card.headerShort1}}</b></p>
+                            <p>{{card.descriptionShort1}}</p>
+                            <p><u>למי הסיור מתאים?</u></p>
+                            <p>{{card.whoCanDoIt}}</p>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-2 col-lg-2">
+                        <div class="card-body">
+                    <a href="{% url  'tour:find_your_day' card.trip_type %}" class="btn btn-tour"> לפרטים והרשמה</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+<!--- Close previous div -->
+        </div><!-- jumbotron row  text-center .d-none .d-sm-block -->
+    </div><!-- container-fluid -->
+<!--- Welcome Section -->
+
+
+    
+
+
+
+
+
+{% endblock %}

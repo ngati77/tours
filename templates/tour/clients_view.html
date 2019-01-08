@@ -1,0 +1,117 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+{% block head %}
+   
+	
+{% endblock %}
+
+{% block content %}
+
+
+{% if request.user.is_authenticated %}
+<div class="container">
+  <header>
+  
+    <div class="row  d-sm-flex p-1 bg-dark text-white">
+     <h5 class="col-sm p-1 text-center">תאריך</h5>
+     <h5 class="col-sm p-1 text-center">שעה</h5>
+     <h5 class="col-sm p-1 text-center">סוג הסיור</h5>
+     <h5 class="col-sm p-1 text-center">מדריך</h5>
+     <h5 class="col-sm p-1 text-center">סטטוס</h5>
+    </div>
+    
+    <div class="row border border-right-0 border-bottom-0">
+         <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-1"> {{ trip.trip_date }}</span>
+        </div>
+         <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-1"> {{ trip.trip_time }}</span>
+        </div>
+        <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate  d-sm-inline-block bg-light text-muted">
+            <span class="date col-1"> {{ trip.trip_type }}</span>
+        </div>
+         <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-1"> {{ trip.trip_guide }}</span>
+        </div>
+        <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-1"> {{ trip.status }}</span>
+        </div>
+    </div>
+    
+    <div class="row d-sm-flex p-1 bg-dark text-white">
+     <h5 class="col-sm p-1 text-center">שם פרטי</h5>
+     <h5 class="col-sm p-1 text-center">שם משפחה</h5>
+     <h5 class="col-sm p-1 text-center">מספר טלפון</h5>
+     <h5 class="col-sm p-2 text-center">דואר אלקטרוני</h5>
+     <h5 class="col-sm p-1 text-center">מבוגרים</h5>
+     <h5 class="col-sm p-1 text-center">ילדים</h5>
+      {% if request.user.is_superuser %}
+      <h5 class="col-sm p-1 text-center">מקדמה</h5>
+     <h5 class="col-sm p-1 text-center">מחיר</h5>
+      {% endif %}
+    </div>
+   </header>
+    <div class="row border border-right-0 border-bottom-0">
+    {% for client in trip.clients_set.all %} 
+        <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-1" style="color:blue" data-toggle="collapse" href="#collapse_{{client.id}}" id="name_{{client.id}}"> {{ client.first_name }} </span>
+        </div>
+        <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-1"> {{  client.last_name }}</span>
+        </div>
+        <div class="day p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-2"> {{  client.phone_number }}</span>
+        </div>
+        <div class="day p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-2"> {{  client.email }}</span>
+        </div>
+        <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-1"> {{  client.number_of_people }}</span>
+        </div>
+        <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+            <span class="date col-1"> {{  client.number_of_children }}</span>
+        </div>
+        {% if request.user.is_superuser %}
+            <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate  d-sm-inline-block bg-light text-muted">
+                <span class="date col-1"> {{  client.pre_paid }}</span>
+            </div>
+            <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted">
+                <span class="date col-1"> {{  client.total_payment }}</span>
+            </div>
+            <div class="w-100"> </div>
+            <div id="collapse_{{client.id}}"  class="panel-collapse collapse">
+            {% for tran in client.transaction_set.all %}
+             
+                <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted text-right">
+                    <span class="date col-1">תאריך עסקה:       {{  tran.create_date }}</span>
+                </div>
+                 <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted text-right">
+                    <span class="date col-1">טוקן: {{  tran.token }} </span>
+                </div>
+                 <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-sm-inline-block bg-light text-muted text-right">
+                    <span class="date col-1">סכום:  {{  tran.amount }}</span>
+                </div>
+                 <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate  d-sm-inline-block bg-light text-muted text-right">
+                    <span class="date col-1">זיהוי:        {{  tran.charge_id }}</span>
+                </div>
+                <div class="w-100"></div>
+              
+            {% endfor %}
+            </div>
+             <div class="w-100"></div>
+        {% endif %}
+    {% endfor %}
+     </div>
+ </div>
+{% endif %}
+
+
+
+
+   
+
+{% endblock %}
+<!--<li><a href="{% url  'tour:detail' tour.id %}">{{ tour.trip_date }} {{ tour.trip_type }}</a></li>-->
+
+    

@@ -1,0 +1,19 @@
+
+h1 a {
+    color: #FCA205;
+}
+
+
+.right{ /*this will align the text to the right*/
+  text-align:right;
+}
+form {
+width: 350px;
+padding: 20px;
+border: 1px solid #270644;
+}
+#right{
+    width: 300px;
+    text-align: right;
+
+}

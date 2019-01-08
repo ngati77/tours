@@ -1,0 +1,105 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid">
+<div class="row">
+ {% if not newCalendar.view == 'A' %}
+    <div class="col-md-5">
+        <div class="calendar_col">
+            <h4 class="card-title">{{ourTour.title}}</h4>
+           
+            <img class="card-img-top" src="{{ourTour.img.url}}">
+            <div class="card-body">
+                <p class="card-text"><b>{{ourTour.headerShort1}}</b></p>
+                <p class="card-text">{{ourTour.descriptionShort1}}</p>
+                <p class="card-text">{{ourTour.description1}}</p>
+                <p class="card-text">{{ourTour.description2}}</p>
+                <p class="card-text">{{ourTour.description3}}</p>
+                <p><u>למי הסיור מתאים?</u></p>
+                <p>{{ourTour.whoCanDoIt}}</p>
+                <p><u>עלות הסיור</u></p>
+                <p>{{ourTour.price}} פאונד לאדם </p>
+                <p><u>משך הסיור</u></p>
+                <p>{{ourTour.duration}}</p>
+                
+            </div>
+                           
+               <div class="meeting_point">  
+                   <p><u>נקודת המפגש</u></p>
+                   <p>מוזיאון הפיצווילאם בכניסה הראשית,</p>
+                   <p>Fitzwilliam Museum</p>
+                   <p>כתובת : Trumpington St, Cambridge CB2 1RB</p>
+                   <a target="_blank" href="https://www.google.co.uk/maps/place/The+Fitzwilliam+Museum/@52.1998685,0.1199856,15z/data=!4m5!3m4!1s0x0:0xb0140168bdc0b72c!8m2!3d52.1998685!4d0.1199856">נקודת מפגש - גוגל</a>
+               </div>  
+               <div class="meeting_point">
+                   <p><u>הוראות הגעה</u></p>
+                    <p>הוראות הגעה מלונדון רכבת ישירה מתחנת Kings Cross יוצאת בשעה 9:42,</p>
+                    <p>משך הנסיעה 50 דקות.</p>
+                    <p>מונית מתחנת הרכבת בקיימברידג׳ לנקודת המפגש משך נסיעה של 7 דקות,</p>
+                    <p>עלות לזוג 5-6 פאונד, מ3 ומעלה אנשים יגבו מכם 3 פאונד נוספים.</p>
+                    <p>הוראות הגעה ישלחו גם במייל בתום ההזמנה </p>
+                    <hr>
+                    <p>במקרה ואתם מגיעים ברכב מומלץ להחנות במלון Hilton Double tree הקרוב לנקודת המפגש</p>
+               
+               
+                </div> 
+                
+            
+            
+        </div>
+   
+    </div>
+    {% endif %}
+    
+     <div class="col-md-7 col-lg-6">
+     <a name="calendar">
+        <div class="calendar_col">
+            <div class="row">
+                <div class="col-sm-1  text-center calendar"><a href="{% url  'tour:new_calendar_view'  newCalendar.prevMonthYear  newCalendar.prevMonth newCalendar.view %}#calendar"><i class=" fa fa-angle-double-right "></i></a></div>
+                <div class="col-sm-7  text-center">{{ newCalendar.monthStr }} {{ newCalendar.yearStr }}</div>
+                <div class="col-sm-3  text-center calendar"><a href="{% url  'tour:new_calendar_view'  newCalendar.thisYear  newCalendar.thisMonth newCalendar.view %}#calendar">היום</a></div>
+                <div class="col-sm-1  text-center calendar"><a href="{% url  'tour:new_calendar_view'  newCalendar.nextMonthYear  newCalendar.nextMonth newCalendar.view %}#calendar"><i class=" fa fa-angle-double-left"></i></a></div>
+            </div>
+            <div class="row d-none d-sm-flex p-1 bg-secondary text-white">
+             <h5 class="col-sm p-1 text-center">ראשון</h5>
+             <h5 class="col-sm p-1 text-center">שני</h5>
+             <h5 class="col-sm p-1 text-center">שלישי</h5>
+             <h5 class="col-sm p-1 text-center">רביעי</h5>
+             <h5 class="col-sm p-1 text-center">חמישי</h5>
+             <h5 class="col-sm p-1 text-center">שישי</h5>
+             <h5 class="col-sm p-1 text-center">שבת</h5>
+              
+            </div>
+          
+          <div class="row border border-right-0 border-bottom-0">
+          {% for week in newCalendar.Pack7Days %}
+          {% for day in week %}
+           <div class="{{ day.fill }}">
+              <h5 class="row align-items-center">
+                <span class="date col-1"> {{ day.dayNumStr }}</span>
+                <small class="col d-sm-none text-center text-muted">{{ day.dayNameHeb }}</small>
+                <span class="col-1"></span>
+              </h5>
+               {% for event in day.events %}
+                   {% if request.user.is_authenticated and newCalendar.view == 'A' %}
+                   <a class="{{ event.attr }}"  href="{% url  event.link  pk=event.id %}">{{ event.text }}</a> 
+                   {% else %}
+                    <a class="{{ event.attr }}"  href="{% url  event.link  pYear=day.year    pMonth=day.month pDay=day.day pHour=event.hour  tripType=event.trip_type %}">{{ event.text }}</a> 
+                    {% endif %}
+        
+                {% endfor %}
+            </div>
+          {% endfor %}
+          <div class="w-100 d-flex flex-row-reverse"></div>  
+          {% endfor %}
+            
+           </div>
+        </div>
+    </div>
+    <div class="col-1"></div>
+</div>
+</div>
+{% endblock %}
+
+

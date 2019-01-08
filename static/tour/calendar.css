@@ -1,0 +1,33 @@
+@media (max-width:575px) {
+    .display-4 {
+        font-size: 1.5rem;
+    }
+    .day  {
+        background-color: white!important;
+        }
+    .day h5 {
+        background-color: #f8f9fa;
+        padding: 3px 5px 5px;
+        margin: -8px -8px 8px -8px;
+    }
+    .date {
+        padding-left: 4px;
+    }
+     .event a{
+        font-size: 18px!important;
+    }
+}
+
+.runner1{
+    margin-top:400px;
+}
+
+@media (min-width: 576px) {
+    .day {
+        height: 14.2857vw;
+        background-color: white!important;
+    }
+    .event a{
+        font-size: 18px!important;
+    }
+}

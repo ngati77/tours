@@ -1,0 +1,53 @@
+{% load static %}
+<nav class="navbar navbar-expand-md navbar-light bg-light sticky-top">
+<div class="container-fluid">
+    <a class="navbar-brand" href="{% url  'tour:home'  %}"><img src="{% static 'tour/images/logo/logo_cambridge.png' %}">
+    <h5 class="navbar-text navbar-first-line"><b> קיימברידג' בעברית</b> <br> סיורים מודרכים בעברית</h5>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" 
+    data-target="#navbarResponsive">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url  'tour:home'  %}">דף הבית</a>
+            </li>
+            <li  class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          הסיורים
+                </a>
+                 <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
+                   <a class="dropdown-item" href="{% url  'tour:find_your_day' %}/C ">סיור קלאסי</a>
+                   <a class="dropdown-item" href="{% url  'tour:find_your_day' %}/F ">סיור משפחות</a>
+                   <a class="dropdown-item" href="{% url  'tour:find_your_day' %}/W ">סיור חורפי</a>
+                   <a class="dropdown-item" href="{% url  'tour:find_your_day' %}/P ">שייט</a>
+                 </div>
+            </li>
+           
+            <li class="nav-item">
+                <a class="nav-link" href="{% url  'tour:reviewes'  %}">המלצות</a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link" href="{% url  'tour:team'  %}">מי אנחנו</a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link" href="{% url  'tour:contact'  %}">צור קשר</a>
+            </li>
+            {% if request.user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url  'tour:guideview'  %}">Guide</a> 
+            </li>
+            {% endif %}
+            {% if request.user.is_superuser %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url  'admin:index'  %}">Admin</a> 
+            </li>
+            {% endif %}
+            
+           
+        </ul>
+    </div>
+</div>
+</nav>
+

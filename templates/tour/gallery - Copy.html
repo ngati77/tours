@@ -1,0 +1,34 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+{% block content %}
+
+   <section class="gallery-block cards-gallery">
+	    <div class="container">
+	        <div class="heading">
+	          <h2>גלריה</h2>
+	        </div>
+	        
+	        <div class="row">
+    	        {% for image in images %}
+	            <div class="col-md-6 col-lg-4">
+	                <div class="card border-0 transform-on-hover">
+	                	<a class="lightbox" href="{% static 'tour/images/gallery/'%}{{image.img}}">
+	                		<img src="{% static 'tour/images/gallery/'%}{{image.img}}" alt="Card Image" class="card-img-top">
+	                	</a>
+	                    <div class="card-body">
+	                        <h6><a href="#">{{image.title}}</a></h6>
+	                        <p class="text-muted card-text">{{image.text}}</p>
+	                    </div>
+	                </div>
+	            </div>
+	            {% endfor %}
+	        </div>
+	    </div>
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
+    <script>
+           baguetteBox.run('.baguetteBoxThree', {
+    });
+    </script>
+</html>
+{% endblock %}

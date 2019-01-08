@@ -1,0 +1,57 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+{% block head %}
+   
+	
+{% endblock %}
+
+{% block content %}
+
+
+{% if request.user.is_authenticated %}
+<div class="container">
+  <header>
+{% if latest_trip_list %}
+  <form method="get" action="{% url 'tour:guideview' %}">
+    <p>Filter: <input type="text" value={{filter}} name="filter"/></p>
+    <p>order_by: <input type="text" value={{orderby}} name="orderby"/></p>
+    <p><input type="submit" name="submit" value="submit"/></p>
+</form>
+    <div class="row d-none d-sm-flex p-1 bg-dark text-white">
+     <h5 class="col-sm p-1 text-center">Date</h5>
+     <h5 class="col-sm p-1 text-center">Time</h5>
+     <h5 class="col-sm p-1 text-center">Guide</h5>
+     <h5 class="col-sm p-1 text-center">Type</h5>
+     <h5 class="col-sm p-1 text-center">People</h5>
+      
+      
+    </div>
+    </header>
+    
+    <div class="row border border-right-0 border-bottom-0">
+    {% for trip in latest_trip_list %}
+    <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-none d-sm-inline-block bg-light text-muted">
+        <a class="date col-1" href="{% url 'tour:clientview' trip.id %}"> {{  trip.trip_date }}</a>
+    </div>
+    <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-none d-sm-inline-block bg-light text-muted">
+        <span class="date col-1"> {{  trip.trip_time }}</span>
+    </div>
+    <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-none d-sm-inline-block bg-light text-muted">
+        <span class="date col-1"> {{  trip.get_trip_guide_display }}</span>
+    </div>
+    <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-none d-sm-inline-block bg-light text-muted">
+        <span class="date col-1"> {{  trip.get_trip_type_display }}</span>
+    </div>
+    <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-none d-sm-inline-block bg-light text-muted">
+        <span class="date col-1"> 15</span>
+    </div>
+    <div class="w-100"></div>  
+    {% endfor %}
+ </div>
+{% else %}
+    <p>No tours are available.</p>
+{% endif %}
+{% endif %}
+{% endblock %}
+<!--<li><a href="{% url  'tour:detail' tour.id %}">{{ tour.trip_date }} {{ tour.trip_type }}</a></li>-->

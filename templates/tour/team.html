@@ -1,0 +1,34 @@
+<!--- Meet the team -->
+{% extends 'tour/base.html' %}
+{% load static %}
+{% block content %}
+
+<!--- Cards -->
+
+<div class="container-fluid padding">
+<div class="row padding">
+</div>
+</div>
+<div class="container-fluid padding">
+<div class="row padding">
+    {% for card in guides %}
+    <div class="col-md-4">
+        <h4 class="card-title">{{card.first_name}} {{card.last_name}}</h4>
+        <div class="card text-right">
+            <img class="card-img-top" src="{{card.image.url}}">
+            <div class="card-body">
+                <p class="card-text"></p>
+                <p class="card-text">{{card.general_info}}</p>
+                {% for background in card.guide_background_set.all %}
+                    <p class="card-text"><i><b>{{background.question}}</b></i></p>
+                    <p class="card-text">{{background.answer}}</p>
+                 {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}

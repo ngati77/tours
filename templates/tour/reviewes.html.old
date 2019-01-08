@@ -1,0 +1,137 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+{% block head %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script> 
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+{% endblock %}
+{% block content %}
+
+
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="container">
+	<div class="row">
+		<h2>המלצות</h2>
+	</div>
+</div>
+<div class="carousel-reviews broun-block">
+    <div class="container">
+        <div class="row">
+            <div id="carousel-reviews" class="carousel slide" data-ride="carousel" data-interval="5000"  data-pause="hover" data-direction="right">
+            
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                    
+                    <div class="container-fluid padding">
+                    <div class="row padding">
+                   
+                    {% for review in first_review %}
+                    
+                	    <div class="col-md-4 col-sm-6">
+        				    <div class="block-text rel zmin">
+						        <div class="mb-2 text-right"><a title="">{{review.title}}</a></div>
+							    <div class="mark text-right">כוכבים:
+							    <div class='rating-stars text-center'>
+                            <ul id='stars'>
+      
+							     {% for star in review.stars %}
+    							     {% if star == 's' %}
+        							     <li class='star-selected'>
+                                    <i class='fa fa-star fa-fw'></i>
+                                    </li>
+    							     {% else %}
+        							     <li class='star-not-selected' >
+                                    <i class='fa fa-star fa-fw'></i>
+                                    </li>
+    							     {% endif %}
+							     {%endfor %}
+							        </ul>
+                              </div>
+							     </div>
+						        <div class="text-right mb-2"><i><b>{{ review.review_text }}</b></i></div>
+							    <ins class="ab zmin sprite sprite-i-triangle block"></ins>
+					        </div>
+							<div class="person-text rel">
+				                <img src="{{review.img.url}}" alt="Avatar" class="avatar mt-4"/>
+								<h4>{{review.first_name}}</h4>
+								<a>{{review.location}}</a>
+							</div>
+						</div>
+						{% endfor %}
+                    
+                    </div>
+                    
+                    	</div>
+						</div>
+                
+                    {% for review3 in reviewes %}
+                    <div class="carousel-item">
+                    
+                    <div class="container-fluid padding">
+                    <div class="row padding">
+                   
+                    {% for review in review3 %}
+                    
+                	    <div class="col-md-4 col-sm-6">
+        				    <div class="block-text rel zmin ">
+						        <div class="mb-2 text-right"><a title="">{{review.title}}</a></div>
+						        <div class="mark text-right">כוכבים:
+							     <div class='rating-stars text-center'>
+                            <ul id='stars'>
+      
+							     {% for star in review.stars %}
+    							     {% if star == 's' %}
+        							     <li class='star-selected'>
+                                    <i class='fa fa-star fa-fw'></i>
+                                    </li>
+    							     {% else %}
+        							     <li class='star-not-selected' >
+                                    <i class='fa fa-star fa-fw'></i>
+                                    </li>
+    							     {% endif %}
+							     {%endfor %}
+							        </ul>
+                              </div>
+							     </div>
+						        <div class="text-right mb-2"><i><b>{{ review.review_text }}</b></i></div>
+							    <ins class="ab zmin sprite sprite-i-triangle block"></ins>
+					        </div>
+							<div class="person-text rel">
+							 <img src="{{review.img.url}}" alt="Avatar" class="avatar  mt-4"/>
+								<h4>{{review.first_name}}</h4>
+								<a>{{review.location}}</a>
+							</div>
+						</div>
+						{% endfor %}
+                    
+                    </div>
+                    
+                    	</div>
+						</div>
+						{% endfor %}
+                </div>
+                
+                <a class="carousel-control-prev" href="#carousel-reviews" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carousel-reviews" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                </a>
+            </div>
+            
+            
+            <a href="{% url  'tour:give_review'  %}"><button type="button" class="btn btn-runner">איך היה בקיימברידג' ?</button></a>
+        </div>
+     
+    </div>
+</div>
+
+	
+
+
+{% endblock %}

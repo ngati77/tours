@@ -1,0 +1,28 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+{% block head %}
+   
+	
+{% endblock %}
+
+{% block content %}
+
+
+{% if request.user.is_authenticated %}
+<link rel="stylesheet" type="text/css" href="{% static 'tour/style.css' %}" />
+{% if latest_tour_list %}
+    <ul>
+    {% for trip in latest_tour_list %}
+        <p>Date: {{trip.trip_date}}</P>
+        <p>Time: {{trip.trip_time}}</P>
+        <p>Guide: {{trip.trip_guide}}</P>
+        <p>Type: {{trip.trip_type}}</P>
+        
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No tours are available.</p>
+{% endif %}
+
+<!--<li><a href="{% url  'tour:detail' tour.id %}">{{ tour.trip_date }} {{ tour.trip_type }}</a></li>-->
