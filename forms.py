@@ -48,7 +48,7 @@ class ContactForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
     last_name      = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
     email          = forms.EmailField(label ='', widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
-    text           = forms.CharField(label  ='', widget=forms.Textarea(attrs={'rows':8, 'cols':20,'placeholder': 'נושא הפנייה'}))
+    text           = forms.CharField(label  ='', widget=forms.Textarea(attrs={'placeholder': 'נושא הפנייה'}))
 
     
     def get_data(self):

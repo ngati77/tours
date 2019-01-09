@@ -8,17 +8,19 @@
 <div class="container-fluid">
     <div class="row d-sm-flex p-1 bg-light text-dark ">
         <div class="col-md-12 col-lg-7 form">
-  
-            <form action="" method="post" >
+           <div class="row">
+            <form action="{% url 'tour:give_review' %}" method="post" >
 
                     {% csrf_token %}
                      
                     <table >
                     {{ form.as_p }}
                     </table>
-                                   
-              <button id="give_review">שלח משוב</button>
+               <div class="row">                     
+              <button class="btn btn-runner1" id="give_review">שלח משוב</button>
+            </div>
             </form>
+            </div>
         </div>
     </div>
 </div>

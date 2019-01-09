@@ -218,7 +218,7 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
                 msg_html = render_to_string('emails/email_success.html', {'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'id': transaction.id, 'trip_type':title, 'client':client, 'print_children':children, 'more_to_pay':more_to_pay})
                 #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
                 emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, email=email, title=emailTitle)
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, email=email, title=emailTitle, cc=['yael.gati@cambridgeinhebrew.com','yrimon@gmail.com'])
             except:
                 print('Got an error...')
             #print(f'Debug {emailSuccess}')
@@ -239,12 +239,15 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
 
 
 def contactUs(request ):
-    
+    print('Hello')
     if request.method == 'POST':
         # Create a form instance and populate it with data from the request (binding):
         form = ContactForm(request.POST)
         # Check if the form is valid:
+        print(form)
+        print(form.is_valid())
         if form.is_valid():
+            
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']
            # Get all infortamtion from form
@@ -252,7 +255,13 @@ def contactUs(request ):
             
             contact = Contact(first_name=first_name, last_name = last_name, email = email, text = text)
             contact.save()
-            
+            try:
+                msg_html = render_to_string('emails/email_contact.html', {'first_name':first_name,'last_name':last_name, 'email':email, 'id': contact.id, 'text':text})
+                msg_plain = str(contact.id) + "מישהו יצר קשר פניה "#emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
+                emailTitle = "מישהו יצר קשר"
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, email='yael.gati@cambridgeinhebrew.com', title=emailTitle, cc=['yael.gati@cambridgeinhebrew.com'])
+            except:
+                print('Got an error...')
             # Save contact here
             return render(request, 'tour/contact_saved.html', {'title':'contact', 'page_title':'contact', 'id': contact.id})
 
@@ -287,7 +296,7 @@ def GiveReview(request ):
     # If this is a GET (or any other method) create the default form.
    # TODO, Double check date as avialable one, or already has a trip on that day. 
     
-    form = ReviewForm(initial={'stars': 0})
+    form = ReviewForm()
         
     return render(request, 'tour/give_review.html', {'title':'Give Review', 'page_title' : 'Give Review', 'form': form})
 

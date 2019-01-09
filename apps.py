@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class TourConfig(AppConfig):
-    name = 'tour'
+class ToursConfig(AppConfig):
+    name = 'tours'

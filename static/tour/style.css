@@ -143,6 +143,20 @@ html, body {
     text-align: right;
     
 }
+
+.btn-runner1 {
+    
+    background-color: Transparent;
+    /*border: 2px solid #6648b1!important;
+    color:     #563d7c;*/
+    border: 2px solid #124789!important;
+    color:     #124789;
+    text-align: right;
+    width: 190px;
+    margin-bottom: 0.2rem!important;
+    margin-right: 1rem!important;
+    margin-top: 0.2rem!important;
+}
 .btn-runner {
     
     background-color: Transparent;
@@ -157,6 +171,7 @@ html, body {
     margin-top: 0.2rem!important;
 }
 
+.btn-runner1:hover,
 .btn-runner:hover {
 
     /*background-color: #563d7c;

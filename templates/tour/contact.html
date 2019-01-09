@@ -5,27 +5,27 @@
 {% block content %}
 
 <div class="container-fluid">
-
     <div class="row d-flex bg-light text-dark contact">
             
         <div class="col-md-12 col-lg-4 form">
-        <div class="row">
-            <form action="" method="post" >
+            <div class="row">
+                <form action="{% url 'tour:contact' %}" method="post" >
                     {% csrf_token %}
                      
                     <table >
                     {{ form.as_p }}
                     </table>
-                              
-               <button type="button" class="btn btn-runner">צור קשר</button>
-            </form>
+                    <div class="row">          
+                   <button id="contact_us" class="btn btn-runner1">צור קשר</button>
+                   </div>
+                </form>
+            </div>
         </div>
-         </div>
-           <div class="col-md-12 col-lg-5 form">
+        <div class="col-md-12 col-lg-5 form">
       
-      <img src="https://cambinhebrew.com/media/Gallery/2018/12/bridge-374048_1920_640x474_1.jpg">
-           </div>
+          <img src="https://cambridgeinhebrew.com/media/Gallery/2018/12/bridge-374048_1920_640x474_1.jpg">
         </div>
     </div>
+</div>
 
 {% endblock %}
