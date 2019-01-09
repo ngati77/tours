@@ -239,13 +239,10 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
 
 
 def contactUs(request ):
-    print('Hello')
     if request.method == 'POST':
         # Create a form instance and populate it with data from the request (binding):
         form = ContactForm(request.POST)
         # Check if the form is valid:
-        print(form)
-        print(form.is_valid())
         if form.is_valid():
             
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
