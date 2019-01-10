@@ -156,7 +156,11 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
     #TyprDict = {'F': 'הרשמה לסיור משפחות', 'C': 'הרשמה לסיור קלאסי', 'B': 'הרשמה לאוטובוס'}
     # Britng the trip name in hebrew from db
     TripTypeQuery = OurTours.objects.filter(trip_type=tripType)
-    title =  TripTypeQuery[0].title
+    title   =  TripTypeQuery[0].title
+    deposit =  TripTypeQuery[0].deposit
+    price =  TripTypeQuery[0].price
+    priceChild =  TripTypeQuery[0].priceChild
+    print_child = (TripTypeQuery[0].priceChild) > 0
     #title = TyprDict[tripType]
     stripe.api_key = settings.STRIPE_SECRET_KEY
    
@@ -218,22 +222,23 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
                 msg_html = render_to_string('emails/email_success.html', {'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'id': transaction.id, 'trip_type':title, 'client':client, 'print_children':children, 'more_to_pay':more_to_pay})
                 #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
                 emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, email=email, title=emailTitle, cc=['yael.gati@cambridgeinhebrew.com','yrimon@gmail.com'])
+                #cc =['yael.gati@cambridgeinhebrew.com']
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, email=email, title=emailTitle, cc=settings.CC_EMAIL)
             except:
                 print('Got an error...')
             #print(f'Debug {emailSuccess}')
-            return render(request, 'tour/success.html', {'title':'success', 'page_title':'success', 'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'deposit':deposit, 'more_to_pay':more_to_pay, 'id': transaction.id, 'trip_type':title, 'first':first_name, 'last':last_name })
+            return render(request, 'tour/success.html', {'title':'success', 'page_title':'success', 'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'deposit':deposit, 'more_to_pay':more_to_pay, 'id': transaction.id, 'trip_type':title, 'first':first_name, 'last': last_name })
            
 
     # If this is a GET (or any other method) create the default form.
    # TODO, Double check date as avialable one, or already has a trip on that day. 
     proposed_date = datetime.datetime(pYear, pMonth, pDay, pHour)
-    form = Booking1Form(initial={'trip_date': proposed_date.date, 'trip_time':  proposed_date.time, 'trip_type':tripType})
+    form = Booking1Form(initial={'trip_date': proposed_date.date, 'trip_time':  proposed_date.time, 'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
         
     tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
     triptime = proposed_date.strftime("%H:%M") 
     
-    return render(request, 'tour/booking.html', {'title':title, 'page_title' : 'Booking', 'form': form, 'tripdate': tripdate, 'triptime': triptime})
+    return render(request, 'tour/booking.html', {'title':title, 'page_title' : 'Booking', 'form': form, 'tripdate': tripdate, 'triptime': triptime, 'price':price, 'priceChild':priceChild, 'deposit':deposit, 'print_child': print_child})
 
 
 

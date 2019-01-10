@@ -84,7 +84,6 @@ html, body {
 
 .contact {
     margin-right:1em;
-
 }
 
 
@@ -312,35 +311,7 @@ html, body {
 .fa-instagram:hover {
     color: #d5d5d5;
 }
-/*.footer-centre{
-    /*color: #FFA500;
-    margin-bottom: .2rem;
-    margin-top: .1rem;
-    font-size:1rem;
-    text-align:center;
-}*/
 
-/*.footer-centre img {
-    width: 30%;
-    height: 30%;
-    border-radius:10%;
-    
-}*/
-/*.footer-centre ul {
-  list-style-type: none;
-  overflow: hidden;
-}*/
-
-/*.social li {
-  float: right;
-  margin-right: 3em;
-}*/
-/*.footer_image{
-    width: 200px;
-}*/
-/*.footer-centre p {
-    font-size: 1.5em;
-}*/
 hr.light{
     border-top: 1px solid #3f3f3f;
     width: 100%;
@@ -463,18 +434,7 @@ hr.light-100 {
     margin-left: 1rem;
 
 }
-/*    .social a {
-    font-size: 2.5em;
-    padding: .2rem;
-    }
-    .social p {
-    font-size: 1.5em;
-    padding: .0rem;
-    }
-    .social li {
-      margin-right: 1em;
-    }
-  */ 
+
     .navbar-brand  {
     width: 250px;
     }
@@ -588,10 +548,10 @@ hr.light-100 {
  .calendar_small{
      font-size: 10%;
  } 
-/*.footer-centre li {
-   font-size: .7em;
-   padding-right: 0rem;
-}*/
+.contact {
+    margin-right:.1em;
+}
+
 }
 
 

@@ -117,6 +117,8 @@ class OurTours(models.Model):
     meetingPoint       = models.TextField(max_length=600)
     gettingThere       = models.TextField(max_length=600)
     price              = models.IntegerField(default=0)
+    priceChild         = models.IntegerField(default=0)
+    deposit            = models.IntegerField(default=0)
     img                = models.ImageField(blank = True, null = True, upload_to = 'Tours/%Y/%m/')
     confirm            = models.BooleanField(default=False)
     trip_type          = models.CharField(

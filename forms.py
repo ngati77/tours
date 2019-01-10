@@ -26,6 +26,8 @@ class Booking1Form(forms.Form):
     number_adults  = forms.IntegerField(max_value = 10, min_value =0, label ='מספר מבוגרים' ) 
     number_child   = forms.IntegerField(max_value = 10, min_value =0, label ='מספר ילדים עד גיל 12')
     deposit        = forms.IntegerField(widget = forms.HiddenInput())
+    price          = forms.IntegerField(widget = forms.HiddenInput())
+    priceChild     = forms.IntegerField(widget = forms.HiddenInput())
     paymentSum     = forms.IntegerField(widget = forms.HiddenInput())
 
     
@@ -48,7 +50,7 @@ class ContactForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
     last_name      = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
     email          = forms.EmailField(label ='', widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
-    text           = forms.CharField(label  ='', widget=forms.Textarea(attrs={'placeholder': 'נושא הפנייה'}))
+    text           = forms.CharField(label  ='', widget=forms.Textarea(attrs={'cols':26,'placeholder': 'נושא הפנייה'}))
 
     
     def get_data(self):

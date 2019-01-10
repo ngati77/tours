@@ -12,6 +12,13 @@
         <div class="col-md-12 col-lg-7 form">
             <h3>טופס הרשמה</h3>
             <p> סוג הסיור: {{title}}</p>
+            <p> מחיר למבוגר: {{price}} פאונד</p>
+             {% if print_child %}
+              <p>מחיר לילד בגיל 3-12: {{priceChild}} פאונד</p>
+              {% else %}
+              <p>ילדים עד גיל 12 חינם</p>
+              {% endif %}
+              </p>
             <p> תאריך:     {{tripdate}} </p>
             <p> שעה:       {{triptime}} </p>
             
@@ -23,13 +30,21 @@
                     {{ form.as_p }}
                     </table>
                                    
-            <p>אנו מבקשים תשלום של 30 פאונד מקדמה על מנת להבטיח את מקומכם בסיור</p>
+            <p>אנו מבקשים תשלום מקדמה על מנת להבטיח את מקומכם בסיור</p>
             <p>התשלום הוא מאובטח, פרטי כרטיס האשראי אינם נשמרים במערכת</p>
             <p>התשלום מבוצע באמצעות  stripe</p>
             <p>שאר הסכום יגבה בסיור</p>
-            <p>במקרה של ביטול בהודעה מראש של 24 שעות לפני המועד, כספכם יוחזר במלואו (למעט עמלות חברת האשראי)</p>
-            <p><br></p>
-
+            <p>במקרה של ביטול בהודעה מראש של 24 שעות לפני המועד, כספכם יוחזר במלואו</p>
+            <hr>
+            <p><b>תשלום:</b></p>
+            <p id="adult_calc">מבוגרים</p>
+            {% if print_child %}
+              <p id="child_calc">ילדים</p>
+              {% endif %}
+            <p id="amount">סה"כ לתשלום: </p> 
+            <p id="deposit">מתוכם מקדמה:  </p> 
+            <p id="left">והשאר במזומן ביום הטיול</p>
+            <p><a target="_blank" href="https://www.globes.co.il/portal/instrument.aspx?instrumentid=10436">גלובס שער המרה פאונד שקל</a></p>
                 <div id="collapseStripe" class="wrapper">
                   <label for="card-element" >
                         המשך לתשלום                                                          
@@ -60,9 +75,9 @@
                  <div id="card-errors" role="alert"></div>
                 </div>
             
-            <p id="pre-pay"> מקדמה:</p>
-            <p id="amount">סה"כ לתשלום: </p> 
-              <button class="btn btn-runner" id="pay_button">לתשלום</button>
+                     
+           
+              <button class="btn btn-runner" id="pay_button">תשלום מקדמה</button>
             </form>
         </div>
         <div id="stripe-token-handler" class="is-hidden">Success! Got token: <span class="token"></span></div>
@@ -84,36 +99,31 @@
             var trip_type = document.getElementById("id_trip_type").value;
             
             var sum = document.getElementById("id_paymentSum");
-            var pre = document.getElementById("id_deposit");
+            var pre = document.getElementById("id_deposit").value;
+            var priceAdult = document.getElementById("id_price").value;
+            var priceChild = document.getElementById("id_priceChild").value;
             var preLabel =  document.getElementById("pre-pay");
             var payLabel =  document.getElementById("pay_button");
             var totalLabel =  document.getElementById("amount");
-            // window.alert("Submit4: " + trip_type);
-            if (trip_type == 'C'){
-                if (adults_num>0){
-                    sum.value = adults_num * 30;
-                    pre.value = 30;
-                    preLabel.innerHTML = 'מקדמה: £30';
-                    payLabel.innerHTML = 'לתשלום: £30';
-                    totalLabel.innerHTML =  'סה"כ לתשלום: '+ '£' +  sum.value  ;
-                }
-            }
-            else if (trip_type == 'W'){
-                if (adults_num>0){
-                    sum.value = adults_num * 30;
-                    pre.value = 30;
-                    preLabel.innerHTML = 'מקדמה: £30';
-                    payLabel.innerHTML = 'לתשלום: £30';
-                    totalLabel.innerHTML =  'סה"כ לתשלום: '+ '£' +  sum.value  ;
-                }
-            }
-            else if(trip_type == 'F'){
-                sum.value = adults_num * 25 + childs_num * 25;
-                pre.value = 30;
-                preLabel.innerHTML = 'מקדמה: £30';
-                payLabel.innerHTML = 'לתשלום: £30';
-                totalLabel.innerHTML =  'סה"כ לתשלום: '+ '£' +  sum.value  ;
-            }
+            var adult_calc = document.getElementById("adult_calc");
+            var child_calc = document.getElementById("child_calc");
+            var deposit    = document.getElementById("deposit");
+            var left       = document.getElementById("left");
+             
+            
+             
+             sum.value = (adults_num * priceAdult) + (childs_num * priceChild); 
+             adult_calc.innerHTML =  adults_num  + '  מבוגרים ב  '  + priceAdult  + '  פאונד לאחד  ' + ' = ' + (adults_num * priceAdult) +   '  פאונד   ';
+             //window.alert("adults_num: " + adults_num + "priceAdult " + priceAdult + "childs_num " + childs_num + "priceChild " + priceChild );
+            // window.alert("sum.value: " + sum.value  );
+             if (priceChild>0){
+                 child_calc.innerHTML =  childs_num + '   ילדים ב '  + priceChild + '  פאונד לאחד   ' + ' = ' + (childs_num * priceChild) +   '  פאונד   ';
+             }
+           
+             totalLabel.innerHTML =  'סה"כ לתשלום: '+ 'פאונד ' +  sum.value  ;
+             deposit.innerHTML    = 'מקדמה: '  + pre ;
+             left.innerHTML        = 'והיתרה: '  + (sum.value - pre) + ' פאונד לתשלום במזומן ביום הטיול למדריכה';
+           
         }
         
     </script>
