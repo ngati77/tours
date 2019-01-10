@@ -261,7 +261,7 @@ def contactUs(request ):
                 msg_html = render_to_string('emails/email_contact.html', {'first_name':first_name,'last_name':last_name, 'email':email, 'id': contact.id, 'text':text})
                 msg_plain = str(contact.id) + "מישהו יצר קשר פניה "#emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
                 emailTitle = "מישהו יצר קשר"
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, email='yael.gati@cambridgeinhebrew.com', title=emailTitle, cc=['yael.gati@cambridgeinhebrew.com'])
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, email='yael.gati@cambridgeinhebrew.com', title=emailTitle, cc=settings.CC_EMAIL_YAEL)
             except:
                 print('Got an error...')
             # Save contact here
