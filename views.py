@@ -58,11 +58,17 @@ def home(request):
     OurToursQuery = OurTours.objects.filter(confirm=True).order_by('order')
     reviewesQuery = Review.objects.filter(confirm=True).order_by('create_date')[:3]
     logger.info('home page')
-    return render(request, 'tour/index.html', {'page_title':'home', 
-                                                  'ourTours':OurToursQuery,
-                                                  'reviewes':reviewesQuery})
-    
-     
+    meta_des_heb = "סיורים בקיימברידג' אנגליה, סיור בעיר יפיפיה מחוץ ללונדון. סיור חד יומי  "
+    meta_des_en  = "Cambridge in hebrew - Guided tours in Hebrew. In the beautiful city Cambridge. This is a one day tour outside London "
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "סיור קיימברידג' קימברידג' קמברידג' אנגליה מחוץ ללונדון  "
+    meta_key_en  = "Cambridge hebrew Guided tours"
+    meta_key     = meta_key_heb + meta_key_en
+    return render(request, 'tour/index.html', {'page_title':"קיימברידג' - סיור בעברית מחוץ ללונדון", 
+                                               'meta_des':meta_des,
+                                               'meta_key':meta_key,
+                                               'ourTours':OurToursQuery,
+                                               'reviewes':reviewesQuery})
 
 def team(request):
     """
@@ -70,15 +76,33 @@ def team(request):
     """
     teamQuery = Guide.objects.filter(confirm=True)
     logger.info('team page')
-    return render(request, 'tour/team.html', {'page_title':'team','guides' : teamQuery})
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - הצוות שלנו  "
+    meta_des_en  = "Cambridge in hebrew - The team "
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "סיור קיימברידג' קימברידג' קמברידג' הצוות  "
+    meta_key_en  = "Cambridge hebrew Guided tours - Team"
+    meta_key     = meta_key_heb + meta_key_en
+    return render(request, 'tour/team.html', {'page_title':'מי אנחנו',
+                                              'meta_des':meta_des,
+                                              'meta_key':meta_key,
+                                              'guides' : teamQuery})
 
 def gallery(request):
     """
     Show the gallery page
     """
-    galleryQuery = Gallery.objects.all()
+    galleryQuery = Gallery.objects.all(confirm=True)
     logger.info('gallery page')
-    return render(request, 'tour/gallery.html', {'page_title':'gallery', 'images':galleryQuery})
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - קיימברידג' בתמונות  "
+    meta_des_en  = "Cambridge in hebrew -Beautiful cambridge in the pictures "
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "תמונות קיימברידג' אנגליה  "
+    meta_key_en  = "Beautiful Cambridge pictures"
+    meta_key     = meta_key_heb + meta_key_en
+    return render(request, 'tour/gallery.html', {'page_title':'גלריית תמונות',
+                                                 'meta_des':meta_des,
+                                                 'meta_key':meta_key,
+                                                 'images':galleryQuery})
 
 def reviewes_old(request):
     """
@@ -106,16 +130,32 @@ def reviewes(request):
     """
     Show home reviewes
     """
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - ממליצים עליינו. חוות דעת ממטילים  "
+    meta_des_en  = "Cambridge in hebrew - Reviewes. Our reputation  "
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "מה חושבים עלינו המלצות  "
+    meta_key_en  = "Reviewes reputation"
+    meta_key     = meta_key_heb + meta_key_en
     reviewesQuery = Review.objects.filter(confirm=True).order_by('create_date')
-    return render(request, 'tour/reviewes.html', {'page_title':'reviewes', 
+    return render(request, 'tour/reviewes.html', {'page_title':'ממליצים עלינו', 
+                                                   'meta_des':meta_des,
+                                                 'meta_key':meta_key,
                                                   'reviewes':reviewesQuery})
 def ourTours(request):
     """
     Show home reviewes
     """
     OurToursQuery = OurTours.objects.filter(confirm=True)
-   
-    return render(request, 'tour/our_tours.html', {'page_title':'Tours', 
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
+    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
+    meta_key_en  = " cambridge college old market"
+    meta_key     = meta_key_heb + meta_key_en
+    return render(request, 'tour/our_tours.html', {'page_title':'הסיורים שלנו', 
+                                                   'meta_des':meta_des,
+                                                   'meta_key':meta_key,
+                                                   
                                                   'ourTours':OurToursQuery})
     
     
@@ -145,7 +185,16 @@ def new_calendar_view(request, pYear, pMonth, view):
             print('Raise exception')
         OurTour = OurToursQuery[0]
 #    print(newCalendar)
-    return render(request, 'tour/calendar.html', {'page_title':'calendar','newCalendar':newCalendar,'ourTour':OurTour})
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
+    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
+    meta_key_en  = " cambridge college old market"
+    meta_key     = meta_key_heb + meta_key_en
+    return render(request, 'tour/calendar.html', {'page_title':OurTour.title,
+                                                   'meta_des':meta_des,
+                                                   'meta_key':meta_key,
+                                                  'newCalendar':newCalendar,'ourTour':OurTour})
 
     
 
@@ -227,7 +276,16 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
             except:
                 print('Got an error...')
             #print(f'Debug {emailSuccess}')
-            return render(request, 'tour/success.html', {'title':'success', 'page_title':'success', 'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'deposit':deposit, 'more_to_pay':more_to_pay, 'id': transaction.id, 'trip_type':title, 'first':first_name, 'last': last_name })
+            meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
+            meta_des_en  = ""
+            meta_des = meta_des_heb + meta_des_en
+            meta_key_heb = "הרשמה הצלחה "
+            meta_key_en  = " "
+            meta_key     = meta_key_heb + meta_key_en
+            return render(request, 'tour/success.html', {'title':'success', 'page_title':'ההרשמה הסתיימה בהצלחה', 
+                                                          'meta_des':meta_des,
+                                                          'meta_key':meta_key,
+                                                         'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'deposit':deposit, 'more_to_pay':more_to_pay, 'id': transaction.id, 'trip_type':title, 'first':first_name, 'last': last_name })
            
 
     # If this is a GET (or any other method) create the default form.
@@ -238,7 +296,23 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
     tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
     triptime = proposed_date.strftime("%H:%M") 
     
-    return render(request, 'tour/booking.html', {'title':title, 'page_title' : 'Booking', 'form': form, 'tripdate': tripdate, 'triptime': triptime, 'price':price, 'priceChild':priceChild, 'deposit':deposit, 'print_child': print_child})
+    pageTitle=  'הזמנת ' +  title 
+    meta_des_heb = "הזמנת סיור בקיימברידג בעברית  "
+    meta_des_en  = "book your tour in Hebrew in Cambridge UK"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "הזמנת סיור עברית קיימברידג' "
+    meta_key_en  = "book tour cambridge hebrew "
+    meta_key     = meta_key_heb + meta_key_en
+    return render(request, 'tour/booking.html', {'title':title, 'page_title' : pageTitle,
+                                                  'meta_des':meta_des,
+                                                  'meta_key':meta_key,
+                                                 'form': form, 
+                                                 'tripdate': tripdate, 
+                                                 'triptime': triptime, 
+                                                 'price':price, 
+                                                 'priceChild':priceChild, 
+                                                 'deposit':deposit, 
+                                                 'print_child': print_child})
 
 
 
@@ -265,14 +339,33 @@ def contactUs(request ):
             except:
                 print('Got an error...')
             # Save contact here
-            return render(request, 'tour/contact_saved.html', {'title':'contact', 'page_title':'contact', 'id': contact.id})
+            meta_des_heb = "קיימברידג בעברית צור קשר  "
+            meta_des_en  = "contact Cambridge in Hebrew"
+            meta_des = meta_des_heb + meta_des_en
+            meta_key_heb = "צור קשר קיימברידג' "
+            meta_key_en  = "contact cambridge hebrew "
+            meta_key     = meta_key_heb + meta_key_en
+            return render(request, 'tour/contact_saved.html', {'title':'contact', 
+                                                               'meta_des':meta_des,
+                                                               'meta_key':meta_key,
+                                                               'page_title':'נחזור אלייך בהקדם', 
+                                                               'id': contact.id})
 
     # If this is a GET (or any other method) create the default form.
    # TODO, Double check date as avialable one, or already has a trip on that day. 
     
     form = ContactForm()
-        
-    return render(request, 'tour/contact.html', {'title':'Contact', 'page_title' : 'Contact', 'form': form})
+    meta_des_heb = "קיימברידג בעברית צור קשר  "
+    meta_des_en  = "contact Cambridge in Hebrew"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "צור קשר קיימברידג' "
+    meta_key_en  = "contact cambridge hebrew "
+    meta_key     = meta_key_heb + meta_key_en    
+    return render(request, 'tour/contact.html', {'title':'Contact', 
+                                                 'page_title' : 'צור קשר', 
+                                                  'meta_des':meta_des,
+                                                  'meta_key':meta_key,
+                                                  'form': form})
 
 def GiveReview(request ):
 
@@ -292,25 +385,57 @@ def GiveReview(request ):
             review = Review(first_name=first_name, title=review_title, review_text = text)
             review.save()
             # Save contact here
-             
-            return render(request, 'tour/review_saved.html', {'title':'Give Review', 'page_title':'Give Review'})
+            meta_des_en  = "write a review for Cambridge in hebrew"
+            meta_des = meta_des_heb + meta_des_en
+            meta_key_heb = "משוב קיימברידג' "
+            meta_key_en  = "review Cambridge hebrew "
+            meta_key     = meta_key_heb + meta_key_en   
+            return render(request, 'tour/review_saved.html', {'title':'Give Review', 
+                                                               'meta_des':meta_des,
+                                                               'meta_key':meta_key,
+                                                               'page_title':'תודה על המשוב'})
 
     # If this is a GET (or any other method) create the default form.
    # TODO, Double check date as avialable one, or already has a trip on that day. 
     
     form = ReviewForm()
-        
-    return render(request, 'tour/give_review.html', {'title':'Give Review', 'page_title' : 'Give Review', 'form': form})
+    meta_des_heb = "תן לנו משוב  "
+    meta_des_en  = "write a review for Cambridge in hebrew"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "משוב קיימברידג' "
+    meta_key_en  = "review Cambridge hebrew "
+    meta_key     = meta_key_heb + meta_key_en        
+    return render(request, 'tour/give_review.html', {'title':'Give Review',
+                                                     'page_title' : 'תן לנו משוב',
+                                                     'meta_des':meta_des,
+                                                     'meta_key':meta_key,
+                                                     'form': form})
 
 
 def success (request):
-    
-   return render(request, 'tour/success.html', {'title':'success','page_title':'success'})
+    meta_des_heb = "ההרשמה הסתיימה בהצלחה  "
+    meta_des_en  = "Booking confirmed"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "ההזמנה הסתיימה קיימברידג' "
+    meta_key_en  = "booking success Cambridge hebrew "
+    meta_key     = meta_key_heb + meta_key_en  
+    return render(request, 'tour/success.html', {'title':'success',
+                                                'meta_des':meta_des,
+                                                'meta_key':meta_key,
+                                                'page_title':'ההרשמה הצליחה'})
 
 
 def failure (request):
-    
-   return render(request, 'tour/failure.html', {'title':'faiure','page_title':'failure'})
+    meta_des_heb = "ההרשמה נכשלה  "
+    meta_des_en  = "Booking failed"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "ההזמנה נכשלה קיימברידג' "
+    meta_key_en  = "booking failed Cambridge hebrew "
+    meta_key     = meta_key_heb + meta_key_en 
+    return render(request, 'tour/failure.html', {'title':'faiure',
+                                                'meta_des':meta_des,
+                                                'meta_key':meta_key,
+                                                'page_title':'ההרשמה נכשלה'})
 
 
 

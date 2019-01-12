@@ -11,7 +11,6 @@ from . import views
 app_name = 'tour'
 urlpatterns = [
     path('',               views.home, name='home'),
-    path('home',           views.home, name='home'),
     path('calendar/<int:pYear>/<int:pMonth>/<str:view>', views.new_calendar_view, name='new_calendar_view'),
     path('<int:pYear>/<int:pMonth>/<int:pDay>/<int:pHour>/<str:tripType>', views.booking, name='booking'),
     path('reviewes',       views.reviewes, name='reviewes'),
