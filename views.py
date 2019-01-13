@@ -91,7 +91,7 @@ def gallery(request):
     """
     Show the gallery page
     """
-    galleryQuery = Gallery.objects.all(confirm=True)
+    galleryQuery = Gallery.objects.filter(confirm=True)
     logger.info('gallery page')
     meta_des_heb = "סיורים בקיימברידג' אנגליה - קיימברידג' בתמונות  "
     meta_des_en  = "Cambridge in hebrew -Beautiful cambridge in the pictures "
