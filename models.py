@@ -114,8 +114,6 @@ class OurTours(models.Model):
     description2       = models.TextField(max_length=600)
     description3       = models.TextField(max_length=600)
     duration           = models.TextField(max_length=200)
-    meetingPoint       = models.TextField(max_length=600)
-    gettingThere       = models.TextField(max_length=600)
     price              = models.IntegerField(default=0)
     priceChild         = models.IntegerField(default=0)
     deposit            = models.IntegerField(default=0)

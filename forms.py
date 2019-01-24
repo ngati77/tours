@@ -74,3 +74,54 @@ class ReviewForm(forms.Form):
         text            = self.cleaned_data['text']
         
         return first_name,  review_title, text
+
+class ReportForm(forms.Form):
+    MONTH = (
+    ('1', 'Jan'),
+    ('2', 'Feb'),
+    ('3', 'Mar'),
+    ('4', 'Apr'),
+    ('5', 'May'),
+    ('6', 'Jun'),
+    ('7', 'Jul'),
+    ('8', 'Aug'),
+    ('9', 'Sep'),
+    ('10', 'Oct'),
+    ('11', 'Nov'),
+    ('12', 'Dec'),
+    )
+    month              = forms.ChoiceField(choices=MONTH)
+    year               = forms.IntegerField(initial=2019)
+    check_guide        = forms.BooleanField(required=False)
+    TRIP_GUIDE = (
+    ('PE', 'Pending'),
+    ('YR', 'YaelR'),
+    ('GS', 'Gui'),
+    ('YG', 'YaelG'),
+    )
+    guide = forms.ChoiceField(choices=TRIP_GUIDE)
+    ORDER = (
+    ('trip_date', 'Date'),
+    ('trip_guide', 'Guide'),
+    )
+    order = forms.ChoiceField(choices=ORDER)
+    OUTPUT = (
+    ('html', 'HTML'),
+    ('pdf', 'SHOW PDF'),
+    ('send_pdf', 'SHOW & SEND PDF'),
+    )
+    output = forms.ChoiceField(choices=OUTPUT)
+    def get_data(self):
+        month           = self.cleaned_data['month']
+        year            = self.cleaned_data['year']
+        check_guide     = self.cleaned_data['check_guide']
+        guide           = self.cleaned_data['guide']
+        order           = self.cleaned_data['order']
+        output          = self.cleaned_data['output']
+    
+        return month, year, check_guide, guide, order, output 
+    
+#    def clean_check_guide(self):
+#        print (self.data['check_guide'])
+#        print('validate checkbox')
+#        return self.data['check_guide']

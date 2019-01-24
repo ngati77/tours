@@ -11,8 +11,7 @@
 
 {% if request.user.is_authenticated %}
 <div class="container">
-  <header>
-{% if latest_trip_list %}
+
   <form method="get" action="{% url 'tour:guideview' %}">
     <p>Filter: <input type="text" value={{filter}} name="filter"/></p>
     <p>order_by: <input type="text" value={{orderby}} name="orderby"/></p>
@@ -27,8 +26,7 @@
       
       
     </div>
-    </header>
-    
+{% if latest_trip_list %}    
     <div class="row border border-right-0 border-bottom-0">
     {% for trip in latest_trip_list %}
     <div class="day col-sm p-2 border border-left-0 border-top-0 text-truncate d-none d-sm-inline-block bg-light text-muted">

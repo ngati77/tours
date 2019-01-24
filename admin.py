@@ -161,8 +161,6 @@ class OurTourAdmin(admin.ModelAdmin):
         (None,               {'fields': ['description2']}),
         (None,               {'fields': ['description3']}),
         (None,               {'fields': ['duration']}),
-        (None,               {'fields': ['meetingPoint']}),
-        (None,               {'fields': ['gettingThere']}),
         (None,               {'fields': ['price']}),
         (None,               {'fields': ['priceChild']}),
         (None,               {'fields': ['deposit']}),

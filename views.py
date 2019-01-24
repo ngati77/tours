@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .forms import Booking1Form, ContactForm, ReviewForm
+from .forms import Booking1Form, ContactForm, ReviewForm, ReportForm
 
 from django.contrib.auth.decorators import login_required
 
@@ -32,8 +32,11 @@ import stripe
 from django.conf import settings
 from django.contrib import messages
 
+from .render import Render
 # import the logging library
 import logging
+
+from threading import Thread, activeCount
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -471,4 +474,157 @@ class ClientView(generic.DetailView):
     template_name = 'tour/clients_view.html'
     model = Trip
 
+# This class is used in the report.html
+class ReportEntry: 
+    def __init__(self, trip_text, trip_date, trip_guide):
+        self.trip_text       = trip_text
+        self.trip_date       = trip_date
+        self.trip_guide      = trip_guide
 
+        self.total_people    = 0
+        self.total_children  = 0
+
+        self.total_deposit   = 0
+        self.total_gross     = 0
+        self.total_guide_exp = 0
+        self.other_expense   = 0
+        self.guide_payback   = 0
+        self.total_neto      = 0
+        
+    """
+    Return report between range of guides and according to the guide
+    """
+    # This function calculate how much money the guide owe the company
+    def calc_guide_payment(self, trip_type ,adult, children):
+        # Before calculating Guide salary check if children are paying
+        ChildAccount    = OurTours.objects.filter(trip_type=trip_type)[0].priceChild>0
+        # If children are account take the number of them otherwise set it to zero
+        childNum        = children if ChildAccount else 0
+        # Just add chidren to people
+        totalPeople     = adult +  childNum
+        # if more than 2 peole than we have extra to add
+        extraPeople     = (totalPeople-2) if totalPeople > 2 else 0
+        # Base amount 40 + 5 Pound per person
+        return (40 + 5 * extraPeople)    
+
+
+#######################################################
+def reportView(request):
+
+    if request.method == 'POST':
+        # Create a form instance and populate it with data from the request (binding):
+        form = ReportForm(request.POST)
+        # We get field called 'rating' a number from 1 to 10
+        # Check if the form is valid:
+        report = []
+        if form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            #book_inst.due_back = form.cleaned_data['renewal_date']
+           # Get all infortamtion from form
+            month, year, check_guide, guide, order, output  = form.get_data()
+           # contact = Contact(first_name=first_name, last_name = last_name, email = email, text = text)
+           # contact.save()
+           
+            if (check_guide):
+                tripQuerey = Trip.objects.filter(
+                    trip_date__month  = month,
+                    trip_date__year   = year,
+                    trip_guide        = guide,
+                    ).order_by(order)
+            # If we want to see all guides    
+            else:
+                tripQuerey = Trip.objects.filter(
+                         trip_date__month  = month,
+                         trip_date__year   = year,
+                        ).order_by(order)
+            # Scan all trips
+            if (len(tripQuerey)>0):
+                reportsum = ReportEntry("sum", "sum", "sum")
+                for trip in tripQuerey:
+                    # Create new entry in the report
+                    reportEntry = ReportEntry(trip.get_trip_type_display(), trip.trip_date.strftime("%d.%m.%y"), trip.get_trip_guide_display())
+                    # Get all cilents from a trip hopefully more than one
+                    clientQuerey = trip.clients_set.all()
+                    # Scan all clients, in the futrue need to scan the invoice
+                    for client in clientQuerey:
+                        reportEntry.total_people    += client.number_of_people
+                        reportEntry.total_children  += client.number_of_children
+                        reportEntry.total_deposit   += client.pre_paid
+                        reportEntry.total_gross     += client.total_payment
+                    
+                    # How much the guide earn from this tour
+                    reportEntry.total_guide_exp = reportEntry.calc_guide_payment(trip_type = trip.trip_type,
+                                                                          adult     = reportEntry.total_people,
+                                                                          children  = reportEntry.total_children)
+                    # how much we earend
+                    reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
+                    # Now that we know how much the guide earn we can calculate home amount he needs to return
+                    reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
+                    # Gather the sum here
+                    reportsum.total_people      += reportEntry.total_people
+                    reportsum.total_children    += reportEntry.total_children
+                    reportsum.total_deposit     += reportEntry.total_deposit
+                    reportsum.total_gross       += reportEntry.total_gross
+                    reportsum.guide_payback     += reportEntry.guide_payback   
+                    reportsum.total_guide_exp   += reportEntry.total_guide_exp
+                    reportsum.total_neto        += reportEntry.total_neto
+                  
+                   
+                   
+                    report.append(reportEntry)
+                report.append(reportsum)
+            # If requested view is html  
+            if (output=='html'):
+                return render(request, 'tour/report.html', {'title':'Report view',
+                                                     'page_title' : 'דוח',
+                                                     'meta_des':'',
+                                                     'meta_key':'',
+                                                     'form': form,
+                                                     'report': report,
+                                                     'filter_check_guide': check_guide
+                                                     })
+            
+            # The view is pdf, therefore Create param dictionary for the pdf
+            print(list(hebmonthdic.keys())[int(month)-1])
+            params = {
+                'report': report[:-1],
+                'sum':   report[-1],
+                'filter_check_guide': check_guide,
+                'month'             : list(hebmonthdic.keys())[int(month)-1],
+                'year'              : year,
+                'request': request
+            }
+            # Check if need to send the pdf    
+            if (output=='send_pdf'):
+                file = Render.render_to_file('tour/pdf.html', params)
+                tour_emails.send_email_pdf(to=['noam.gati@gmail.com'],file=file)
+                
+            
+            return Render.render('tour/pdf.html', params)    
+    else:
+        form = ReportForm()
+        report = []
+        check_guide = False
+        return render(request, 'tour/report.html', {'title':'Report view',
+                                                     'page_title' : 'דוח',
+                                                     'meta_des':'קיימברידג בעברית דוחות',
+                                                     'meta_key':'קמברידג',
+                                                     'form': form,
+                                                     'report': report,
+                                                     'filter_check_guide': check_guide
+                                                     })
+            
+
+        # If this is a GET (or any other method) create the default form.
+        # TODO, Double check date as avialable one, or already has a trip on that day. 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

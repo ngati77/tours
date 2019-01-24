@@ -13,6 +13,29 @@ class tour_emails:
         
         msg             = EmailMultiAlternatives(subject=title, body= msg_plain, from_email=settings.EMAIL_YAEL, to=to,cc=settings.CC_EMAIL ,bcc=settings.BCC_EMAIL)
         msg.attach_alternative(msg_html, "text/html")
+        
+        #attachment = open(request.session['customer']+".txt.blowfish", 'rb')
+        #msg.attach('Name.txt.blowfish', attachment.read(), 'text/plain')
+        
+        
+        try:
+            success = msg.send()
+        except: 
+            print('Error sending email')    
+        return success
+ 
+    def send_email_pdf(to, file):
+        
+        msg_plain = 'Cambridge in hebrew invoice'
+        title     = 'Çambridge In Hebrew'
+        
+        msg             = EmailMultiAlternatives(subject=title, body= msg_plain, from_email=settings.EMAIL_YAEL, to=to)
+        #msg.attach_alternative(msg_html, "text/html")
+        
+        attachment = open(file[1], 'rb')
+        msg.attach('inovice.pdf', attachment.read(), 'text/plain')
+        
+        
         try:
             success = msg.send()
         except: 
