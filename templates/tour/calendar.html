@@ -18,10 +18,17 @@
                 <p class="card-text">{{ourTour.description3}}</p>
                 <p><u>למי הסיור מתאים?</u></p>
                 <p>{{ourTour.whoCanDoIt}}</p>
-                <p><u>עלות הסיור</u></p>
-                <p>{{ourTour.price}} פאונד לאדם </p>
+                
                 <p><u>משך הסיור</u></p>
                 <p>{{ourTour.duration}}</p>
+                <p><u> עלות הסיור </u></p>
+                <p>{{ourTour.price}} פאונד למבוגר </p>
+                {% if print_child %}
+                <p>{{ourTour.priceChild}} פאונד ילדים בגיל 3-12 </p>
+                {% else %}
+                <p>ילדים עד גיל 12 חינם</p>
+                {% endif %}
+               
                 
             </div>
                            

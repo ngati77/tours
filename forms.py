@@ -16,8 +16,9 @@ from datetime import date, datetime, time
  
     
 class Booking1Form(forms.Form):
-    trip_date      = forms.DateField(widget = forms.HiddenInput())
-    trip_time      = forms.TimeField(widget = forms.HiddenInput())
+    title          = forms.CharField(widget = forms.HiddenInput())
+    trip_date      = forms.CharField(widget = forms.HiddenInput())
+    trip_time      = forms.CharField(widget = forms.HiddenInput())
     trip_type      = forms.CharField(widget = forms.HiddenInput())
     first_name     = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
     last_name      = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
@@ -32,6 +33,7 @@ class Booking1Form(forms.Form):
 
     
     def get_data(self):
+        title           = self.data['title']
         first_name      = self.cleaned_data['first_name']
         trip_date       = self.cleaned_data['trip_date']
         trip_time       = self.cleaned_data['trip_time']
@@ -43,8 +45,37 @@ class Booking1Form(forms.Form):
         number_child    = self.cleaned_data['number_child']
         deposit         = self.cleaned_data['deposit']
         paymentSum      = self.cleaned_data['paymentSum']
-        return trip_date, trip_time, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum 
-        
+        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum 
+       
+class PaymentForm(forms.Form):
+    title          = forms.CharField(widget = forms.HiddenInput())
+    trip_date      = forms.CharField(widget = forms.HiddenInput())
+    trip_time      = forms.CharField(widget = forms.HiddenInput())
+    trip_type      = forms.CharField(widget = forms.HiddenInput())
+    first_name     = forms.CharField(widget = forms.HiddenInput())
+    last_name      = forms.CharField(widget = forms.HiddenInput())
+    phone          = forms.CharField(widget = forms.HiddenInput())
+    email          = forms.EmailField(widget = forms.HiddenInput())
+    number_adults  = forms.IntegerField(widget = forms.HiddenInput()) 
+    number_child   = forms.IntegerField(widget = forms.HiddenInput())
+    deposit        = forms.IntegerField(widget = forms.HiddenInput())
+    paymentSum     = forms.IntegerField(widget = forms.HiddenInput())
+
+    
+    def get_data(self):
+        title           = self.data['title']
+        first_name      = self.data['first_name']
+        trip_date       = self.data['trip_date']
+        trip_time       = self.data['trip_time']
+        trip_type       = self.data['trip_type']
+        last_name       = self.data['last_name']
+        phone           = self.data['phone']
+        email           = self.data['email']
+        number_adults   = self.data['number_adults']
+        number_child    = self.data['number_child']
+        deposit         = self.data['deposit']
+        paymentSum      = self.data['paymentSum']
+        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum        
 
 class ContactForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
@@ -120,6 +151,8 @@ class ReportForm(forms.Form):
         output          = self.cleaned_data['output']
     
         return month, year, check_guide, guide, order, output 
+    
+
     
 #    def clean_check_guide(self):
 #        print (self.data['check_guide'])

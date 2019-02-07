@@ -166,6 +166,12 @@ class Trip(models.Model):
             )
     
     def __str__(self):
+        print('Trip indo')
+        print('Trip date: ')
+        print(self.trip_date)
+        print('Trip time: ')
+        print(self.trip_time)
+        print(type(self.trip_time))
         return self.trip_text
     
     
@@ -460,6 +466,184 @@ class Contact(models.Model):
     confirm          = models.BooleanField(default=False)
     
     #create_date      = models.DateTimeField('date create')
+
+class Calendar:
+    
+    def __init__(self, request, year, month, view):
+        daydict = {'Sun':1, 'Mon':2, 'Tue':3, 'Wed':4, 'Thu':5, 'Fri':6, 'Sat':7}
+        
+        dayInCalendar = []
+        self.dayInCalendar     = []
+        monthCount = 'PrevMonth';
+        
+        today           = datetime.datetime.now()
+        today           = datetime.date(today.year,today.month,today.day)
+        firstDayOfMonth = datetime.date(year, month, 1)
+        self.monthStr        = hebmonthdic[firstDayOfMonth.strftime("%b")]
+        self.yearStr         = str(firstDayOfMonth.year)
+        self.view            = view
+            
+        # Find the last day of the month,
+        # If Decmber than moving to the next year
+        if (month == 12):
+            firstDayOfNextMonth = datetime.date(year+1, 1, 1);
+        else:
+            firstDayOfNextMonth = datetime.date(year, month+1, 1);
+        lastDayInMonth = firstDayOfNextMonth - datetime.timedelta(days=1)
+        # use firstDayOfNextMonth as href to move to the nextmont
+        self.nextMonth      = firstDayOfNextMonth.month
+        self.nextMonthYear  = firstDayOfNextMonth.year
+        
+        self.thisYear       = today.year
+        self.thisMonth      = today.month
+        
+        # Find the last day ofthe previous month
+        LastDayInPrevMonth  = firstDayOfMonth - datetime.timedelta(days=1)
+        # Subtract how many days from previous month we need to use 
+        self.prevMonth      = LastDayInPrevMonth.month
+        self.prevMonthYear  = LastDayInPrevMonth.year
+        
+        #Start from previous month
+        dayCount = LastDayInPrevMonth.day - daydict[firstDayOfMonth.strftime("%a")] + 2
+        _month =   LastDayInPrevMonth.month
+        _year  =   1977
+        
+        for i in range (1,43):
+            # Moving to current month
+            if (i==daydict[firstDayOfMonth.strftime("%a")]):
+                monthCount = 'thisMonth'
+                dayCount =1
+                _month =   month
+                _year  =   year
+            # Endsup with next month
+            elif (dayCount==(lastDayInMonth.day+1) and monthCount== 'thisMonth' ):
+                monthCount = 'nextMonth'
+                dayCount =1
+                _month =   self.nextMonth
+                _year  =   1977
+            
+            dayInMonth = datetime.date(_year, _month, dayCount)
+                
+            self.dayInCalendar.append(DayInCalendar1(request=request, dateInCalendar=dayInMonth, today= today, view=view))
+            
+            # Every 7 days pack in new list, and also revered the order to be from right to left for the hebrew calendar
+#            if (i%7==0):
+#                if (monthCount == 'nextMonth') and (dayCount >6):
+#                    pass
+#                else:
+#                    self.Pack7Days.append(dayInCalendar)  
+#                    dayInCalendar = []
+            # Increment counter if we have started counting
+            dayCount += 1
+                
+    def __str__(self):
+        
+        for day in self.dayInCalendar:
+            print('fill: ' + day.fill)
+            print('dayNumStr: ' + day.dayNumStr)
+        
+        return 'Here is my calendatr:'
+                
+
+class DayInCalendar1:
+    
+    def __init__(self, request, dateInCalendar, today, view):
+        self.events=[]
+        hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
+        
+        self.year  = dateInCalendar.year
+        self.month = dateInCalendar.month
+        self.day   = dateInCalendar.day 
+        
+        # If client then bring the relevant day of avliable tours
+        # Remove days were guide is on vacation and tour isn't possible
+        
+        if (dateInCalendar < today):
+            self.fill =    ""
+        elif (dateInCalendar == today):
+           self.fill =    "active"
+        else:
+           self.fill =    ""
+        
+#        if (dateInCalendar.day==1):
+#            self.dayNumStr     =  str(dateInCalendar.day) + '    .....   ' + hebmonthdic[dateInCalendar.strftime("%b")]
+#        else:
+        if self.year == 1977:
+            self.dayNumStr     =  ""
+        else:
+            self.dayNumStr     =  str(dateInCalendar.day)
+            
+        # Querey guide holiday
+        guideVacationQuery   = GuideVacation.objects.filter(vac_start_date__lte=dateInCalendar,
+                                                        vac_end_date__gte=dateInCalendar) 
+        self.attr = False
+        if (dateInCalendar > today):
+            
+            # Check specific day in the week
+            availableDateQuery0     = TripAvailabilty.objects.filter(Q(ava_select_day    =   dateInCalendar.strftime('%a')))
+            # Check for all days
+            availableDateQuery1     = TripAvailabilty.objects.filter(Q(ava_select_day    =   'All'))
+            availableDateQuery = availableDateQuery1 | availableDateQuery0
+            
+                   
+            for tripAvailabilty in availableDateQuery:
+                #print(tripAvailabilty.ava_trip_type)
+                if (tripAvailabilty.ava_trip_type != 'A' and tripAvailabilty.ava_trip_type != view):
+                    continue
+                canceled = False
+                # Check if the trip was canceld
+                noneAvailableDateQuery = TripAvailabilty.objects.filter(ava_no_trip_day__year  = dateInCalendar.year,
+                                                                        ava_no_trip_day__month = dateInCalendar.month,
+                                                                        ava_no_trip_day__day   = dateInCalendar.day,
+                                                                        ava_no_trip_day__hour  = tripAvailabilty.ava_time.hour
+                                                                        )
+                for noneAvailableDate in noneAvailableDateQuery:
+                    #print(noneAvailableDate.ava_no_trip_day.strftime("%Y-%M-%D-%H"))
+                    if noneAvailableDate.ava_trip_type == 'A' or noneAvailableDate.ava_trip_type == tripAvailabilty.ava_trip_type:
+                        #print("TRUE")
+                        # Break from nearset for
+                        canceled = True
+                        break
+                # As it was canceled move to the next item in the lisy
+                if (canceled):
+                    continue
+                    
+                # Check if their is already a different trip on this day, we don't want two trips on the same day
+                tripQuery = Trip.objects.filter(trip_date__year  = dateInCalendar.year,
+                                                trip_date__month = dateInCalendar.month,
+                                                trip_date__day   = dateInCalendar.day,
+                                                trip_time__hour  = tripAvailabilty.ava_time.hour,
+                                                
+                                                )
+              
+                # We found a trip let's check if it is a different one.
+                for trip in tripQuery:
+                    if (trip.trip_type != view):
+                        canceled = True
+                        break
+                if (canceled):
+                    continue
+                    
+                bg_color = 'bg-success'    
+                #attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small "+ bg_color + " text-white"
+                self.attr = True
+                self.id   = dateInCalendar.strftime('%d_%m_%Y')
+                self.id   += "-"+ tripAvailabilty.ava_time.strftime('%H_%M')
+                #text  = tripAvailabilty.ava_time.strftime('%H:%M') + '  ' +   TRIP_TYPE_HEB[tripAvailabilty.ava_trip_type]
+                text  = tripAvailabilty.ava_time.strftime('%H:%M') 
+                link  = 'tour:booking'
+                self.events.append(EventAttr(attr=self.attr, text=text, link=link, hour=int(tripAvailabilty.ava_time.strftime('%H')), 
+                                             trip_type=view,  trip_id= 1))
+                
+            
+                
+                
+            self.year  = dateInCalendar.year
+            self.month = dateInCalendar.month
+            self.day   = dateInCalendar.day
+
+
+
     
     def __str__(self):
         return self.first_name

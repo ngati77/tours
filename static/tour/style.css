@@ -4,11 +4,17 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
     display: block;
 }
+
+* {box-sizing: border-box;}
+ul {list-style-type: none;}
+
+
 html, body {
     height: 100%;
     width: 100%;
     /*font-family: 'Poppins', sans-serif;*/
     font-family: 'Heebo', sans-serif;
+    /*font-family: Verdana, sans-serif*/
     color: #222;  
     background-color: white;  
 }
@@ -31,6 +37,8 @@ html, body {
     height: 30%;
     
 }
+
+
 
 .navbar-first-line{
     position:absolute;
@@ -86,7 +94,12 @@ html, body {
     margin-right:1em;
 }
 
-
+.image_in_site {
+    width:80%;
+    border-radius:10%;
+    background-color:white;
+    
+}
 .carousel-caption h4{
     position: absolute;
     left: 100px;
@@ -107,15 +120,14 @@ html, body {
 }
 
 .jumbotron {
-    padding: 2rem;
     border-radius: 2;
     background-color: white;
-    margin-right: 2em;
     margin-top: 1em;
 }    
 
 .runner {
     background-color:#f1f1f1;
+    margin-top:30px;
 }
 
 .btn-tour {

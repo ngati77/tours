@@ -1,0 +1,201 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+{% block head %}
+
+  <!-- CSS for each example: -->
+  <link rel="stylesheet" type="text/css" href="{% static 'tour/book-tour.css' %}" data-rel-css="" />
+{% endblock %}   
+	
+
+{% block content %}
+
+   
+<div class="container-fluid">
+    <div class="row d-sm-flex p-1 bg-light text-dark d-flex justify-content-center text-right">
+        <div class="col-sm-7 col-md-6 col-lg-5 form">
+            <h3><font color="blue"> טופס הרשמה לסיור </font></h3>
+            <h4> סוג הסיור: {{title}}</h4>
+            <p> מחיר למבוגר: {{price}} פאונד</p>
+             {% if print_child %}
+              <p>מחיר לילד בגיל 3-12: {{priceChild}} פאונד</p>
+              {% else %}
+              <p>ילדים עד גיל 12 חינם</p>
+              {% endif %}
+              </p>
+         
+            
+ <!--           
+            <h1>CSS Calendar</h1>
+-->
+<a name="calendar"></a>
+<p><font color="blue"><strong>בחר/י את היום המתאים בלוח השנה </strong></font> </p>
+<div class="month">      
+  <ul>
+    <li><a class="prev" href="{% url  'tour:book-tour'  newCalendar.nextMonthYear  newCalendar.nextMonth newCalendar.view %}#calendar">&#10095;</a></li>
+    <li><a class="next" href="{% url  'tour:book-tour'  newCalendar.prevMonthYear  newCalendar.prevMonth newCalendar.view %}#calendar">&#10094;</a></li>
+    <li>
+      {{ newCalendar.monthStr }}<br>
+      <span style="font-size:18px"> {{ newCalendar.yearStr }}</span>
+    </li>
+  </ul>
+</div>
+
+<ul class="weekdays">
+  <li>א</li>
+  <li>ב</li>
+  <li>ג</li>
+  <li>ד</li>
+  <li>ה</li>
+  <li>ו</li>
+  <li>ש</li>
+</ul>
+
+<ul class="days">  
+ {% for day in newCalendar.dayInCalendar %}
+     {% if day.attr %}
+      <li><a class="active" id={{day.id}} onclick="return a1_onclick('{{day.id}}')" > {{ day.dayNumStr }}</a></li>
+      {% else %}
+      <li> {{ day.dayNumStr }}</li>
+      {% endif %} 
+    {% endfor %}
+ 
+</ul>
+
+    <p class="small"><strong>* מקסימום 10 אנשים בסיור </strong> </p>
+    <p class="small "><strong>* מינימום 2 אנשים בסיור </strong></p>
+   <p id="date"> תאריך:   </p>
+   <p id="time"> שעה:     </p>          
+            <form action="{% url 'tour:book-tour' 1 1 'C' %}" method="post" >
+                    {% csrf_token %}
+                     
+                    <table >
+                    {{ form.as_p }}
+                    </table>
+                                   
+            <p>אנו מבקשים תשלום מקדמה על מנת להבטיח את מקומכם בסיור</p>
+            <p>התשלום הוא מאובטח, פרטי כרטיס האשראי אינם נשמרים במערכת</p>
+            <p>התשלום מבוצע באמצעות  stripe</p>
+            <p>שאר הסכום יגבה בסיור</p>
+            <p>במקרה של ביטול בהודעה מראש של 24 שעות לפני המועד, כספכם יוחזר במלואו</p>
+            <hr>
+            <p><b>תשלום:</b></p>
+                      
+            <ul class="sum">
+              <li></li>
+              <li>מספר</li>
+              <li>עלות</li>
+              <li>סה"כ</li>
+             </ul>
+              <ul class="sum">
+              <li>מבגרים</li>
+              <li id="num_adults"></li>
+              <li id="price_adults"></li>
+              <li id="total_adults"></li>
+             </ul>
+             <ul class="sum">
+              <li>ילדים</li>
+              <li id="num_child"></li>
+              <li id="price_child"></li>
+              <li id="total_child"></li>
+             </ul>
+             <ul class="sum sumsum">
+              <li>סה"כ</li>
+              <li id="total_num"></li>
+              <li></li>
+              <li id="total_amount"></li>
+             </ul>
+             <ul class="sum sumsum">
+              <li>מקדמה</li>
+              <li></li>
+              <li></li>
+              <li id="deposit"></li>
+             </ul>
+             <ul class="sum sumsum">
+             <li>יתרה</li>
+              <li>לתשלום</li>
+              <li>ביום הטיול</li>
+              <li id="left_over"></li>
+             </ul>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            <p><a target="_blank" href="https://www.globes.co.il/portal/instrument.aspx?instrumentid=10436">גלובס שער המרה פאונד שקל</a></p>
+              <button class="btn btn-runner" id="pay_button">המשך לתשלום</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+    
+
+         <script>
+        
+        
+    	document.getElementById("id_number_adults").onchange = function() {myFunction()};
+    	document.getElementById("id_number_child").onchange = function() {myFunction()};
+
+        function myFunction() {
+            var adults_num = document.getElementById("id_number_adults").value;
+            var childs_num = document.getElementById("id_number_child").value;
+            var trip_type = document.getElementById("id_trip_type").value;
+            
+            var sum = document.getElementById("id_paymentSum");
+            var pre = document.getElementById("id_deposit").value;
+            var priceAdult = document.getElementById("id_price").value;
+            var priceChild = document.getElementById("id_priceChild").value;
+             
+            sum.value = (adults_num * priceAdult) + (childs_num * priceChild); 
+             
+            document.getElementById("num_adults").innerHTML    = adults_num;
+            document.getElementById("price_adults").innerHTML  = priceAdult;
+            document.getElementById("total_adults").innerHTML  = adults_num * priceAdult;
+            document.getElementById("num_child").innerHTML     = childs_num;
+            document.getElementById("price_child").innerHTML   = priceChild;
+            document.getElementById("total_child").innerHTML   = childs_num * priceChild;
+            document.getElementById("total_num").innerHTML     = (childs_num*1  + adults_num*1);
+            document.getElementById("total_amount").innerHTML  = sum.value;
+            document.getElementById("deposit").innerHTML       = pre*1;
+            document.getElementById("left_over").innerHTML     =(sum.value - pre);
+             
+             
+             
+           
+        }
+        
+        //This function change the calendar color and update the time and date fields 
+        function a1_onclick(id) {
+            var all = document.querySelectorAll(".active");
+            for(var i=0;i<all.length;i++){
+                all[i].style.backgroundColor = "#eee";
+                all[i].style.color= "#124789";
+                
+            }
+            document.getElementById(id).style.backgroundColor = "#124789"; 
+            document.getElementById(id).style.color= "white";  
+            res = id.split("-");
+            
+            document.getElementById("date").innerHTML = "תאריך: " + res[0].replace(/_/g,".");
+            document.getElementById("time").innerHTML = "שעה: " + res[1].replace(/_/g,":");
+            
+            
+            var date = res[0].split("_");
+            document.getElementById("id_trip_date").value = date[2] + "-" + date[1] + "-" + date[0];
+            document.getElementById("id_trip_time").value = res[1].replace(/_/g,":");
+        }
+    </script>
+    
+
+
+{% endblock %}
+
+

@@ -9,7 +9,7 @@ from django.views import generic
 
 from django.utils import timezone
 
-from .models import Trip, Clients, NewCalendar, Review, Gallery
+from .models import Trip, Clients, NewCalendar, Review, Gallery, Calendar
 from .models import OurTours, Guide, Transaction, Contact
 
 from .tour_emails import tour_emails 
@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .forms import Booking1Form, ContactForm, ReviewForm, ReportForm
+from .forms import Booking1Form, ContactForm, ReviewForm, ReportForm, PaymentForm
 
 from django.contrib.auth.decorators import login_required
 
@@ -67,7 +67,7 @@ def home(request):
     meta_key_heb = "סיור קיימברידג' קימברידג' קמברידג' אנגליה מחוץ ללונדון  "
     meta_key_en  = "Cambridge hebrew Guided tours"
     meta_key     = meta_key_heb + meta_key_en
-    return render(request, 'tour/index.html', {'page_title':"קיימברידג' - סיור בעברית מחוץ ללונדון", 
+    return render(request, 'tour/index.html', {'page_title':"Cambridge in hebrew", 
                                                'meta_des':meta_des,
                                                'meta_key':meta_key,
                                                'ourTours':OurToursQuery,
@@ -79,10 +79,10 @@ def team(request):
     """
     teamQuery = Guide.objects.filter(confirm=True)
     logger.info('team page')
-    meta_des_heb = "סיורים בקיימברידג' אנגליה - הצוות שלנו  "
+    meta_des_heb = "טיול בקיימברידג' אנגליה - הצוות שלנו  "
     meta_des_en  = "Cambridge in hebrew - The team "
     meta_des = meta_des_heb + meta_des_en
-    meta_key_heb = "סיור קיימברידג' קימברידג' קמברידג' הצוות  "
+    meta_key_heb = "טיול קיימברידג' קימברידג' קמברידג' הצוות  "
     meta_key_en  = "Cambridge hebrew Guided tours - Team"
     meta_key     = meta_key_heb + meta_key_en
     return render(request, 'tour/team.html', {'page_title':'מי אנחנו',
@@ -102,33 +102,12 @@ def gallery(request):
     meta_key_heb = "תמונות קיימברידג' אנגליה  "
     meta_key_en  = "Beautiful Cambridge pictures"
     meta_key     = meta_key_heb + meta_key_en
-    return render(request, 'tour/gallery.html', {'page_title':'גלריית תמונות',
+    return render(request, 'tour/gallery.html', {'page_title':'Tour Gallery',
                                                  'meta_des':meta_des,
                                                  'meta_key':meta_key,
                                                  'images':galleryQuery})
 
-def reviewes_old(request):
-    """
-    Show home reviewes
-    """
-    reviewList = []
-    review3List = []
-    reviewesQuery = Review.objects.filter(confirm=True)
-    for i, reviewEntry in enumerate(reviewesQuery):
-        review3List.append(reviewEntry)
-        
-       
-        if i%3==2:
-            if i==2:
-                first3 = review3List
-            else:
-                reviewList.append(review3List)
-            review3List = []
-    reviewList.append(review3List)    
-    print (len(first3))    
-    print (len(reviewList)) 
-    return render(request, 'tour/reviewes.html', {'page_title':'reviewes', 
-                                                  'first_review':first3, 'reviewes':reviewList})
+
 def reviewes(request):
     """
     Show home reviewes
@@ -169,9 +148,37 @@ def find_your_day(request, view):
     """
     today = datetime.date.today()
     #return calendar(request, lToday.year, lToday.month)
-    return new_calendar_view(request=request,  pYear=today.year, pMonth=today.month, view=view)
+    return bookTour(request=request,  pYear=today.year, pMonth=today.month, tripType=view)
 
   
+
+#def old_calendar_view(request, pYear, pMonth, view):
+#    """
+#    Show calendar of events this month
+#    """
+#   
+#    #return calendar(request, lToday.year, lToday.month)
+#    newCalendar= NewCalendar(request=request, year=pYear,  month=pMonth , view=view)
+#    if view == 'A':
+#        OurTour = ''
+#    else:
+#        OurToursQuery = OurTours.objects.filter(trip_type=view)
+#        if len(OurToursQuery)!=1:
+#            print('Raise exception')
+#        OurTour = OurToursQuery[0]
+##    print(newCalendar)
+#    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
+#    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
+#    meta_des = meta_des_heb + meta_des_en
+#    meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
+#    meta_key_en  = " cambridge college old market"
+#    meta_key     = meta_key_heb + meta_key_en
+#    print_child = (OurTour.priceChild) > 0
+#    return render(request, 'tour/calendar.html', {'page_title':OurTour.title,
+#                                                   'meta_des':meta_des,
+#                                                   'meta_key':meta_key,
+#                                                   'print_child':print_child,
+#                                                  'newCalendar':newCalendar,'ourTour':OurTour})
 
 def new_calendar_view(request, pYear, pMonth, view):
     """
@@ -179,7 +186,6 @@ def new_calendar_view(request, pYear, pMonth, view):
     """
    
     #return calendar(request, lToday.year, lToday.month)
-    newCalendar= NewCalendar(request=request, year=pYear,  month=pMonth , view=view)
     if view == 'A':
         OurTour = ''
     else:
@@ -194,16 +200,179 @@ def new_calendar_view(request, pYear, pMonth, view):
     meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
     meta_key_en  = " cambridge college old market"
     meta_key     = meta_key_heb + meta_key_en
-    return render(request, 'tour/calendar.html', {'page_title':OurTour.title,
+    print_child = (OurTour.priceChild) > 0
+    return render(request, 'tour/tour-details.html', {'page_title':OurTour.title,
                                                    'meta_des':meta_des,
                                                    'meta_key':meta_key,
-                                                  'newCalendar':newCalendar,'ourTour':OurTour})
-
+                                                   'print_child':print_child,
+                                                   'ourTour':OurTour})
+    
+def payment(request ):
+    form = PaymentForm(request.POST)
+    if request.method == 'POST':
+        title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum = form.get_data() 
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        deposit = int(deposit)
+        try:
+            token  = request.POST['stripeToken']
+            charge = stripe.Charge.create(
+                amount=deposit*100,
+                currency='gbp',
+                description='Advance payment',
+                source=token,
+                receipt_email = email
+            )
+        except stripe.error.CardError as e:
+            messages.info(request, "Your card has been declined.")
+            return render(request, 'tour/failure.html', {'title':'failure', 'page_title':'failure'})
+        
+        # We made a payment, greaty lat's create trip and client
+        date = [int(x) for x in trip_date.split("-")]
+        dataClass = datetime.date(date[0],date[1],date[2])
+        tripQuerySet = Trip.get_event(dataClass)
+        # If need a new trip
+        if (len(tripQuerySet)==0):
+            trip = Trip(trip_text='', trip_date=dataClass, trip_time=trip_time ,trip_type=trip_type)
+            trip.save()
+        else:
+            trip = tripQuerySet[0]
+        print(trip)    
+        # Create new client           
+        client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
+                         number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum))
+#            
+        client.save()
+        transaction = Transaction(client=client,
+                            token=token, 
+                            charge_id = charge.id,
+                            amount=client.pre_paid,
+                            success=True)
+            # save the transcation (otherwise doesn't exist)
+        transaction.save()
+        
+        msg_plain= 'DUMMY ONE'
+        children = (client.number_of_children > 0)
+        more_to_pay=(client.total_payment-client.pre_paid)
+        try:
+            msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
+                                                                      'trip_time':trip.trip_time, 
+                                                                      'id': transaction.id, 
+                                                                      'trip_type':title, 
+                                                                      'client':client, 
+                                                                      'print_children':children, 
+                                                                      'more_to_pay':more_to_pay})
+            #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
+            emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+            #cc =['yael.gati@cambridgeinhebrew.com']
+            emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[email], title=emailTitle, cc=settings.CC_EMAIL)
+        except:
+            print('Got an error... sending email...')
+        #print(f'Debug {emailSuccess}')
+        meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
+        meta_des_en  = ""
+        meta_des = meta_des_heb + meta_des_en
+        meta_key_heb = "הרשמה הצלחה "
+        meta_key_en  = " "
+        meta_key     = meta_key_heb + meta_key_en
+        print(trip)
+        return render(request, 'tour/success.html', {'title':'תשלום הצליח', 'page_title':'ההרשמה הסתיימה בהצלחה', 
+                                                          'meta_des':meta_des,
+                                                          'meta_key':meta_key,
+                                                          'trip_date':trip.trip_date.strftime("%d-%m-%Y"),
+                                                          'trip_time':trip.trip_time, 
+                                                          'deposit':deposit, 
+                                                          'more_to_pay':more_to_pay, 
+                                                          'id': transaction.id, 
+                                                          'trip_type':title, 
+                                                          'first':first_name, 
+                                                          'last': last_name })
+    
+#    meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
+#    meta_des_en  = "cambridge in hebrew payment"
+#    meta_des = meta_des_heb + meta_des_en
+#    meta_key_heb = "תשלום "
+#    meta_key_en  = "payment "
+#    meta_key     = meta_key_heb + meta_key_en
+    return render(request, 'tour/failure.html', {'title':'failure payment end', 'page_title':'failure'})
     
 
-def booking(request, pYear, pMonth, pDay, pHour, tripType):
-
+def tour_details(request, tripType='Ç'):
+    OurToursQuery = OurTours.objects.filter(trip_type=tripType)
+    if len(OurToursQuery)!=1:
+        print('Raise exception')
+    OurTour = OurToursQuery[0]
+#    print(newCalendar)
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
+    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
+    meta_key_en  = " cambridge college old market"
+    meta_key     = meta_key_heb + meta_key_en
+    print_child = (OurTour.priceChild) > 0
+    return render(request, 'tour/tour_details.html', {'page_title':OurTour.title,
+                                                   'meta_des':meta_des,
+                                                   'meta_key':meta_key,
+                                                   'print_child':print_child,
+                                                   'ourTour':OurTour})
     
+def bookTourToday(request, tripType ):
+     today = datetime.date.today()
+     return bookTour(request,today.year, today.month, tripType )
+            
+def bookTour(request,pYear, pMonth, tripType ):
+    if request.method == 'POST':
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        # Create a form instance and populate it with data from the request (binding):
+        form = Booking1Form(request.POST)
+        # Check if the form is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            #book_inst.due_back = form.cleaned_data['renewal_date']
+           # Get all infortamtion from form
+            title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum = form.get_data()
+            #trip_date = datetime.datetime(pYear, pMonth, pDay, pHour)
+            # Check iftrip exists
+  
+            
+            date = [int(x) for x in trip_date.split("-")]
+            dataClass = datetime.date(date[0],date[1],date[2])
+            tripQuerySet = Trip.get_event(dataClass)
+            # Check if a trip already exist, if no let's make sure we have more than one person
+            if (len(tripQuerySet)==0 and (number_adults + number_child)==1):
+                print("Sorry we need more people TODO")
+                #trip.save()
+#            return payment(request, trip=trip, client=client )
+            meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
+            meta_des_en  = "cambridge in hebrew payment"
+            meta_des = meta_des_heb + meta_des_en
+            meta_key_heb = "תשלום "
+            meta_key_en  = "payment "
+            meta_key     = meta_key_heb + meta_key_en
+
+            form = PaymentForm(initial={       'title':title,
+                                               'trip_date':trip_date,
+                                               'trip_time':trip_time,
+                                               'trip_type':trip_type,
+                                               'first_name':first_name,
+                                               'last_name':last_name,
+                                               'phone':phone,
+                                               'email':email,
+                                               'number_adults':number_adults,
+                                               'number_child':number_child,
+                                               'deposit':deposit,
+                                               'paymentSum':paymentSum})
+
+            return render(request, 'tour/payment.html', {'title':title, 'page_title' : 'תשלום עבור סיור',
+                                                  'meta_des':meta_des,
+                                                  'meta_key':meta_key,
+                                                  'form':form,
+                                                 'tripdate': trip_date, 
+                                                 'triptime': trip_time, 
+                                                 'price':paymentSum, 
+                                                 'deposit':deposit, 
+                                                 })
+           
+    newCalendar= Calendar(request=request, year=pYear,  month=pMonth , view=tripType)
     # If this is a POST request then process the Form data
     #TyprDict = {'F': 'הרשמה לסיור משפחות', 'C': 'הרשמה לסיור קלאסי', 'B': 'הרשמה לאוטובוס'}
     # Britng the trip name in hebrew from db
@@ -213,88 +382,10 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
     price =  TripTypeQuery[0].price
     priceChild =  TripTypeQuery[0].priceChild
     print_child = (TripTypeQuery[0].priceChild) > 0
-    #title = TyprDict[tripType]
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-   
-    if request.method == 'POST':
-        # Create a form instance and populate it with data from the request (binding):
-        form = Booking1Form(request.POST)
-        # Check if the form is valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
-            #book_inst.due_back = form.cleaned_data['renewal_date']
-           # Get all infortamtion from form
-            trip_date, trip_time, first_name, last_name, phone, email, number_audlts, number_child, deposit, paymentSum = form.get_data()
-            
-            #trip_date = datetime.datetime(pYear, pMonth, pDay, pHour)
-            # Check iftrip exists
-           
-            
-            try:
-                token = request.POST['stripeToken']
-                charge = stripe.Charge.create(
-                    amount=deposit*100,
-                    currency='gbp',
-                    description='Advance payment',
-                    source=token,
-                    receipt_email = email,
-                )
-            except stripe.error.CardError as e:
-                messages.info(request, "Your card has been declined.")
-                return render(request, 'tour/failure.html', {'title':'failure', 'page_title':'failure'})
-            
-            # Create ne trip
-            tripQuerySet = Trip.get_event(trip_date)
-            if (len(tripQuerySet)==0):
-                trip = Trip(trip_text='', trip_date=trip_date, trip_time=trip_time ,trip_type=tripType)
-                trip.save()
-            else:
-                trip = tripQuerySet[0]
-            
-            # Create new client           
-            client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=number_audlts, number_of_children=number_child, pre_paid = deposit, total_payment = paymentSum)
-            client.save()
-            # create a transaction
-            transaction = Transaction(client=client,
-                            token=token, 
-                            charge_id = charge.id,
-                            amount=deposit,
-                            success=True)
-            # save the transcation (otherwise doesn't exist)
-            transaction.save()
-            
-            # redirect to a new URL:
-            #print("Added new client")
-            #return HttpResponseRedirect(reverse('all-borrowed') )
-            #sg_plain = render_to_string('templates/email.txt', {'some_params': some_params})
-            msg_plain= 'DUMMY ONE'
-            children = (client.number_of_children > 0)
-            more_to_pay=(paymentSum-deposit)
-            try:
-                msg_html = render_to_string('emails/email_success.html', {'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'id': transaction.id, 'trip_type':title, 'client':client, 'print_children':children, 'more_to_pay':more_to_pay})
-                #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
-                emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-                #cc =['yael.gati@cambridgeinhebrew.com']
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[email], title=emailTitle, cc=settings.CC_EMAIL)
-            except:
-                print('Got an error...')
-            #print(f'Debug {emailSuccess}')
-            meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
-            meta_des_en  = ""
-            meta_des = meta_des_heb + meta_des_en
-            meta_key_heb = "הרשמה הצלחה "
-            meta_key_en  = " "
-            meta_key     = meta_key_heb + meta_key_en
-            return render(request, 'tour/success.html', {'title':'success', 'page_title':'ההרשמה הסתיימה בהצלחה', 
-                                                          'meta_des':meta_des,
-                                                          'meta_key':meta_key,
-                                                         'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'deposit':deposit, 'more_to_pay':more_to_pay, 'id': transaction.id, 'trip_type':title, 'first':first_name, 'last': last_name })
-           
-
     # If this is a GET (or any other method) create the default form.
    # TODO, Double check date as avialable one, or already has a trip on that day. 
-    proposed_date = datetime.datetime(pYear, pMonth, pDay, pHour)
-    form = Booking1Form(initial={'trip_date': proposed_date.date, 'trip_time':  proposed_date.time, 'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+    proposed_date = datetime.datetime(pYear, pMonth, 1, 11)
+    form = Booking1Form(initial={'title':title, 'trip_date': proposed_date.date, 'trip_time':  proposed_date.time, 'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
         
     tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
     triptime = proposed_date.strftime("%H:%M") 
@@ -306,7 +397,7 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
     meta_key_heb = "הזמנת סיור עברית קיימברידג' "
     meta_key_en  = "book tour cambridge hebrew "
     meta_key     = meta_key_heb + meta_key_en
-    return render(request, 'tour/booking.html', {'title':title, 'page_title' : pageTitle,
+    return render(request, 'tour/book-tour.html', {'title':title, 'page_title' : pageTitle,
                                                   'meta_des':meta_des,
                                                   'meta_key':meta_key,
                                                  'form': form, 
@@ -315,8 +406,124 @@ def booking(request, pYear, pMonth, pDay, pHour, tripType):
                                                  'price':price, 
                                                  'priceChild':priceChild, 
                                                  'deposit':deposit, 
-                                                 'print_child': print_child})
+                                                 'print_child': print_child,
+                                                 'newCalendar':newCalendar})
 
+#def booking(request, pYear, pMonth, pDay, pHour, tripType):
+#
+#    
+#    # If this is a POST request then process the Form data
+#    #TyprDict = {'F': 'הרשמה לסיור משפחות', 'C': 'הרשמה לסיור קלאסי', 'B': 'הרשמה לאוטובוס'}
+#    # Britng the trip name in hebrew from db
+#    TripTypeQuery = OurTours.objects.filter(trip_type=tripType)
+#    title   =  TripTypeQuery[0].title
+#    deposit =  TripTypeQuery[0].deposit
+#    price =  TripTypeQuery[0].price
+#    priceChild =  TripTypeQuery[0].priceChild
+#    print_child = (TripTypeQuery[0].priceChild) > 0
+#    #title = TyprDict[tripType]
+#    stripe.api_key = settings.STRIPE_SECRET_KEY
+#   
+#    if request.method == 'POST':
+#        # Create a form instance and populate it with data from the request (binding):
+#        form = Booking1Form(request.POST)
+#        # Check if the form is valid:
+#        if form.is_valid():
+#            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+#            #book_inst.due_back = form.cleaned_data['renewal_date']
+#           # Get all infortamtion from form
+#            trip_date, trip_time, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum = form.get_data()
+#            
+#            #trip_date = datetime.datetime(pYear, pMonth, pDay, pHour)
+#            # Check iftrip exists
+#           
+#            
+#            try:
+#                token = request.POST['stripeToken']
+#                charge = stripe.Charge.create(
+#                    amount=deposit*100,
+#                    currency='gbp',
+#                    description='Advance payment',
+#                    source=token,
+#                    receipt_email = email,
+#                )
+#            except stripe.error.CardError as e:
+#                messages.info(request, "Your card has been declined.")
+#                return render(request, 'tour/failure.html', {'title':'failure', 'page_title':'failure'})
+#            
+#            # Create ne trip
+#            tripQuerySet = Trip.get_event(trip_date)
+#            if (len(tripQuerySet)==0):
+#                trip = Trip(trip_text='', trip_date=trip_date, trip_time=trip_time ,trip_type=tripType)
+#                trip.save()
+#            else:
+#                trip = tripQuerySet[0]
+#            
+#            # Create new client           
+#            client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=number_adults, number_of_children=number_child, pre_paid = deposit, total_payment = paymentSum)
+#            client.save()
+#            # create a transaction
+#            transaction = Transaction(client=client,
+#                            token=token, 
+#                            charge_id = charge.id,
+#                            amount=deposit,
+#                            success=True)
+#            # save the transcation (otherwise doesn't exist)
+#            transaction.save()
+#            
+#            # redirect to a new URL:
+#            #print("Added new client")
+#            #return HttpResponseRedirect(reverse('all-borrowed') )
+#            #sg_plain = render_to_string('templates/email.txt', {'some_params': some_params})
+#            msg_plain= 'DUMMY ONE'
+#            children = (client.number_of_children > 0)
+#            more_to_pay=(paymentSum-deposit)
+#            try:
+#                msg_html = render_to_string('emails/email_success.html', {'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'id': transaction.id, 'trip_type':title, 'client':client, 'print_children':children, 'more_to_pay':more_to_pay})
+#                #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
+#                emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+#                #cc =['yael.gati@cambridgeinhebrew.com']
+#                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[email], title=emailTitle, cc=settings.CC_EMAIL)
+#            except:
+#                print('Got an error...')
+#            #print(f'Debug {emailSuccess}')
+#            meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
+#            meta_des_en  = ""
+#            meta_des = meta_des_heb + meta_des_en
+#            meta_key_heb = "הרשמה הצלחה "
+#            meta_key_en  = " "
+#            meta_key     = meta_key_heb + meta_key_en
+#            return render(request, 'tour/success.html', {'title':'success', 'page_title':'ההרשמה הסתיימה בהצלחה', 
+#                                                          'meta_des':meta_des,
+#                                                          'meta_key':meta_key,
+#                                                         'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'deposit':deposit, 'more_to_pay':more_to_pay, 'id': transaction.id, 'trip_type':title, 'first':first_name, 'last': last_name })
+#           
+#
+#    # If this is a GET (or any other method) create the default form.
+#   # TODO, Double check date as avialable one, or already has a trip on that day. 
+#    proposed_date = datetime.datetime(pYear, pMonth, pDay, pHour)
+#    form = Booking1Form(initial={'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+#        
+#    tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
+#    triptime = proposed_date.strftime("%H:%M") 
+#    
+#    pageTitle=  'הזמנת ' +  title 
+#    meta_des_heb = "הזמנת סיור בקיימברידג בעברית  "
+#    meta_des_en  = "book your tour in Hebrew in Cambridge UK"
+#    meta_des = meta_des_heb + meta_des_en
+#    meta_key_heb = "הזמנת סיור עברית קיימברידג' "
+#    meta_key_en  = "book tour cambridge hebrew "
+#    meta_key     = meta_key_heb + meta_key_en
+#    return render(request, 'tour/booking.html', {'title':title, 'page_title' : pageTitle,
+#                                                  'meta_des':meta_des,
+#                                                  'meta_key':meta_key,
+#                                                 'form': form, 
+#                                                 'tripdate': tripdate, 
+#                                                 'triptime': triptime, 
+#                                                 'price':price, 
+#                                                 'priceChild':priceChild, 
+#                                                 'deposit':deposit, 
+#                                                 'print_child': print_child})
 
 
 
@@ -439,9 +646,6 @@ def failure (request):
                                                 'meta_des':meta_des,
                                                 'meta_key':meta_key,
                                                 'page_title':'ההרשמה נכשלה'})
-
-
-
 
 
 class GuideView(generic.ListView):
