@@ -1,66 +1,103 @@
 {% extends 'tour/base.html' %}
 {% load static %}
+
+{% block head %}
+
+  <!-- CSS for each example: -->
+  <link rel="stylesheet" type="text/css" href="{% static 'tour/tour_details.css' %}" data-rel-css="" />
+{% endblock %}
+
+
 {% block content %}
 
 <div class="container-fluid">
-<div class="row d-flex justify-content-center">
-    <div class="col-sm-12 col-md-8 col-lg-6 ">
-        <div class="calendar_col">
-            <h4 class="card-title">{{ourTour.title}}</h4>
-           
-            <img class="card-img-top" src="{{ourTour.img.url}}">
-            <div class="card-body">
-                <p class="card-text"><b>{{ourTour.headerShort1}}</b></p>
-                <p class="card-text">{{ourTour.descriptionShort1}}</p>
-                <p class="card-text">{{ourTour.description1}}</p>
-                <p class="card-text">{{ourTour.description2}}</p>
-                <p class="card-text">{{ourTour.description3}}</p>
-                <p><u>למי הסיור מתאים?</u></p>
-                <p>{{ourTour.whoCanDoIt}}</p>
-                
-                <p><u>משך הסיור</u></p>
-                <p>{{ourTour.duration}}</p>
-                <p><u> עלות הסיור </u></p>
-                <p>{{ourTour.price}} פאונד למבוגר </p>
-                {% if print_child %}
-                <p>{{ourTour.priceChild}} פאונד ילדים בגיל 3-12 </p>
-                {% else %}
-                <p>ילדים עד גיל 12 חינם</p>
-                {% endif %}
-               
-                
-            </div>
-                           
-               <div class="meeting_point">  
-                   <p><u>נקודת המפגש</u></p>
-                   <p>מוזיאון הפיצווילאם בכניסה הראשית,</p>
-                   <p>Fitzwilliam Museum</p>
-                   <p>כתובת : Trumpington St, Cambridge CB2 1RB</p>
-                   <a target="_blank" href="https://www.google.co.uk/maps/place/The+Fitzwilliam+Museum/@52.1998685,0.1199856,15z/data=!4m5!3m4!1s0x0:0xb0140168bdc0b72c!8m2!3d52.1998685!4d0.1199856">נקודת מפגש - גוגל</a>
-               </div>  
-               <div class="meeting_point">
-                   <p><u>הוראות הגעה</u></p>
-                    <p>הוראות הגעה מלונדון רכבת ישירה מתחנת Kings Cross יוצאת בשעה 9:42,</p>
-                    <p>משך הנסיעה 50 דקות.</p>
-                    <p>מונית מתחנת הרכבת בקיימברידג׳ לנקודת המפגש משך נסיעה של 7 דקות,</p>
-                    <p>עלות לזוג 5-6 פאונד, מ3 ומעלה אנשים יגבו מכם 3 פאונד נוספים.</p>
-                    <p>הוראות הגעה ישלחו גם במייל בתום ההזמנה </p>
-                    <hr>
-                    <p>במקרה ואתם מגיעים ברכב מומלץ להחנות במלון Hilton Double tree הקרוב לנקודת המפגש</p>
-               
-               
-                </div> 
-                
-                 <div class="card-body">
-                    <a href="{% url  'tour:book_tour_today' ourTour.trip_type %}" class="btn btn-tour"> להרשמה</a>
-                        </div>
-            
+    <div class="row d-flex justify-content-center">
+        <div class="row" text-align="right">
+             <h3 font-color="blue" class="card-title" >{{ourTour.title}}</font></h3>
         </div>
-   
+        <div class="row">
+            <div class="col-sm-8 col-md-5 col-lg-5 order-0 order-md-1">
+        <!--
+            <div class="calendar_col">
+            -->
+               
+               
+                <img class="card-img-top" src="{{ourTour.img.url}}">
+            </div>
+            <div class="col-sm-12 col-md-5 col-lg-5 d-flex order-1 order-md-0">
+                <div class="card-body">
+                    <p class="card-text"><b>{{ourTour.headerShort1}}</b></p>
+                    <p class="card-text">{{ourTour.descriptionShort1}}</p>
+                    <p class="card-text">{{ourTour.description1}}</p>
+                    <p class="card-text">{{ourTour.description2}}</p>
+                    <p class="card-text">{{ourTour.description3}}</p>
+                    <p><u>למי הסיור מתאים?</u></p>
+                    <p>{{ourTour.whoCanDoIt}}</p>
+                    
+                    <p><u>משך הסיור</u></p>
+                    <p>{{ourTour.duration}}</p>
+                    <div class="meeting_point">
+                        <p><u> עלות הסיור </u></p>
+                        <p>{{ourTour.price}} פאונד למבוגר </p>
+                        {% if print_child %}
+                        <p>{{ourTour.priceChild}} פאונד ילדים בגיל 3-12 </p>
+                        {% else %}
+                        <p>ילדים עד גיל 12 חינם</p>
+                        {% endif %}
+                    </div>
+                    <div class="meeting_point">  
+                       <p><u>נקודת המפגש</u></p>
+                       <p>מוזיאון הפיצווילאם בכניסה הראשית,</p>
+                       <p>Fitzwilliam Museum</p>
+                       <p>כתובת : Trumpington St, Cambridge CB2 1RB</p>
+                       <a target="_blank" href="https://www.google.co.uk/maps/place/The+Fitzwilliam+Museum/@52.1998685,0.1199856,15z/data=!4m5!3m4!1s0x0:0xb0140168bdc0b72c!8m2!3d52.1998685!4d0.1199856">לצפיה בנקודת המפגש במפת גוגל</a>
+                   </div>  
+                     
+                   <button class="collapsible"><u>לחצו להוראות הגעה מפורטות</u></button>
+                   <div class="content">
+                       <div class="meeting_point">
+                            <p>הוראות הגעה מלונדון רכבת ישירה מתחנת Kings Cross יוצאת בשעה 9:42,</p>
+                            <p>משך הנסיעה 50 דקות.</p>
+                            <p>מונית מתחנת הרכבת בקיימברידג׳ לנקודת המפגש משך נסיעה של 7 דקות,</p>
+                            <p>עלות לזוג 5-6 פאונד, מ3 ומעלה אנשים יגבו מכם 3 פאונד נוספים.</p>
+                            <p>הוראות הגעה ישלחו גם במייל בתום ההזמנה </p>
+                            <hr>
+                            <p>במקרה ואתם מגיעים ברכב מומלץ להחנות במלון Hilton Double tree הקרוב לנקודת המפגש</p>
+                       </div> 
+                    
+                   
+                    </div> 
+                     <div class="card-body">
+                    <a href="{% url  'tour:book_tour_today' ourTour.trip_type %}" class="btn btn-tour"> להרשמה</a>
+                </div>
+                </div><!--div class="card-body"-->
+                                   
+               
+                    
+            </div><!--col-sm-12 col-md-6 col-lg-6 order-sm-1 order-md-0--->
     </div>
-    
+   <!--
+    </div>
+    -->
+    </div>
 </div>
-</div>
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+} 
+</script>
 {% endblock %}
 
 

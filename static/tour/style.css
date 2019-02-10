@@ -41,7 +41,6 @@ html, body {
 
 
 .navbar-first-line{
-    position:absolute;
     height: 30%;
     width:   40%;
     transform: translateY(30%);
@@ -49,14 +48,14 @@ html, body {
     text-align:right;
     padding-right: 0.4em;
 }
-.navbar-second-line{
-    position:absolute;
-    height: 25%;
-    width:   100%;
-    right:-62.5%;
-    top: 55%;
+.navbar-en-line{
+    height: 30%;
+    width:   40%;
+    transform: translateY(30%);
+    font-size: 17px;
+    text-align:left;
+    padding-right: 0.4em;
 }
-
 .nav-link {
     font-size: 1.1em;
 }
@@ -125,9 +124,15 @@ html, body {
     margin-top: 1em;
 }    
 
+.main_text{
+     margin-top: .6em;
+     margin-right: .6em;
+
+}
 .runner {
     background-color:#f1f1f1;
     margin-top:30px;
+    margin-left:1em;
 }
 
 .btn-tour {
@@ -138,9 +143,8 @@ html, body {
     border: 2px solid #124789!important;
     color:     #124789;
     text-align: right;
-    width: 140px;
     margin-bottom: 0.2rem!important;
-  
+     margin-right: 0rem!important;
     margin-top: 0.2rem!important;
 }
 
@@ -163,7 +167,6 @@ html, body {
     border: 2px solid #124789!important;
     color:     #124789;
     text-align: right;
-    width: 190px;
     margin-bottom: 0.2rem!important;
     margin-right: 1rem!important;
     margin-top: 0.2rem!important;
@@ -176,7 +179,6 @@ html, body {
     border: 2px solid #124789!important;
     color:     #124789;
     text-align: right;
-    width: 190px;
     margin-bottom: 0.2rem!important;
     margin-right: 0.1rem!important;
     margin-top: 0.2rem!important;
@@ -334,10 +336,10 @@ hr.light{
 
 .tips-row {
   
-   margin-right: 0rem;
+   margin-right: 3rem;
    margin-left: 0rem;
    margin-top: 0rem;
-   margin-bottom: 0rem;
+   margin-bottom: 1rem;
    padding: 0rem;
    
 }
@@ -352,7 +354,8 @@ hr.short{
 
 .tips {
    
-   margin-right: 0rem;
+   margin-right: 2rem;
+   margin-bottom: .5rem;
    padding: 0rem;
    
 }
@@ -366,6 +369,8 @@ hr.short{
      text-align:right;
 
 }
+
+
 
 .tips p{
    font-size:14px;
@@ -387,15 +392,15 @@ hr.short{
     border-radius:100%;
     padding:.3em;
     left:45%;
-    top: 5%;
+    top: -8%;
     
 }
 
 .arrow1 {
-   margin-right: 110px;
+   margin-right: 1em;
 }
 .arrow2 {
-   margin-right: 65px;
+   margin-right: 1em;
 }
 .review {
    margin-top: 1rem;
@@ -411,10 +416,11 @@ hr.short{
 
 .meeting_point{
    text-align:right;
-   margin: 1rem;
+   margin-top: 1rem;
+   margin-bottom: 1rem;
    padding-right: 1rem;
    background-color: #f1f1f1; 
-   border-radius:10%;
+   border-radius:5%;
 
 }
 .text-center {
@@ -447,13 +453,10 @@ hr.light-100 {
 
 }
 
-    .navbar-brand  {
-    width: 250px;
-    }
     .navbar-brand img {
     width: 30%;
-    height: 30%;
-    
+    height: 50%;
+   
 }
     .jumbotron {
     margin-top: 1rem;
@@ -464,7 +467,9 @@ hr.light-100 {
     font-size:150%;
     font-weight: 300%;
 }
-    
+    .reg-btn{
+        font-size:80%
+    }
 }
   
 @media (max-width: 768px) {
@@ -479,6 +484,8 @@ hr.light-100 {
     width:100px;
 }
 */
+ .navbar-brand img {
+    width: 20%;
  .disapear_md {
      display: none;
      
@@ -511,10 +518,14 @@ hr.light-100 {
     padding: .2rem;
     
 } 
+.reg-btn{
+        font-size:50%
+    }
 /*.footer-centre li {
    font-size: 1em;
    padding-right: .5rem;
 }
+ 
 */
 }
 @media (max-width: 576px) {
@@ -563,7 +574,9 @@ hr.light-100 {
 .contact {
     margin-right:.1em;
 }
-
+.reg-btn{
+        font-size:100%
+    }
 }
 
 

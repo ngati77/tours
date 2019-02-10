@@ -67,7 +67,7 @@ def home(request):
     meta_key_heb = "סיור קיימברידג' קימברידג' קמברידג' אנגליה מחוץ ללונדון  "
     meta_key_en  = "Cambridge hebrew Guided tours"
     meta_key     = meta_key_heb + meta_key_en
-    return render(request, 'tour/index.html', {'page_title':"Cambridge in hebrew", 
+    return render(request, 'tour/index.html', {'page_title':"Cambridge In Hebrew טיול בקיימברידג", 
                                                'meta_des':meta_des,
                                                'meta_key':meta_key,
                                                'ourTours':OurToursQuery,
@@ -142,13 +142,13 @@ def ourTours(request):
     
     
     
-def find_your_day(request, view):
-    """
-    Show calendar of events this month
-    """
-    today = datetime.date.today()
-    #return calendar(request, lToday.year, lToday.month)
-    return bookTour(request=request,  pYear=today.year, pMonth=today.month, tripType=view)
+#def find_your_day(request, view):
+#    """
+#    Show calendar of events this month
+#    """
+#    today = datetime.date.today()
+#    #return calendar(request, lToday.year, lToday.month)
+#    return bookTour(request=request,  pYear=today.year, pMonth=today.month, tripType=view)
 
   
 
@@ -596,6 +596,7 @@ def GiveReview(request ):
             review.save()
             # Save contact here
             meta_des_en  = "write a review for Cambridge in hebrew"
+            meta_des_heb = "משוב טיול בקיימברידג"
             meta_des = meta_des_heb + meta_des_en
             meta_key_heb = "משוב קיימברידג' "
             meta_key_en  = "review Cambridge hebrew "

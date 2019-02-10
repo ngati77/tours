@@ -1,0 +1,30 @@
+* {box-sizing: border-box;}
+ul {list-style-type: none;}
+
+.collapsible {
+  color:     #124789;
+  background-color: Transparent;
+  border: 2px solid #124789!important;
+  text-align: right;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .collapsible:hover {
+  background-color: #124789;
+    border: 1px solid #124789;
+    color:     white;
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+
+ .card-img-top{
+    width:90%;
+    border-radius:8%;
+    text-align:right;
+}

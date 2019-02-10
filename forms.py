@@ -22,7 +22,7 @@ class Booking1Form(forms.Form):
     trip_type      = forms.CharField(widget = forms.HiddenInput())
     first_name     = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
     last_name      = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
-    phone          = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'טלפון לזמן הטיול'}))
+    phone          = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'מספר טלפון ביום הטיול'}))
     email          = forms.EmailField(label ='' ,widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
     number_adults  = forms.IntegerField(max_value = 10, min_value =0, label ='מספר מבוגרים' ) 
     number_child   = forms.IntegerField(max_value = 10, min_value =0, label ='מספר ילדים עד גיל 12')
