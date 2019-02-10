@@ -46,7 +46,7 @@ html, body {
     transform: translateY(30%);
     font-size: 17px;
     text-align:right;
-    padding-right: 0.4em;
+    margin-right: .6rem;
 }
 .navbar-en-line{
     height: 30%;
@@ -361,7 +361,7 @@ hr.short{
 }
 
 .card-title{
-
+    margin-top:.6em;
     text-align:right;
 }
 
@@ -484,13 +484,19 @@ hr.light-100 {
     width:100px;
 }
 */
+.tips-row {
+   margin-right: 0rem;
+}
+.tips {
+   margin-right: 0rem;
+}
+
  .navbar-brand img {
     width: 20%;
  .disapear_md {
      display: none;
      
 }
-
 
 .carousel-caption {
     top: 45%;
@@ -521,6 +527,7 @@ hr.light-100 {
 .reg-btn{
         font-size:50%
     }
+
 /*.footer-centre li {
    font-size: 1em;
    padding-right: .5rem;
@@ -536,6 +543,16 @@ hr.light-100 {
     .footer_image{
     width:100px;
 }
+
+.main_text{
+     margin-top: 0em;
+     margin-right: 0em;
+
+}
+.jumbotron {
+    margin-right: 0em;
+    margin-left:0em!important;
+}  
 /*    .social p {
     font-size: 1.5em;
     padding: .0rem;
@@ -577,6 +594,19 @@ hr.light-100 {
 .reg-btn{
         font-size:100%
     }
+.tips {
+   
+   margin-right: 0rem;
+   
+    }
+    
+    .tips-row {
+  
+   margin-right: 0rem;
+   
+}
+    
+    
 }
 
 
@@ -604,9 +634,6 @@ figure {
   height: 100%;
 }
 /*--- Bootstrap Padding Fix --*/
-[class*="col-"] {
-    padding: 1rem;
-}
 
 .runner1{
     margin-top:80px;
