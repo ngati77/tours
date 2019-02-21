@@ -15,7 +15,7 @@ from datetime import date, datetime, time
 
  
     
-class Booking1Form(forms.Form):
+class BookingForm(forms.Form):
     title          = forms.CharField(widget = forms.HiddenInput())
     trip_date      = forms.CharField(widget = forms.HiddenInput())
     trip_time      = forms.CharField(widget = forms.HiddenInput())
@@ -26,6 +26,8 @@ class Booking1Form(forms.Form):
     email          = forms.EmailField(label ='' ,widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
     number_adults  = forms.IntegerField(max_value = 10, min_value =0, label ='מספר מבוגרים' ) 
     number_child   = forms.IntegerField(max_value = 10, min_value =0, label ='מספר ילדים עד גיל 12')
+    confirm_use    = forms.BooleanField(label ='אני מסכים שפרטי ישמרו כדי ליצור קשר לגבי הסיור')
+    send_emails    = forms.BooleanField(required=False, label ='אני מעוניין להצטרף לרשומית התפוצה')
     deposit        = forms.IntegerField(widget = forms.HiddenInput())
     price          = forms.IntegerField(widget = forms.HiddenInput())
     priceChild     = forms.IntegerField(widget = forms.HiddenInput())
@@ -45,7 +47,9 @@ class Booking1Form(forms.Form):
         number_child    = self.cleaned_data['number_child']
         deposit         = self.cleaned_data['deposit']
         paymentSum      = self.cleaned_data['paymentSum']
-        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum 
+        confirm_use     = self.cleaned_data['confirm_use']
+        send_emails     = self.cleaned_data['send_emails']
+        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails  
        
 class PaymentForm(forms.Form):
     title          = forms.CharField(widget = forms.HiddenInput())
@@ -58,8 +62,11 @@ class PaymentForm(forms.Form):
     email          = forms.EmailField(widget = forms.HiddenInput())
     number_adults  = forms.IntegerField(widget = forms.HiddenInput()) 
     number_child   = forms.IntegerField(widget = forms.HiddenInput())
+    confirm_use    = forms.BooleanField(widget = forms.HiddenInput())
+    send_emails    = forms.BooleanField(required=False, widget = forms.HiddenInput())
     deposit        = forms.IntegerField(widget = forms.HiddenInput())
     paymentSum     = forms.IntegerField(widget = forms.HiddenInput())
+    
 
     
     def get_data(self):
@@ -75,7 +82,9 @@ class PaymentForm(forms.Form):
         number_child    = self.data['number_child']
         deposit         = self.data['deposit']
         paymentSum      = self.data['paymentSum']
-        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum        
+        confirm_use     = self.data['confirm_use']
+        send_emails     = self.data['send_emails']
+        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails        
 
 class ContactForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))

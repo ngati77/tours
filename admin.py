@@ -42,10 +42,9 @@ class ClientAdmin(admin.ModelAdmin):
         
     ]
     inlines         = [TransactionInline]
-    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment')
+    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails')
     list_filter     = ['first_name']
     search_fields   = ['first_name']
-
 
 class TransactionAdmin(admin.ModelAdmin):
    

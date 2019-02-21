@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .forms import Booking1Form, ContactForm, ReviewForm, ReportForm, PaymentForm
+from .forms import BookingForm, ContactForm, ReviewForm, ReportForm, PaymentForm
 
 from django.contrib.auth.decorators import login_required
 
@@ -210,7 +210,7 @@ def new_calendar_view(request, pYear, pMonth, view):
 def payment(request ):
     form = PaymentForm(request.POST)
     if request.method == 'POST':
-        title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum = form.get_data() 
+        title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails = form.get_data() 
         stripe.api_key = settings.STRIPE_SECRET_KEY
         deposit = int(deposit)
         try:
@@ -239,7 +239,7 @@ def payment(request ):
         print(trip)    
         # Create new client           
         client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
-                         number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum))
+                         number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails)
 #            
         client.save()
         transaction = Transaction(client=client,
@@ -323,20 +323,20 @@ def bookTour(request,pYear, pMonth, tripType ):
     if request.method == 'POST':
         stripe.api_key = settings.STRIPE_SECRET_KEY
         # Create a form instance and populate it with data from the request (binding):
-        form = Booking1Form(request.POST)
+        form = BookingForm(request.POST)
         # Check if the form is valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']
            # Get all infortamtion from form
-            title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum = form.get_data()
+            title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails  = form.get_data()
             #trip_date = datetime.datetime(pYear, pMonth, pDay, pHour)
             # Check iftrip exists
   
             
             date = [int(x) for x in trip_date.split("-")]
-            dataClass = datetime.date(date[0],date[1],date[2])
-            tripQuerySet = Trip.get_event(dataClass)
+            dateClass = datetime.date(date[0],date[1],date[2])
+            tripQuerySet = Trip.get_event(dateClass)
             # Check if a trip already exist, if no let's make sure we have more than one person
             if (len(tripQuerySet)==0 and (number_adults + number_child)==1):
                 print("Sorry we need more people TODO")
@@ -359,6 +359,9 @@ def bookTour(request,pYear, pMonth, tripType ):
                                                'email':email,
                                                'number_adults':number_adults,
                                                'number_child':number_child,
+                                               
+                                               'confirm_use': confirm_use, 
+                                               'send_emails': send_emails,
                                                'deposit':deposit,
                                                'paymentSum':paymentSum})
 
@@ -384,12 +387,13 @@ def bookTour(request,pYear, pMonth, tripType ):
     print_child = (TripTypeQuery[0].priceChild) > 0
     # If this is a GET (or any other method) create the default form.
    # TODO, Double check date as avialable one, or already has a trip on that day. 
-    proposed_date = datetime.datetime(pYear, pMonth, 1, 11)
-    form = Booking1Form(initial={'title':title, 'trip_date': proposed_date.date, 'trip_time':  proposed_date.time, 'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+#    proposed_date = datetime.datetime(pYear, pMonth, 1, 11)
+#    form = BookingForm(initial={'title':title, 'trip_date': proposed_date.date, 'trip_time':  proposed_date.time, 'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
         
-    tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
-    triptime = proposed_date.strftime("%H:%M") 
-    
+#    tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
+#    triptime = proposed_date.strftime("%H:%M") 
+    form = BookingForm(initial={'title':title, 'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+
     pageTitle=  'הזמנת ' +  title 
     meta_des_heb = "הזמנת סיור בקיימברידג בעברית  "
     meta_des_en  = "book your tour in Hebrew in Cambridge UK"
@@ -401,8 +405,6 @@ def bookTour(request,pYear, pMonth, tripType ):
                                                   'meta_des':meta_des,
                                                   'meta_key':meta_key,
                                                  'form': form, 
-                                                 'tripdate': tripdate, 
-                                                 'triptime': triptime, 
                                                  'price':price, 
                                                  'priceChild':priceChild, 
                                                  'deposit':deposit, 
@@ -426,7 +428,7 @@ def bookTour(request,pYear, pMonth, tripType ):
 #   
 #    if request.method == 'POST':
 #        # Create a form instance and populate it with data from the request (binding):
-#        form = Booking1Form(request.POST)
+#        form = BookingForm(request.POST)
 #        # Check if the form is valid:
 #        if form.is_valid():
 #            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
@@ -502,7 +504,7 @@ def bookTour(request,pYear, pMonth, tripType ):
 #    # If this is a GET (or any other method) create the default form.
 #   # TODO, Double check date as avialable one, or already has a trip on that day. 
 #    proposed_date = datetime.datetime(pYear, pMonth, pDay, pHour)
-#    form = Booking1Form(initial={'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+#    form = BookingForm(initial={'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
 #        
 #    tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
 #    triptime = proposed_date.strftime("%H:%M") 

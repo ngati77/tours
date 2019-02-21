@@ -20,17 +20,19 @@
           {% for review in reviewes %}
                     
             <div class="col-md-3 col-sm-6 review_page">
+            <div class="review_header">
+            <i class="fa fa-quote-right" aria-hidden="true"></i>
 			    <div class="text-right mb-2"><i><b>{{ review.title }}</b></i></div>
+			    </div>
 			    <div class="text-right mb-2">{{ review.review_text }}</div>
-		        <div class="person-text rel">
-			        <h4>{{review.first_name}}</h4>
-		        </div>
+			     <i class="fa fa-quote-left" aria-hidden="true"></i>
+			     <div class="text-left mb-2"><i><b>{{ review.first_name }}</b></i></div>
 		    </div>
        	{% endfor %}
             
         </div>
        <div class="row padding contact">
-         <a href="{% url  'tour:give_review'  %}"><button type="button" class="btn btn-runner">איך היה בקיימברידג' ?</button></a>
+         <a href="{% url  'tour:give_review'  %}"><button type="button" class="btn btn-runner">איך היה בסיור? להוספת המלצה</button></a>
         </div>
          <div class="row padding contact">
          <div class="review_facebook">לחוות דעת נוספות, בקרו באתר הפייסבוק שלנו</div>

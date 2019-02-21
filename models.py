@@ -211,6 +211,8 @@ class Clients(models.Model):
     total_payment      = models.IntegerField(default=0)
     pre_paid           = models.IntegerField(default=0)
     create_date        = models.DateTimeField(default=timezone.now)
+    confirm_use        = models.BooleanField(default=False)
+    send_emails        = models.BooleanField(default=False)
     status             = models.CharField(
                                         max_length=1,
                                         choices=STATUS_CLIENT,

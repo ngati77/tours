@@ -140,6 +140,7 @@ function registerElements(elements, exampleName) {
         //window.alert("Submit4");
 
         // Submit the form
+        disableInputs()
         form.submit();
         
       } else {
@@ -150,16 +151,5 @@ function registerElements(elements, exampleName) {
     });
   });
 
-
-    
-    var successElement = document.getElementById('stripe-token-handler');
-  document.querySelector('.wrapper').addEventListener('click', function() {
-    successElement.className = 'is-hidden';
-  });
-
-  
-  
-  
-  
   
 }
