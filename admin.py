@@ -70,7 +70,7 @@ class ClientAdmin(admin.ModelAdmin):
             more_to_pay=(client.total_payment-client.pre_paid)
             try:
                 msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
-                                                                          'trip_time':trip.trip_time, 
+                                                                          'trip_time':trip.trip_time.strftime('%H:%M'), 
                                                                           'id': transaction.id, 
                                                                           'trip_type':title, 
                                                                           'client':client, 

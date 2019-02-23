@@ -236,7 +236,7 @@ def payment(request ):
             trip.save()
         else:
             trip = tripQuerySet[0]
-        print(trip)    
+        #print(trip)    
         # Create new client           
         client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
                          number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails)
@@ -255,7 +255,7 @@ def payment(request ):
         more_to_pay=(client.total_payment-client.pre_paid)
         try:
             msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
-                                                                      'trip_time':trip.trip_time, 
+                                                                      'trip_time':trip.trip_time.strftime('%H:%M'), 
                                                                       'id': transaction.id, 
                                                                       'trip_type':title, 
                                                                       'client':client, 
@@ -274,7 +274,7 @@ def payment(request ):
         meta_key_heb = "הרשמה הצלחה "
         meta_key_en  = " "
         meta_key     = meta_key_heb + meta_key_en
-        print(trip)
+        #print(trip)
         return render(request, 'tour/success.html', {'title':'תשלום הצליח', 'page_title':'ההרשמה הסתיימה בהצלחה', 
                                                           'meta_des':meta_des,
                                                           'meta_key':meta_key,
@@ -792,7 +792,7 @@ def reportView(request):
                                                      })
             
             # The view is pdf, therefore Create param dictionary for the pdf
-            print(list(hebmonthdic.keys())[int(month)-1])
+            #print(list(hebmonthdic.keys())[int(month)-1])
             params = {
                 'report': report[:-1],
                 'sum':   report[-1],
