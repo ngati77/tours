@@ -1,0 +1,60 @@
+
+* {box-sizing: border-box;}
+ul {list-style-type: none;}
+
+
+
+.title {
+  margin: 0;
+  background-color: #ddd;
+  text-align: right !important;
+  
+}
+
+.title li {
+  display: inline-block;
+  width: 8%;
+  color: #666;
+  text-align: center;
+}
+
+.data {
+  background: #eee;
+  margin: 0;
+  text-align: right !important;
+}
+
+.data li {
+  list-style-type: none;
+  display: inline-block;
+  width: 8%;
+  text-align: center;
+  margin-bottom: 5px;
+  font-size:12px;
+  color:     #124789;
+}
+
+
+
+
+
+/* Add media queries for smaller screens */
+@media screen and (max-width:720px) {
+  .title li, .data li {
+  width: 9%;
+  font-size:10px;
+  }
+
+@media screen and (max-width: 420px) {
+  .title li, .data li {
+  width: 8%;
+  font-size:8px;
+  }
+}
+
+@media screen and (max-width: 290px) {
+  .title li, .data li {
+   width: 5%;
+   font-size:8px;
+  }
+}

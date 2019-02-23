@@ -84,3 +84,4 @@ migrations/
 
 # Stripe
 
+stripe*.js
