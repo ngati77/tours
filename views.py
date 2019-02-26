@@ -228,15 +228,14 @@ def payment(request ):
         
         # We made a payment, greaty lat's create trip and client
         date = [int(x) for x in trip_date.split("-")]
-        dataClass = datetime.date(date[0],date[1],date[2])
-        tripQuerySet = Trip.get_event(dataClass)
+        dateClass = datetime.date(date[0],date[1],date[2])
+        tripQuerySet = Trip.get_event(dateClass)
         # If need a new trip
         if (len(tripQuerySet)==0):
-            trip = Trip(trip_text='', trip_date=dataClass, trip_time=trip_time ,trip_type=trip_type)
+            trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time ,trip_type=trip_type)
             trip.save()
         else:
             trip = tripQuerySet[0]
-        #print(trip)    
         # Create new client           
         client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
                          number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails)
@@ -255,7 +254,7 @@ def payment(request ):
         more_to_pay=(client.total_payment-client.pre_paid)
         try:
             msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
-                                                                      'trip_time':trip.trip_time.strftime('%H:%M'), 
+                                                                      'trip_time':trip.trip_time, 
                                                                       'id': transaction.id, 
                                                                       'trip_type':title, 
                                                                       'client':client, 
@@ -555,7 +554,7 @@ def contactUs(request ):
                 msg_html = render_to_string('emails/email_contact.html', {'first_name':first_name,'last_name':last_name, 'email':email, 'id': contact.id, 'text':text})
                 msg_plain = str(contact.id) + "מישהו יצר קשר פניה "#emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
                 emailTitle = "מישהו יצר קשר"
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.EMAIL_YAEL], title=emailTitle, cc=settings.CC_EMAIL)
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.EMAIL_YAEL], title=emailTitle, cc=[settings.EMAIL_YAEL])
             except:
                 print('Got an error...')
             # Save contact here
