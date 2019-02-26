@@ -13,7 +13,7 @@
 {% if request.user.is_authenticated %}
 <div class="container-fluid">
   <div class="row d-flex bg-light text-dark contact">
-      <form action="{% url 'tour:report-view' %}" method="post" >
+      <form action="{% url 'tour:trip_view' %}" method="post" >
                         {% csrf_token %}
                          
                         <table >
@@ -29,39 +29,22 @@
 
     <ul class="title">
       <li>תאריך</li>
+      <li>שעה</li>
       <li>מדריך</li>
       <li>סוג סיור</li>
       <li>מבוגרים</li>
       <li>ילדים</li>
-      <li>מקדמה</li>
-      <li>הכנסה</li>
-       <li>הוצאה מדריך</li>
-      <li>הוצאה נוספת</li>
-      <li>נטו</li>
-      {% if filter_check_guide %}
-      <li>סכום להעביר ליעל</li>
-       {% endif%}
     </ul>
     
     {% for entry in report %}
      <ul class="data">
    
-     <li>{{  entry.trip_date }}</li>
+     <li><a href="{% url 'tour:clientview' entry.trip_id %}">{{  entry.trip_date }}</a></li>
+     <li>{{  entry.trip_time }}</li>
      <li>{{  entry.trip_guide }}</li>
      <li>{{  entry.trip_text }}</li>
      <li>{{  entry.total_people }}</li>
      <li>{{  entry.total_children }}</li>
-     <li>{{  entry.total_deposit }}</li>
-     <li>{{  entry.total_gross }}</li>
-     <li>{{  entry.total_guide_exp }}</li>
-     <li>{{  entry.other_expense }}</li>
-     <li>{{  entry.total_neto }}</li>
-     
-    
-    {% if filter_check_guide %}
-   
-    <li>{{  entry.guide_payback }}</li>
-    {% endif %}
      </ul>
     {% endfor %}
    

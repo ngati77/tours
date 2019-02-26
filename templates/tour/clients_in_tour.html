@@ -1,0 +1,81 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+{% block head %}
+
+  <!-- CSS for each example: -->
+  <link rel="stylesheet" type="text/css" href="{% static 'tour/report.css' %}" data-rel-css="" />
+{% endblock %} 
+
+{% block content %}
+
+
+{% if request.user.is_authenticated %}
+<div class="container-fluid">
+  <div class="row d-flex bg-light text-dark contact">
+      <form action="{% url 'tour:trip_pdf' trip.id %}" method="post" >
+                        {% csrf_token %}
+                       
+                        <div class="row">          
+                       <button id="rep_html"   class="btn btn-runner1" value="rep_html">צור דוח</button>
+                       </div>
+       </form>
+  
+   </div>
+
+
+    <ul class="title">
+      <li>תאריך</li>
+      <li>שעה</li>
+      <li>סוג סיור</li>
+       <li>מדריך</li>
+      <li>סטטוס</li>
+    </ul>
+     <ul class="data">
+      <li>{{ trip.trip_date }}</li>
+      <li>{{ trip.trip_time }}</li>
+      <li>{{ trip.trip_type }}</li>
+      <li>{{ trip.trip_guide }}</li>
+      <li>{{ trip.status }}</li>
+    </ul>
+    
+     <ul class="title">
+   
+     <li>שם פרטי</li>
+     <li>שם משפחה</li>
+     <li>ספר טלפון</li>
+     <li>דואר אלקטרוני</li>
+     <li>מבוגרים</li>
+     <li>ילדים</li>
+     <li>מקדמה</li>
+     <li>סה"כ</li>
+     </ul>
+ 
+     {% for client in trip.clients_set.all %} 
+    <ul class="data">
+   
+     <li>{{ client.first_name }}</li>
+     <li>{{ client.last_name }}</li>
+     <li>{{ client.phone_number }}</li>
+     <li>{{ client.email }}</li>
+     <li>{{ client.number_of_people }}</li>
+     <li>{{ client.number_of_children }}</li>
+     <li>{{ client.pre_paid }}</li>
+     <li>{{ client.total_payment }}</li>
+     </ul>
+     {% endfor %}
+    
+   
+          
+ </div>
+{% endif %}
+
+
+
+
+   
+
+{% endblock %}
+<!--<li><a href="{% url  'tour:detail' tour.id %}">{{ tour.trip_date }} {{ tour.trip_type }}</a></li>-->
+
+    

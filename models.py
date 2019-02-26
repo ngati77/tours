@@ -475,7 +475,7 @@ class Calendar:
         daydict = {'Sun':1, 'Mon':2, 'Tue':3, 'Wed':4, 'Thu':5, 'Fri':6, 'Sat':7}
         
         dayInCalendar = []
-        self.dayInCalendar     = []
+        self.Pack7Days     = []
         monthCount = 'PrevMonth';
         
         today           = datetime.datetime.now()
@@ -526,23 +526,24 @@ class Calendar:
             
             dayInMonth = datetime.date(_year, _month, dayCount)
                 
-            self.dayInCalendar.append(DayInCalendar1(request=request, dateInCalendar=dayInMonth, today= today, view=view))
+            dayInCalendar.append(DayInCalendar1(request=request, dateInCalendar=dayInMonth, today= today, view=view))
             
             # Every 7 days pack in new list, and also revered the order to be from right to left for the hebrew calendar
-#            if (i%7==0):
-#                if (monthCount == 'nextMonth') and (dayCount >6):
-#                    pass
-#                else:
-#                    self.Pack7Days.append(dayInCalendar)  
-#                    dayInCalendar = []
+            if (i%7==0):
+                if (monthCount == 'nextMonth') and (dayCount >6):
+                    pass
+                else:
+                    self.Pack7Days.append(dayInCalendar)  
+                    dayInCalendar = []
             # Increment counter if we have started counting
             dayCount += 1
                 
     def __str__(self):
         
-        for day in self.dayInCalendar:
-            print('fill: ' + day.fill)
-            print('dayNumStr: ' + day.dayNumStr)
+        for day7 in self.Pack7Days.dayInCalendar:
+            for day in day7:
+                print('fill: ' + day.fill)
+                print('dayNumStr: ' + day.dayNumStr)
         
         return 'Here is my calendatr:'
                 
@@ -579,7 +580,32 @@ class DayInCalendar1:
         guideVacationQuery   = GuideVacation.objects.filter(vac_start_date__lte=dateInCalendar,
                                                         vac_end_date__gte=dateInCalendar) 
         self.attr = False
-        if (dateInCalendar > today):
+        
+        if (request.user.is_authenticated and view == 'A'):
+#        if (False):
+            # If user then bring relevant data of:
+            # Planned trips for user
+            # Days off for user
+            tripQuery = Trip.objects.filter(trip_date=dateInCalendar)
+            
+            #for trip in tripQuery:
+            #Check if we have a trip this day
+            if len(tripQuery)>0:
+            # Check for unconfirmed trips
+                
+                self.attr = True
+                self.id   = dateInCalendar.strftime('%d_%m_%Y')
+                self.id   += "-"+ tripQuery[0].trip_time.strftime('%H_%M')
+                
+            # Now print day off    
+#            for vac in guideVacationQuery:
+#                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small bg-info text-white"
+#                text  = 'Vaction ' + vac.guide_vacation
+#                link  = None  
+#                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=11, trip_type='C', trip_id =1))
+            
+        
+        elif (dateInCalendar > today):
             
             # Check specific day in the week
             availableDateQuery0     = TripAvailabilty.objects.filter(Q(ava_select_day    =   dateInCalendar.strftime('%a')))
@@ -631,18 +657,10 @@ class DayInCalendar1:
                 self.attr = True
                 self.id   = dateInCalendar.strftime('%d_%m_%Y')
                 self.id   += "-"+ tripAvailabilty.ava_time.strftime('%H_%M')
-                #text  = tripAvailabilty.ava_time.strftime('%H:%M') + '  ' +   TRIP_TYPE_HEB[tripAvailabilty.ava_trip_type]
-                text  = tripAvailabilty.ava_time.strftime('%H:%M') 
-                link  = 'tour:booking'
-                self.events.append(EventAttr(attr=self.attr, text=text, link=link, hour=int(tripAvailabilty.ava_time.strftime('%H')), 
-                                             trip_type=view,  trip_id= 1))
                 
             
                 
                 
-            self.year  = dateInCalendar.year
-            self.month = dateInCalendar.month
-            self.day   = dateInCalendar.day
 
 
 

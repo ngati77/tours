@@ -38,6 +38,18 @@ ul {list-style-type: none;}
   
 }
 
+.datedate{
+    margin-top: 1em;
+    font-size: 18px;
+    color:     blue;
+}
+.timetime{
+    margin-top: .5em;
+    margin-bottom: .5em;
+    font-size: 18px;
+    color:     blue;
+}
+
 .weekdays li {
   display: inline-block;
   width: 12%;
@@ -46,7 +58,7 @@ ul {list-style-type: none;}
 }
 
 .days {
-  padding: 10px 0;
+  padding: 3px 0;
   background: #eee;
   margin: 0;
 }

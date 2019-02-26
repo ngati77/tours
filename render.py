@@ -25,10 +25,10 @@ class Render:
             return HttpResponse("Error Rendering PDF", status=400)
 
     @staticmethod
-    def render_to_file(path: str, params: dict):
+    def render_to_file(path: str, fileName: str, params: dict):
         template = get_template(path)
         html = template.render(params)
-        file_name = "{0}-{1}.pdf".format('test', '1')
+        file_name = fileName
         file_path = os.path.join(os.path.abspath(os.path.dirname("__file__")), "store", file_name)
         print('File Path')
         print(file_path)

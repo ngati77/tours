@@ -51,19 +51,23 @@
   <li>ש</li>
 </ul>
 
-<ul class="days">  
- {% for day in newCalendar.dayInCalendar %}
+ 
+ {% for week in newCalendar.Pack7Days %}
+ <ul class="days"> 
+     {% for day in week %}
      {% if day.attr %}
       <li><a class="active" id={{day.id}} onclick="return a1_onclick('{{day.id}}')" > {{ day.dayNumStr }}</a></li>
       {% else %}
       <li> {{ day.dayNumStr }}</li>
       {% endif %} 
     {% endfor %}
+    </ul>
+    {% endfor %}
  
-</ul>
 
-   <p id="date"> תאריך:   </p>
-   <p id="time"> שעה:     </p>          
+
+   <p class="timetime" id="date"> תאריך:   </p>
+   <p class="timetime" id="time"> שעה:     </p>          
             <form action="{% url 'tour:book-tour' 1 1 'C' %}" method="post" >
                     {% csrf_token %}
                      

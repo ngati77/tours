@@ -28,13 +28,15 @@ urlpatterns = [
 #    path('find_your_day',  views.find_your_day, name='find_your_day'),
     path('gallery',        views.gallery, name='gallery'),
     path('team',           views.team, name='team'),
-    path(r'guideview',     views.GuideView.as_view(), name='guideview'),
-    path('clientview/<int:pk>/',    views.ClientView.as_view(), name='clientview'),
+#    path(r'guideview',     views.GuideView.as_view(), name='guideview'),
+    path('clients_in_tour/<int:pk>/',    views.ClientView.as_view(), name='clientview'),
     path('success',         views.success, name="success"),
     path('failure',         views.failure, name="failure"),
     path('contact',         views.contactUs, name="contact"),
     path('give_review',     views.GiveReview, name="give_review"),
     path('report-view',     views.reportView, name="report-view"),
+    path('trip_view',       views.tripView, name="trip_view"),
+    path('trip_pdf/<int:pk>/', views.tripPdf, name='trip_pdf'),
     path('payment',          views.payment, name="payment"),
 
 ]

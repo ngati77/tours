@@ -39,7 +39,7 @@
             </li>
             {% if request.user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link" href="{% url  'tour:guideview'  %}">Guide</a> 
+                <a class="nav-link" href="{% url  'tour:trip_view'  %}">Guide</a> 
             </li>
             {% endif %}
             {% if request.user.is_superuser %}
@@ -49,7 +49,7 @@
                 </a>
                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
                    <a class="dropdown-item" href="{% url  'tour:report-view' %}">דוחות</a> 
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/A ">לוח שנה</a>
+                   <a class="dropdown-item" href="{% url  'tour:book_tour_today' %}/A ">לוח שנה</a>
                    <a class="dropdown-item" href="{% url  'admin:index' %}">Admin</a>
                  </div>
             </li>
