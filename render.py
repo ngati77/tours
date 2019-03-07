@@ -11,14 +11,20 @@ from django.template.loader import get_template
 import xhtml2pdf.pisa as pisa
 import os
 
+from bidi import algorithm as bidialg
+
 class Render:
 
     @staticmethod
     def render(path: str, params: dict):
         template = get_template(path)
+        print(template)
         html = template.render(params)
+        print('----------------------------------------------------------------')
+        print(html)
         response = BytesIO()
-        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
+        pdf = pisa.CreatePDF(bidialg.get_display(html, base_dir="L"), response)
+        #pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
         if not pdf.err:
             return HttpResponse(response.getvalue(), content_type='application/pdf')
         else:
@@ -33,5 +39,6 @@ class Render:
         print('File Path')
         print(file_path)
         with open(file_path, 'wb') as pdf:
-            pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf)
+            #pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf)
+             pisa.CreatePDF(bidialg.get_display(html, base_dir="L"), pdf)
         return [file_name, file_path]

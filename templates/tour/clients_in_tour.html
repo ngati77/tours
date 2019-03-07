@@ -25,6 +25,7 @@
 
 
     <ul class="title">
+      <li>trip id</li>
       <li>תאריך</li>
       <li>שעה</li>
       <li>סוג סיור</li>
@@ -32,15 +33,16 @@
       <li>סטטוס</li>
     </ul>
      <ul class="data">
-      <li>{{ trip.trip_date }}</li>
-      <li>{{ trip.trip_time }}</li>
-      <li>{{ trip.trip_type }}</li>
-      <li>{{ trip.trip_guide }}</li>
-      <li>{{ trip.status }}</li>
+      <li>{{ trip.id }}</li>
+      <li>{{ trip.trip_date|date:"d/m/Y" }}</li>
+      <li>{{ trip.trip_time|date:"H:i" }}</li>
+      <li>{{ trip.get_trip_type_display }}</li>
+      <li>{{ trip.get_trip_guide_display }}</li>
+      <li>{{ trip.get_status_display }}</li>
     </ul>
     
      <ul class="title">
-   
+     <li>client id</li>
      <li>שם פרטי</li>
      <li>שם משפחה</li>
      <li>ספר טלפון</li>
@@ -53,7 +55,7 @@
  
      {% for client in trip.clients_set.all %} 
     <ul class="data">
-   
+     <li>{{ client.id }}</li>
      <li>{{ client.first_name }}</li>
      <li>{{ client.last_name }}</li>
      <li>{{ client.phone_number }}</li>

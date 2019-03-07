@@ -38,5 +38,12 @@ urlpatterns = [
     path('trip_view',       views.tripView, name="trip_view"),
     path('trip_pdf/<int:pk>/', views.tripPdf, name='trip_pdf'),
     path('payment',          views.payment, name="payment"),
+    path('tasks',            views.tasks, name="tasks"),
+    
+    path('tour_confirm/<int:pk>/',            views.tour_confirm, name="tour_confirm"),
+    path('tour_complete/<int:pk>/',            views.tour_complete, name="tour_complete"),
+    path('contact_confirm/<int:pk>/',            views.contact_confirm, name="contact_confirm"),
+    path('review_confirm/<int:pk>/',            views.review_confirm, name="review_confirm"),
+
 
 ]

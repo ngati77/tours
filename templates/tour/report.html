@@ -28,6 +28,7 @@
 {% if report %}
 
     <ul class="title">
+      <li>trip id</li>
       <li>תאריך</li>
       <li>מדריך</li>
       <li>סוג סיור</li>
@@ -45,7 +46,7 @@
     
     {% for entry in report %}
      <ul class="data">
-   
+      <li><a href="{% url 'tour:clientview' entry.trip_id %}">{{  entry.trip_id }}</a></li>
      <li>{{  entry.trip_date }}</li>
      <li>{{  entry.trip_guide }}</li>
      <li>{{  entry.trip_text }}</li>

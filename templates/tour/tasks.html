@@ -1,0 +1,200 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+{% block head %}
+
+  <!-- CSS for each example: -->
+  <link rel="stylesheet" type="text/css" href="{% static 'tour/report.css' %}" data-rel-css="" />
+{% endblock %} 
+
+{% block content %}
+
+
+{% if request.user.is_authenticated %}
+<div class="container-fluid">
+<!--Check for new tours change status from new to confirm-->
+{% if new_tours %}
+
+<div class="row p-1 bg-light text-blue">
+    <p>סיורים חדשים</p>
+     </div>
+
+    <ul class="title">
+      <li>id</li>
+      <li>תאריך סיור</li>
+      <li>שעה</li>
+      <li>מדריך</li>
+      <li>סוג סיור</li>
+      <li>נוצר בתאריך</li>
+      <li>אישור</li>
+    </ul>
+    
+    {% for entry in new_tours %}
+     <ul class="data">
+     <li><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></li>
+     <li>{{  entry.trip_date|date:'d.m.Y' }}</li>
+     <li>{{  entry.trip_time|date:'H:i'  }}</li>
+     <li>{{  entry.get_trip_guide_display }}</li>
+     <li>{{  entry.get_trip_type_display }}</li>
+     <li>{{  entry.create_date|date:'d.m.Y' }}</li>
+     <li><a href="{% url  'tour:tour_confirm' entry.id %}" class="btn btn-tour reg-btn"> אישור סיור</a></li>
+     </ul>
+    {% endfor %}
+   
+{% else %}
+    <div class="row p-1 bg-light text-blue">
+    <p>אין סיורים חדשים</p>
+     </div>
+{% endif %}
+
+
+<!--Check for tours for completion
+    Change status to complete
+    Create invoice
+    Send email to client with invoice and link for feedback
+ 
+-->
+
+{% if complete_tours %}
+<div class="row p-1 bg-light text-blue">
+    <p>סיורים שהסתיימו</p>
+     </div>
+
+    <ul class="title">
+      <li>id</li>
+      <li>תאריך</li>
+      <li>שעה</li>
+      <li>מדריך</li>
+      <li>סוג סיור</li>
+      <li>אישור</li>
+    </ul>
+    
+    {% for entry in complete_tours %}
+     <ul class="data">
+     <li><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></li>
+     <li>{{  entry.trip_date|date:'d.m.Y' }}</li>
+     <li>{{  entry.trip_time|date:'H:i' }}</li>
+     <li>{{  entry.get_trip_guide_display }}</li>
+     <li>{{  entry.get_trip_type_display }}</li>
+     <li><a href="{% url  'tour:tour_complete' entry.id %}" class="btn btn-tour reg-btn"> סיום סיור</a></li>
+     </ul>
+    {% endfor %}
+   
+{% else %}
+    <div class="row p-1 bg-light text-blue">
+    <p>אין סיורים ממתינים לסיום</p>
+     </div>
+{% endif %}
+
+<!--Check for new contacts
+    Change status to confirm - once they answer the message
+-->
+
+{% if new_contact %}
+<div class="row p-1 bg-light text-blue">
+    <p>יצרו קשר ומחכים למענה</p>
+     </div>
+    <ul class="title">
+      <li>id</li>
+      <li>תאריך</li>
+      <li>שם פרטי</li>
+      <li>שם משפחה</li>
+      <li>דואל</li>
+      <li  class="more_text">הודעה</li>
+      <li>אישור</li>
+    </ul>
+    
+    {% for entry in new_contact %}
+     <ul class="data">
+     <li>{{  entry.id }}</li>
+     <li>{{  entry.create_date|date:'d.m.Y' }}</a></li>
+     <li>{{  entry.first_name }}</li>
+     <li>{{  entry.last_name }}</li>
+     <li>{{  entry.email }}</li>
+     <li  class="more_text">{{  entry.text }}</li>
+     <li><a href="{% url  'tour:contact_confirm' entry.id %}" class="btn btn-tour reg-btn">יצרתי קשר</a></li>
+     </ul>
+    {% endfor %}
+   
+{% else %}
+    <div class="row p-1 bg-light text-blue">
+    <p>אין פניות חדשות</p>
+     </div>
+{% endif %}
+
+
+<!--Check for new contacts
+    Change status to confirm - once they answer the message
+-->
+
+{% if new_review %}
+<div class="row p-1 bg-light text-blue">
+    <p>משובים חדשים</p>
+     </div>
+    <ul class="title">
+      <li>id</li>
+      <li>תאריך</li>
+      <li>שם פרטי</li>
+      <li>כותרת</li>
+      <li  class="more_text">הודעה</li>
+      <li>אישור</li>
+
+    </ul>
+    
+    {% for entry in new_review %}
+     <ul class="data">
+     <li>{{  entry.id }}</li>
+     <li>{{  entry.create_date|date:'d.m.Y' }}</li>
+     <li>{{  entry.first_name }}</li>
+     <li>{{  entry.title }}</li>
+     <li class="more_text">{{  entry.review_text }}</li>
+     <li><a href="{% url  'tour:review_confirm' entry.id %}" class="btn btn-tour reg-btn">אישור משוב</a></li>
+     </ul>
+    {% endfor %}
+   
+{% else %}
+    <div class="row p-1 bg-light text-blue">
+    <p>אין משובים חדשים</p>
+     </div>
+{% endif %}
+
+
+<!-- show for future tours
+-->
+{% if next_tours %}
+
+<div class="row p-1 bg-light text-blue">
+    <p>הסיורים הבאים</p>
+     </div>
+
+    <ul class="title">
+      <li>id</li>
+      <li>תאריך סיור</li>
+      <li>שעה</li>
+      <li>מדריך</li>
+      <li>סוג סיור</li>
+      <li>נוצר בתאריך</li>
+    </ul>
+    
+    {% for entry in next_tours %}
+     <ul class="data">
+     <li><a href="{% url 'tour:clientview' entry.id %}">{{ entry.id }}</a></li>
+     <li>{{ entry.trip_date|date:'d.m.Y' }}</li>
+     <li>{{ entry.trip_time|date:'H:i'  }}</li>
+     <li>{{ entry.get_trip_guide_display }}</li>
+     <li>{{ entry.get_trip_type_display }}</li>
+     <li>{{ entry.create_date|date:'d.m.Y' }}</li>
+     </ul>
+    {% endfor %}
+   
+{% else %}
+    <div class="row p-1 bg-light text-blue">
+    <p>אין סיורים בעתיד</p>
+     </div>
+{% endif %}
+
+
+ </div>
+{% endif %}
+{% endblock %}
+

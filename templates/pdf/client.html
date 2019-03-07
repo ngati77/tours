@@ -1,11 +1,10 @@
-{% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he"
     dir = "rtl">
     
 <head>
     <meta charset="utf-8">
-    <title>Cambridge in Hebrew trip details</title>
+    <title>Cambridge in Hebrew - Client invoice</title>
     <style type="text/css">
         @font-face {
             font-family: "David";
@@ -15,16 +14,12 @@
         html {
             font-family: David;
             font-size: 11pt;
+            text-align:right;
         }
-       
-
-      
-    
         @page {
             size: A4;
             margin: 1cm;
         }
-       
         .table {
             width: 100%;
             max-width: 100%;
@@ -67,7 +62,21 @@
             vertical-align: top;
             text-align: center;
         }
-        
+         .sum {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 5px;
+            background-color: #fff;
+            padding: 5px;
+            vertical-align: top;
+            text-align: center;
+            vertical-align: bottom;
+            border-bottom: 2px solid #0000ff;
+            padding: 5px;
+            vertical-align: top;
+            border-top: 3px solid #0000ff;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -76,43 +85,49 @@
     <div class="card">
         <div class="card-header">
 <!--            <h3>Sales Report - {{ today | date:"d/m/Y" }}</h3>-->
-      <h2>Cambridge In Hebrew trip details</h2>
-      <h3>Date: {{ trip.trip_date }}</h3>
-      <h3>Time: {{ trip.trip_time }}</h3>
-      <h3>Type: {{ trip.trip_type }}</h3>
-      <h3>Guide: {{ trip.trip_guide }}</h3>
+      <h2>Cambridge in Hebrew - Client invoice No. {{client.id}}</h2>
         </div>
 
-       
+         <h3> שם לקוח:{{client.first_name}} {{client.last_name}}</h3>
+         <h3> מס' לקוח:{{client.id}}</h3>
+         <h3>תאריך: {{sum.payment_date|date:"d/m/Y" }}</h3>
+         <h3>מספר מבוגרים: {{client.number_of_people}}</h3>
+         {% if children %}
+            <h3>מספר ילדים: {{client.number_of_children}}</h3>
+         {% endif %}
 
         <table class="table">
             <thead>
             <tr>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Adults</th>
-                <th>Child</th>
-                <th>Pre paid</th>
-                <th>Total</th>
+                <th> סכום בפאונד</th>
+                <th>אסמכתא</th>
+                <th>אמצעי תשלום</th>
+                <th>תאריך</th>
+                
+               
             </tr>
             </thead>
             <tbody>
-            {%  for client in trip.clients_set.all %}
+            {%  for entry in report %}
                 <tr>
 <!--                    <td>{{ sale.created_at | date:"d/m/Y" }}</td>  -->
-                    <td>{{ client.first_name }}</td>
-                    <td>{{ client.last_name }}</td>
-                    <td>{{ client.phone_number }}</td>
-                    <td>{{ client.email }}</td>
-                    <td>{{ client.number_of_people }}</td>
-                    <td>{{ client.number_of_children }}</td>
-                    <td>{{ client.pre_paid }}</td>
-                    <td>{{ client.total_payment }}</td>
+                    <td>{{ entry.payment_amount }}</td>
+                    <td>{{  entry.payment_id  }}</td>
+                    <td>{{  entry.payment_type }}</td>
+                    <td>{{  entry.payment_date|date:"d/m/Y" }}</td>
+                  
+                    
+                    
                 </tr>
            
             {% endfor %}
+             <tr class="sum">
+<!--                    <td>{{ sale.created_at | date:"d/m/Y" }}</td>  -->
+                    <td>{{ sum.payment_amount }}</td>
+                    <td>{{  sum.payment_id  }}</td>
+                    <td>{{  sum.payment_type }}</td>
+                    <td>{{  sum.payment_date|date:"d/m/Y" }}</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -120,5 +135,6 @@
 
 </body>
 </html>
+
 
  

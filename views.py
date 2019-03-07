@@ -38,6 +38,8 @@ import logging
 
 from threading import Thread, activeCount
 
+
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -776,6 +778,8 @@ def reportView(request):
                     reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
                     # Now that we know how much the guide earn we can calculate home amount he needs to return
                     reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
+                    
+                    reportEntry.trip_id         = trip.id
                     # Gather the sum here
                     reportsum.total_people      += reportEntry.total_people
                     reportsum.total_children    += reportEntry.total_children
@@ -929,13 +933,164 @@ def tripPdf(request, pk):
         'trip': trip,
         'request': request
     }
-         
                 
             
     return Render.render('pdf/trip_details.html', params)    
    
     
     
+def tasks(request):
+    today           = datetime.date.today()
+    new_tours =  Trip.objects.filter(
+                         status  = 'n'
+                        ).order_by('trip_date')
+    
+    complete_tours = Trip.objects.filter(
+                         status  = 'a',
+                         trip_date__lte  = today
+                        ).order_by('trip_date')
+    
+    new_contact = Contact.objects.filter(confirm = False)
+    
+    new_review = Review.objects.filter(confirm = False)
+    
+    next_tours =  Trip.objects.filter(
+                        trip_date__gte  = today
+                        ).order_by('trip_date')
     
     
+    return render(request, 'tour/tasks.html', {'title':'Tasks',
+                                                     'page_title' : 'משימות',
+                                                     'meta_des':'קיימברידג בעברית משימות',
+                                                     'meta_key':'קמברידג',
+                                                     'new_tours': new_tours,
+                                                     'complete_tours': complete_tours,
+                                                     'new_contact':new_contact,
+                                                     'new_review':new_review,
+                                                     'next_tours':next_tours
+                                                     
+                                                     })
+
+
+def tour_confirm(request, pk):
+    '''
+    This function change trip status to confirm
+    '''
+    tours_query =  Trip.objects.filter(id  = pk)
+    if (len(tours_query)>0):
+        tour = tours_query[0]
+        tour.status = 'a'
+        tour.save()
+    return tasks(request)
+
+# This class is used in the report.html
+class TransactionEntry: 
+    def __init__(self, payment_type, payment_date, payment_amount, payment_id):
+        self.payment_type      = payment_type
+        self.payment_date      = payment_date
+        self.payment_amount    = payment_amount
+        self.payment_id        = payment_id
+
     
+
+
+
+def tour_complete(request, pk):
+    '''
+    This function change trip status to complete:
+        1. Create transaction cache
+        2. Create invice
+        3. Send email with request for feedback
+    '''
+    tours_query =  Trip.objects.filter(id  = pk)
+    if (len(tours_query)>0):
+        trip = tours_query[0]
+        clientQuerey = trip.clients_set.all()
+        
+        # Scan all clients
+        for client in clientQuerey:
+            transactionArray = []
+            if client.total_payment > client.pre_paid:
+                # Create Cache transaction  
+                try:
+                    transaction = Transaction(
+                                    client          =  client,
+                                    create_date     =  trip.trip_date,
+                                    token           =  'Cash',
+                                    amount          =  (client.total_payment - client.pre_paid),
+                                    charge_id       =  'Cash',
+                                    success         =  True)
+                    transaction.save()
+                except:
+                    print ('problem creating transaction')
+                        
+            #'Now create the invoice'
+            
+            transactionQuerey = client.transaction_set.all()
+            amount = 0
+            for tran in transactionQuerey:
+                tType = 'אשראי'
+                if tran.token == 'Cash':
+                    tType = 'מזומן'
+                amount += tran.amount
+                tranEntry = TransactionEntry(payment_type   = tType,
+                                             payment_date   = tran.create_date,
+                                             payment_amount = tran.amount ,
+                                             payment_id     = tran.id )  
+                
+                transactionArray.append(tranEntry)
+            # create sum 
+            tranEntry = TransactionEntry(payment_type   = 'סיכום',
+                                             payment_date   = datetime.datetime.now(),
+                                             payment_amount = amount ,
+                                             payment_id     = trip.id )
+            # Ready to create invoice
+            params = {
+                'report'   : transactionArray,
+                'sum'      : tranEntry, 
+                'client'   : client,
+                'children' : (client.number_of_children > 0),
+                'request'  : request
+            }
+            # Check if need to send the pdf    
+            try:
+                file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
+                file = Render.render_to_file('pdf/client.html', file_name, params)
+            except:
+                print("Can't create pdf")
+            try:
+                msg_plain = "תודה שטיילתם איתנו בקיימברדיג' היה לנו כייף"
+                msg_html = render_to_string('emails/email_feedback.html')
+                title = "קיימברידג' בעברית- תודה שטיילתם איתנו"
+                tour_emails.send_email_msg_pdf( to=[client.email],
+                                               msg_html=msg_html, 
+                                               msg_plain=msg_plain, 
+                                               file=file, 
+                                               file_name=file_name, 
+                                               cc=settings.CC_EMAIL, 
+                                               title=title)
+            except:
+                print("Can't send email")
+        # Change trip status to complete    
+        trip.status = 'e'
+        trip.save()
+    
+    # Bring back the tasks        
+    return tasks(request)
+
+def contact_confirm(request, pk):
+    contact_query =  Contact.objects.filter(id  = pk)
+    if (len(contact_query)>0):
+        contact = contact_query[0]
+        contact.confirm = True
+        contact.save()
+    return tasks(request)
+
+
+def review_confirm(request, pk):
+    review_query = Review.objects.filter(id  = pk)
+    if (len(review_query)>0):
+        review = review_query[0]
+        review.confirm = True
+        review.save()
+    return tasks(request)

@@ -35,7 +35,10 @@ ul {list-style-type: none;}
 }
 
 
+.more_text {
+   width: 20%;
 
+}
 
 
 /* Add media queries for smaller screens */
