@@ -39,7 +39,14 @@
             </li>
             {% if request.user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link" href="{% url  'tour:trip_view'  %}">Guide</a> 
+                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Guide
+                </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
+                 <a class="nav-link" href="{% url  'tour:trip_view'  %}">הטיולים הבאים</a> 
+                 <a class="dropdown-item" href="{% url  'tour:book_tour_today' %}/A ">לוח שנה</a>
+                  <a class="dropdown-item" href="{% url  'logout' %}">logout</a>
+                 </div>
             </li>
             {% endif %}
             {% if request.user.is_superuser %}
@@ -50,7 +57,7 @@
                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
                    <a class="dropdown-item" href="{% url  'tour:tasks' %} ">משימות</a>
                    <a class="dropdown-item" href="{% url  'tour:report-view' %}">דוחות</a> 
-                   <a class="dropdown-item" href="{% url  'tour:book_tour_today' %}/A ">לוח שנה</a>
+                  
                    <a class="dropdown-item" href="{% url  'admin:index' %}">Admin</a>
                  </div>
             </li>
