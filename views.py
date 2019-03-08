@@ -1067,7 +1067,7 @@ def tour_complete(request, pk):
                                                msg_plain=msg_plain, 
                                                file=file, 
                                                file_name=file_name, 
-                                               cc=settings.CC_EMAIL, 
+                                               cc=[settings.EMAIL_YAEL], 
                                                title=title)
             except:
                 print("Can't send email")

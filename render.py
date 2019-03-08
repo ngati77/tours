@@ -18,10 +18,10 @@ class Render:
     @staticmethod
     def render(path: str, params: dict):
         template = get_template(path)
-        print(template)
+        #print(template)
         html = template.render(params)
-        print('----------------------------------------------------------------')
-        print(html)
+        #print('----------------------------------------------------------------')
+        #print(html)
         response = BytesIO()
         pdf = pisa.CreatePDF(bidialg.get_display(html, base_dir="L"), response)
         #pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
@@ -36,8 +36,8 @@ class Render:
         html = template.render(params)
         file_name = fileName
         file_path = os.path.join(os.path.abspath(os.path.dirname("__file__")), "store", file_name)
-        print('File Path')
-        print(file_path)
+        #print('File Path')
+        #print(file_path)
         with open(file_path, 'wb') as pdf:
             #pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf)
              pisa.CreatePDF(bidialg.get_display(html, base_dir="L"), pdf)

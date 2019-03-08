@@ -45,7 +45,7 @@ class tour_emails:
     def send_email_msg_pdf(to, msg_html, msg_plain, file, file_name, cc, title): 
         
         
-        msg             = EmailMultiAlternatives(subject=title, body= msg_plain, from_email=settings.EMAIL_YAEL, to=to ,bcc=settings.BCC_EMAIL)
+        msg             = EmailMultiAlternatives(subject=title, body= msg_plain, from_email=settings.EMAIL_YAEL, to=to ,bcc=settings.BCC_EMAIL, cc=cc)
         #msg.attach_alternative(msg_html, "text/html")
         
         attachment = open(file[1], 'rb')
