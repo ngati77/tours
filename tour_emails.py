@@ -11,7 +11,7 @@ from django.core.mail import EmailMultiAlternatives
 class tour_emails:
     def send_email(msg_html, msg_plain, to, title,cc):
         
-        msg             = EmailMultiAlternatives(subject=title, body= msg_plain, from_email=settings.EMAIL_YAEL, to=to,cc=settings.CC_EMAIL ,bcc=settings.BCC_EMAIL)
+        msg  = EmailMultiAlternatives(subject = title, body= msg_plain, from_email=settings.EMAIL_YAEL, to=to,cc=settings.CC_EMAIL ,bcc=settings.BCC_EMAIL)
         msg.attach_alternative(msg_html, "text/html")
         
         #attachment = open(request.session['customer']+".txt.blowfish", 'rb')
@@ -21,6 +21,7 @@ class tour_emails:
         try:
             success = msg.send()
         except: 
+            success = False
             print('Error sending email')    
         return success
  
@@ -40,6 +41,7 @@ class tour_emails:
             success = msg.send()
         except: 
             print('Error sending email')    
+            success = False
         return success
  
     def send_email_msg_pdf(to, msg_html, msg_plain, file, file_name, cc, title): 
@@ -55,5 +57,6 @@ class tour_emails:
         try:
             success = msg.send()
         except: 
-            print('Error sending email')    
+            print('Error sending email')   
+            success = False
         return success
