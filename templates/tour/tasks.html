@@ -10,7 +10,7 @@
 {% block content %}
 
 
-{% if request.user.is_authenticated %}
+{% if request.user.is_superuser %}
 <div class="container-fluid">
 <!--Check for new tours change status from new to confirm-->
 {% if new_tours %}
