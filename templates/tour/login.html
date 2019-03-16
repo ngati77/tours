@@ -1,9 +1,9 @@
 {% extends 'tour/base.html' %}
-{% load static %}
 
 	
 
 {% block content %}
+{% trans 'Login' %}
 {% if user.is_authenticated %}
   Hi {{ user.username }}!
   <p><a href="{% url 'logout' %}">logout</a></p>

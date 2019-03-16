@@ -10,8 +10,8 @@ import sys, os, django
 import datetime
 # append root folder of django project
 # could be solved with a relative path like os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..') which corresponds to the parent folder of the actual file.
-sys.path.append('C:\\first_web\\mysite')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+sys.path.append('/home/ngati/cambridge')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings.production'
 django.setup()
 
 from django.core.mail import send_mail
@@ -36,11 +36,7 @@ def main():
     for trip in tripQuery:
         clientQuerey = trip.clients_set.filter(status = 'a')
         for client in clientQuerey:
-            msg_plain= 'DUMMY ONE'
-#            msg_html = render_to_string('emails/email_reminder.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 'trip_time':trip.trip_time.strftime("%H:%M"), 'trip_type':trip.trip_type, 'first':client.first_name, 'last':client.last_name })
-#            #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
-#            emailSuccess =tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=title,cc=[settings.CC_EMAIL])
-#        
+            msg_plain= 'תזכורת לסיור מחר'
             more_to_pay=str(client.total_payment-client.pre_paid)
             try:
                 msg_html = render_to_string('emails/email_reminder.html', { 
@@ -52,22 +48,6 @@ def main():
                 emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
             except:
                 print('Got an error... sending email...')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
