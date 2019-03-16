@@ -193,6 +193,36 @@
      </div>
 {% endif %}
 
+<!-- show for future tours
+-->
+{% if next_vacations %}
+<div class="row p-1 bg-light text-blue">
+    <p>החופשות הבאות הבאים</p>
+     </div>
+
+    <ul class="title">
+      <li>id</li>
+      <li>מדריך</li>
+      <li>תאריך התחלה</li>
+      <li>תאריך סיום</li>
+     
+    </ul>
+    
+    {% for entry in next_vacations %}
+     <ul class="data">
+     <li>{{ entry.id }}</li>
+     <li>{{ entry.get_guide_vacation_display }}</li>
+     <li>{{ entry.vac_start_date|date:'d.m.Y' }}</li>
+     <li>{{ entry.vac_end_date|date:'d.m.Y' }}</li>
+     
+     </ul>
+    {% endfor %}
+   
+{% else %}
+    <div class="row p-1 bg-light text-blue">
+    <p>אין חופשות בעתיד</p>
+     </div>
+{% endif %}
 
  </div>
 {% endif %}

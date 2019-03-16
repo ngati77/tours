@@ -80,6 +80,12 @@ ul {list-style-type: none;}
   
 }
 
+.days li .vacation {
+  padding: 3px;
+  border: 1px solid #ff0000;
+  
+  
+}
 .days li .active:hover {
   background-color: #124789;
   color:white

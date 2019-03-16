@@ -237,224 +237,6 @@ class Transaction(models.Model):
         return str(self.client_id)
 
   
-class NewCalendar:
-    
-    def __init__(self, request, year, month, view):
-        daydict = {'Sun':1, 'Mon':2, 'Tue':3, 'Wed':4, 'Thu':5, 'Fri':6, 'Sat':7}
-        
-        dayInCalendar = []
-        self.Pack7Days     = []
-        monthCount = 'PrevMonth';
-        
-        today           = datetime.datetime.now()
-        today           = datetime.date(today.year,today.month,today.day)
-        firstDayOfMonth = datetime.date(year, month, 1)
-        self.monthStr        = hebmonthdic[firstDayOfMonth.strftime("%b")]
-        self.yearStr         = str(firstDayOfMonth.year)
-        self.view            = view
-            
-        # Find the last day of the month,
-        # If Decmber than moving to the next year
-        if (month == 12):
-            firstDayOfNextMonth = datetime.date(year+1, 1, 1);
-        else:
-            firstDayOfNextMonth = datetime.date(year, month+1, 1);
-        lastDayInMonth = firstDayOfNextMonth - datetime.timedelta(days=1)
-        # use firstDayOfNextMonth as href to move to the nextmont
-        self.nextMonth      = firstDayOfNextMonth.month
-        self.nextMonthYear  = firstDayOfNextMonth.year
-        
-        self.thisYear       = today.year
-        self.thisMonth      = today.month
-        
-        # Find the last day ofthe previous month
-        LastDayInPrevMonth  = firstDayOfMonth - datetime.timedelta(days=1)
-        # Subtract how many days from previous month we need to use 
-        self.prevMonth      = LastDayInPrevMonth.month
-        self.prevMonthYear  = LastDayInPrevMonth.year
-        
-        #Start from previous month
-        dayCount = LastDayInPrevMonth.day - daydict[firstDayOfMonth.strftime("%a")] + 2
-        _month =   LastDayInPrevMonth.month
-        _year  =   LastDayInPrevMonth.year
-        
-        for i in range (1,43):
-            # Moving to current month
-            if (i==daydict[firstDayOfMonth.strftime("%a")]):
-                monthCount = 'thisMonth'
-                dayCount =1
-                _month =   month
-                _year  =   year
-            # Endsup with next month
-            elif (dayCount==(lastDayInMonth.day+1) and monthCount== 'thisMonth' ):
-                monthCount = 'nextMonth'
-                dayCount =1
-                _month =   self.nextMonth
-                _year  =   self.nextMonthYear
-            
-            dayInMonth = datetime.date(_year, _month, dayCount)
-                
-            dayInCalendar.append(DayInCalendar(request=request, dateInCalendar=dayInMonth, today= today, view=view))
-            
-            # Every 7 days pack in new list, and also revered the order to be from right to left for the hebrew calendar
-            if (i%7==0):
-                if (monthCount == 'nextMonth') and (dayCount >6):
-                    pass
-                else:
-                    self.Pack7Days.append(dayInCalendar)  
-                    dayInCalendar = []
-            # Increment counter if we have started counting
-            dayCount += 1
-                
-    def __str__(self):
-        
-        for week in self.Pack7Days:
-            for day in week:
-                print('fill: ' + day.fill)
-                print('dayNumStr: ' + day.dayNumStr)
-        
-        return 'Here is my calendatr:'
-                
-
-class DayInCalendar:
-    
-    def __init__(self, request, dateInCalendar, today, view):
-        self.events=[]
-        hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
-        
-        self.year  = dateInCalendar.year
-        self.month = dateInCalendar.month
-        self.day   = dateInCalendar.day 
-        
-        # If client then bring the relevant day of avliable tours
-        # Remove days were guide is on vacation and tour isn't possible
-        
-        if (dateInCalendar < today):
-            self.fill =    "day col-sm sm-hide p-2 border border-left-0 border-top-0 text-truncate bg-light text-right"
-        elif (dateInCalendar == today):
-           self.fill =    "day col-sm p-2 border text-truncate border-success text-right"
-        else:
-           self.fill =    "day col-sm p-2 border border-left-0 border-top-0 text-truncate text-right"
-        
-        if (dateInCalendar.day==1):
-            self.dayNumStr     =  str(dateInCalendar.day) + '    .....   ' + hebmonthdic[dateInCalendar.strftime("%b")]
-        else:
-            self.dayNumStr     =  str(dateInCalendar.day)
-            
-        self.dayNameHeb    = hebdict[dateInCalendar.strftime("%a")]
-        
-        # Querey guide holiday
-        guideVacationQuery   = GuideVacation.objects.filter(vac_start_date__lte=dateInCalendar,
-                                                        vac_end_date__gte=dateInCalendar) 
-        # If date belong to previous month maker it gray
-        if (request.user.is_authenticated and view == 'A'):
-#        if (False):
-            # If user then bring relevant data of:
-            # Planned trips for user
-            # Days off for user
-            tripQuery = Trip.objects.filter(trip_date=dateInCalendar)
-            
-             
-            
-            
-            for trip in tripQuery:
-                # Check for unconfirmed trips
-                if (trip.status == 'n'):
-                    bg_color =  'bg-warning'
-                elif trip.status == 'd': 
-                    bg_color = 'bg-primary'
-                elif trip.status == 'e':
-                    bg_color = 'bg-success'
-                else:
-                    bg_color = 'bg-dark'
-
-                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small " + bg_color + " text-white"
-                text  = trip.get_trip_type_display() + ' Tour'
-                link  = 'tour:clientview'
-                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=int(trip.trip_time.strftime('%H')), trip_type=trip.trip_type, trip_id= trip.id))
-                
-            # Now print day off    
-            for vac in guideVacationQuery:
-                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small bg-info text-white"
-                text  = 'Vaction ' + vac.guide_vacation
-                link  = None  
-                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=11, trip_type='C', trip_id =1))
-                
-            
-        # This is a client here or admin that looks on avaliable trips!!!
-        # Still need to add an option to cancel trip if guide is on vacation
-        elif (dateInCalendar > today):
-            # Check specific day in the week
-            availableDateQuery0     = TripAvailabilty.objects.filter(Q(ava_select_day    =   dateInCalendar.strftime('%a')))
-            # Check for all days
-            availableDateQuery1     = TripAvailabilty.objects.filter(Q(ava_select_day    =   'All'))
-            availableDateQuery = availableDateQuery1 | availableDateQuery0
-            
-                   
-            for tripAvailabilty in availableDateQuery:
-                #print(tripAvailabilty.ava_trip_type)
-                if (tripAvailabilty.ava_trip_type != 'A' and tripAvailabilty.ava_trip_type != view):
-                    continue
-                canceled = False
-                # Check if the trip was canceld
-                noneAvailableDateQuery = TripAvailabilty.objects.filter(ava_no_trip_day__year  = dateInCalendar.year,
-                                                                        ava_no_trip_day__month = dateInCalendar.month,
-                                                                        ava_no_trip_day__day   = dateInCalendar.day,
-                                                                        ava_no_trip_day__hour  = tripAvailabilty.ava_time.hour
-                                                                        )
-                for noneAvailableDate in noneAvailableDateQuery:
-                    #print(noneAvailableDate.ava_no_trip_day.strftime("%Y-%M-%D-%H"))
-                    if noneAvailableDate.ava_trip_type == 'A' or noneAvailableDate.ava_trip_type == tripAvailabilty.ava_trip_type:
-                        #print("TRUE")
-                        # Break from nearset for
-                        canceled = True
-                        break
-                # As it was canceled move to the next item in the lisy
-                if (canceled):
-                    continue
-                    
-                # Check if their is already a different trip on this day, we don't want two trips on the same day
-                tripQuery = Trip.objects.filter(trip_date__year  = dateInCalendar.year,
-                                                trip_date__month = dateInCalendar.month,
-                                                trip_date__day   = dateInCalendar.day,
-                                                trip_time__hour  = tripAvailabilty.ava_time.hour,
-                                                
-                                                )
-              
-                # We found a trip let's check if it is a different one.
-                for trip in tripQuery:
-                    if (trip.trip_type != view):
-                        canceled = True
-                        break
-                if (canceled):
-                    continue
-                    
-                bg_color = 'bg-success'    
-                #attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small "+ bg_color + " text-white"
-                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small text-white"
-                #text  = tripAvailabilty.ava_time.strftime('%H:%M') + '  ' +   TRIP_TYPE_HEB[tripAvailabilty.ava_trip_type]
-                text  = tripAvailabilty.ava_time.strftime('%H:%M') 
-                link  = 'tour:booking'
-                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=int(tripAvailabilty.ava_time.strftime('%H')), 
-                                             trip_type=view,  trip_id= 1))
-                
-            
-                
-                
-            self.year  = dateInCalendar.year
-            self.month = dateInCalendar.month
-            self.day   = dateInCalendar.day
-            
-            ########################
-     
-class EventAttr:
-    def __init__(self, attr, text, link, hour, trip_type, trip_id):
-        self.attr = attr
-        self.text = text
-        self.link = link
-        self.hour = hour
-        self.trip_type =trip_type
-        self.id   = trip_id
                 
 class Contact(models.Model):
     '''
@@ -526,7 +308,7 @@ class Calendar:
             
             dayInMonth = datetime.date(_year, _month, dayCount)
                 
-            dayInCalendar.append(DayInCalendar1(request=request, dateInCalendar=dayInMonth, today= today, view=view))
+            dayInCalendar.append(DayInCalendar(request=request, dateInCalendar=dayInMonth, today= today, view=view))
             
             # Every 7 days pack in new list, and also revered the order to be from right to left for the hebrew calendar
             if (i%7==0):
@@ -548,7 +330,7 @@ class Calendar:
         return 'Here is my calendatr:'
                 
 
-class DayInCalendar1:
+class DayInCalendar:
     
     def __init__(self, request, dateInCalendar, today, view):
         self.events=[]
@@ -580,6 +362,7 @@ class DayInCalendar1:
         guideVacationQuery   = GuideVacation.objects.filter(vac_start_date__lte=dateInCalendar,
                                                         vac_end_date__gte=dateInCalendar) 
         self.attr = False
+        self.vac = False
         
         if (request.user.is_authenticated and view == 'A'):
 #        if (False):
@@ -596,7 +379,9 @@ class DayInCalendar1:
                 self.attr = True
                 self.id   = dateInCalendar.strftime('%d_%m_%Y')
                 self.id   += "-"+ tripQuery[0].trip_time.strftime('%H_%M')
-                
+            
+            if len(guideVacationQuery)>0:
+                self.vac = True
             # Now print day off    
 #            for vac in guideVacationQuery:
 #                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small bg-info text-white"
@@ -633,6 +418,14 @@ class DayInCalendar1:
                         canceled = True
                         break
                 # As it was canceled move to the next item in the lisy
+                if (canceled):
+                    continue
+                
+                for vac in guideVacationQuery:
+                    if (vac.vac_cancel_all) or (vac.vac_cancel_family and view=='F') or (vac.vac_cancel_classy and view=='C'):
+                        canceled = True
+                        break
+                # Guide on holiday there is no tour on this day
                 if (canceled):
                     continue
                     

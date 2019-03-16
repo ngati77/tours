@@ -9,8 +9,8 @@ from django.views import generic
 
 from django.utils import timezone
 
-from .models import Trip, Clients, NewCalendar, Review, Gallery, Calendar
-from .models import OurTours, Guide, Transaction, Contact
+from .models import Trip, Clients, Review, Gallery, Calendar
+from .models import OurTours, Guide, Transaction, Contact, GuideVacation
 
 from .tour_emails import tour_emails 
 import datetime
@@ -958,7 +958,10 @@ def tasks(request):
                         trip_date__gte  = today
                         ).order_by('trip_date')
     
-    
+    next_vacations = GuideVacation.objects.filter(
+            vac_end_date__gte = today
+            ).order_by('vac_start_date')
+         
     return render(request, 'tour/tasks.html', {'title':'Tasks',
                                                      'page_title' : 'משימות',
                                                      'meta_des':'קיימברידג בעברית משימות',
@@ -967,7 +970,8 @@ def tasks(request):
                                                      'complete_tours': complete_tours,
                                                      'new_contact':new_contact,
                                                      'new_review':new_review,
-                                                     'next_tours':next_tours
+                                                     'next_tours':next_tours,
+                                                     'next_vacations':next_vacations
                                                      
                                                      })
 

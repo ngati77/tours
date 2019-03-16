@@ -57,6 +57,8 @@
      {% for day in week %}
      {% if day.attr %}
       <li><a class="active" id={{day.id}} onclick="return a1_onclick('{{day.id}}')" > {{ day.dayNumStr }}</a></li>
+      {% elif day.vac %}
+      <li><a class="vacation"> {{ day.dayNumStr }}</a></li>
       {% else %}
       <li> {{ day.dayNumStr }}</li>
       {% endif %} 
