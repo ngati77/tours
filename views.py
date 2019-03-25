@@ -374,6 +374,7 @@ def bookTour(request,pYear, pMonth, tripType ):
                                                  'triptime': trip_time, 
                                                  'price':paymentSum, 
                                                  'deposit':deposit, 
+                                                 'stripe_public_key':settings.STRIPE_PUBLISHABLE_KEY,
                                                  })
            
     newCalendar= Calendar(request=request, year=pYear,  month=pMonth , view=tripType)

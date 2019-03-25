@@ -82,6 +82,5 @@ __init__.pyc
 apps.pyc
 migrations/
 
-# Stripe
 
-stripe*.js
+
