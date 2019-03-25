@@ -8,7 +8,7 @@
 
 
   <!-- CSS for each example: -->
-  <link rel="stylesheet" type="text/css" href="{% static 'tour/stripe_example2.css' %}" data-rel-css="" />
+  <link rel="stylesheet" type="text/css" href="{% static 'tour/stripe_nice.css' %}" data-rel-css="" />
 {% endblock %}
 
 {% block content %}
@@ -79,8 +79,10 @@
     </main>
   </div>
 
-
-    <script src="{% static 'tour/stripe_new.js' %}" data-rel-js></script>
-    <script src="{% static 'tour/stripe_example2.js' %}" data-rel-js></script>
+<script>
+   var stripe_public_key = '{{ stripe_public_key|escapejs }}';
+</script>
+    <script src="{% static 'tour/stripe_nice_main.js' %}" data-rel-js></script>
+    <script src="{% static 'tour/stripe_nice_sub.js' %}" data-rel-js></script>
 
 {% endblock %}

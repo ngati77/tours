@@ -1,8 +1,7 @@
 'use strict';
 
-//var stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
-var stripe_key ={{stripe_public_key | safe }};
-var stripe = Stripe(stripe_key);
+//window.alert(stripe_public_key);
+var stripe = Stripe(stripe_public_key);
 
 function registerElements(elements, exampleName) {
   var formClass = '.' + exampleName;
