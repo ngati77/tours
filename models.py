@@ -363,7 +363,7 @@ class DayInCalendar:
                                                         vac_end_date__gte=dateInCalendar) 
         self.attr = False
         self.vac = False
-        
+        # Only gor Managment
         if (request.user.is_authenticated and view == 'A'):
 #        if (False):
             # If user then bring relevant data of:
@@ -375,10 +375,10 @@ class DayInCalendar:
             #Check if we have a trip this day
             if len(tripQuery)>0:
             # Check for unconfirmed trips
-                
-                self.attr = True
-                self.id   = dateInCalendar.strftime('%d_%m_%Y')
-                self.id   += "-"+ tripQuery[0].trip_time.strftime('%H_%M')
+                if (tripQuery[0].status  != 'b'):
+                    self.attr = True
+                    self.id   = dateInCalendar.strftime('%d_%m_%Y')
+                    self.id   += "-"+ tripQuery[0].trip_time.strftime('%H_%M')
             
             if len(guideVacationQuery)>0:
                 self.vac = True
@@ -439,7 +439,7 @@ class DayInCalendar:
               
                 # We found a trip let's check if it is a different one.
                 for trip in tripQuery:
-                    if (trip.trip_type != view):
+                    if (trip.status  != 'b' and trip.trip_type != view):
                         canceled = True
                         break
                 if (canceled):
