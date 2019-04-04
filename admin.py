@@ -49,6 +49,7 @@ class ClientAdmin(admin.ModelAdmin):
         
         ('Payments',         {'fields': ['pre_paid']}),
         (None,               {'fields': ['total_payment']}),
+        ('Trip',             {'fields': ['trip']}),
         
     ]
     inlines         = [TransactionInline]

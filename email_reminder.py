@@ -29,6 +29,7 @@ def main():
     tripQuery = Trip.objects.filter(trip_date__year  = tomorrow.year,
                                      trip_date__month = tomorrow.month,
                                      trip_date__day   = tomorrow.day,
+                                     status           = 'a',
                                      
                                     )
     

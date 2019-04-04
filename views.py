@@ -38,6 +38,7 @@ import logging
 
 from threading import Thread, activeCount
 
+from django.db.models import Q
 
 
 # Get an instance of a logger
@@ -746,6 +747,7 @@ def reportView(request):
            
             if (check_guide):
                 tripQuerey = Trip.objects.filter(
+                    status            = 'e',
                     trip_date__month  = month,
                     trip_date__year   = year,
                     trip_guide        = guide,
@@ -753,6 +755,7 @@ def reportView(request):
             # If we want to see all guides    
             else:
                 tripQuerey = Trip.objects.filter(
+                         status            = 'e',
                          trip_date__month  = month,
                          trip_date__year   = year,
                         ).order_by(order)
@@ -956,6 +959,7 @@ def tasks(request):
     new_review = Review.objects.filter(confirm = False)
     
     next_tours =  Trip.objects.filter(
+                        ~Q(status='b'),
                         trip_date__gte  = today
                         ).order_by('trip_date')
     
@@ -1010,75 +1014,76 @@ def tour_complete(request, pk):
     tours_query =  Trip.objects.filter(id  = pk)
     if (len(tours_query)>0):
         trip = tours_query[0]
-        clientQuerey = trip.clients_set.all()
-        
-        # Scan all clients
-        for client in clientQuerey:
-            transactionArray = []
-            if client.total_payment > client.pre_paid:
-                # Create Cache transaction  
-                try:
-                    transaction = Transaction(
-                                    client          =  client,
-                                    create_date     =  trip.trip_date,
-                                    token           =  'Cash',
-                                    amount          =  (client.total_payment - client.pre_paid),
-                                    charge_id       =  'Cash',
-                                    success         =  True)
-                    transaction.save()
-                except:
-                    print ('problem creating transaction')
-                        
-            #'Now create the invoice'
+        if trip.status == 'a':
+            # Change trip status to complete    
+            trip.status = 'e'
+            trip.save()
+            clientQuerey = trip.clients_set.all()
             
-            transactionQuerey = client.transaction_set.all()
-            amount = 0
-            for tran in transactionQuerey:
-                tType = 'אשראי'
-                if tran.token == 'Cash':
-                    tType = 'מזומן'
-                amount += tran.amount
-                tranEntry = TransactionEntry(payment_type   = tType,
-                                             payment_date   = tran.create_date,
-                                             payment_amount = tran.amount ,
-                                             payment_id     = tran.id )  
+            # Scan all clients
+            for client in clientQuerey:
+                transactionArray = []
+                if client.total_payment > client.pre_paid:
+                    # Create Cache transaction  
+                    try:
+                        transaction = Transaction(
+                                        client          =  client,
+                                        token           =  'Cash',
+                                        amount          =  (client.total_payment - client.pre_paid),
+                                        charge_id       =  'Cash',
+                                        success         =  True)
+                        transaction.save()
+                    except:
+                        print ('problem creating transaction')
+                            
+                #'Now create the invoice'
                 
-                transactionArray.append(tranEntry)
-            # create sum 
-            tranEntry = TransactionEntry(payment_type   = 'סיכום',
-                                             payment_date   = datetime.datetime.now(),
-                                             payment_amount = amount ,
-                                             payment_id     = trip.id )
-            # Ready to create invoice
-            params = {
-                'report'   : transactionArray,
-                'sum'      : tranEntry, 
-                'client'   : client,
-                'children' : (client.number_of_children > 0),
-                'request'  : request
-            }
-            # Check if need to send the pdf    
-            try:
-                file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
-                file = Render.render_to_file('pdf/client.html', file_name, params)
-            except:
-                print("Can't create pdf")
-            try:
-                msg_plain = "תודה שטיילתם איתנו בקיימברדיג' היה לנו כייף"
-                msg_html = render_to_string('emails/email_feedback.html')
-                title = "קיימברידג' בעברית- תודה שטיילתם איתנו"
-                tour_emails.send_email_msg_pdf( to=[client.email],
-                                               msg_html=msg_html, 
-                                               msg_plain=msg_plain, 
-                                               file=file, 
-                                               file_name=file_name, 
-                                               cc=[settings.EMAIL_YAEL], 
-                                               title=title)
-            except:
-                print("Can't send email")
-        # Change trip status to complete    
-        trip.status = 'e'
-        trip.save()
+                transactionQuerey = client.transaction_set.all()
+                amount = 0
+                for tran in transactionQuerey:
+                    tType = 'אשראי'
+                    if tran.token == 'Cash':
+                        tType = 'מזומן'
+                    amount += tran.amount
+                    tranEntry = TransactionEntry(payment_type   = tType,
+                                                 payment_date   = tran.create_date,
+                                                 payment_amount = tran.amount ,
+                                                 payment_id     = tran.id )  
+                    
+                    transactionArray.append(tranEntry)
+                # create sum 
+                tranEntry = TransactionEntry(payment_type   = 'סיכום',
+                                                 payment_date   = datetime.datetime.now(),
+                                                 payment_amount = amount ,
+                                                 payment_id     = trip.id )
+                # Ready to create invoice
+                params = {
+                    'report'   : transactionArray,
+                    'sum'      : tranEntry, 
+                    'client'   : client,
+                    'children' : (client.number_of_children > 0),
+                    'request'  : request
+                }
+                # Check if need to send the pdf    
+                try:
+                    file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
+                    file = Render.render_to_file('pdf/client.html', file_name, params)
+                except:
+                    print("Can't create pdf")
+                try:
+                    msg_plain = "תודה שטיילתם איתנו בקיימברדיג' היה לנו כייף"
+                    msg_html = render_to_string('emails/email_feedback.html')
+                    title = "קיימברידג' בעברית- תודה שטיילתם איתנו"
+                    tour_emails.send_email_msg_pdf( to=[client.email],
+                                                   msg_html=msg_html, 
+                                                   msg_plain=msg_plain, 
+                                                   file=file, 
+                                                   file_name=file_name, 
+                                                   cc=[settings.EMAIL_YAEL], 
+                                                   title=title)
+                except:
+                    print("Can't send email")
+        
     
     # Bring back the tasks        
     return tasks(request)

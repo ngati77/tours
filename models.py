@@ -166,13 +166,13 @@ class Trip(models.Model):
             )
     
     def __str__(self):
-        print('Trip indo')
-        print('Trip date: ')
-        print(self.trip_date)
-        print('Trip time: ')
-        print(self.trip_time)
-        print(type(self.trip_time))
-        return self.trip_text
+#        print('Trip indo')
+#        print('Trip date: ')
+#        print(self.trip_date)
+#        print('Trip time: ')
+#        print(self.trip_time)
+#        print(type(self.trip_time))
+        return str(self.id)
     
     
  
@@ -185,7 +185,9 @@ class Trip(models.Model):
             return False
     @staticmethod
     def get_event(date):
-        return Trip.objects.filter(trip_date=date)
+        return Trip.objects.filter(
+                                ~Q(status='b'),
+                                trip_date=date)
      
     #was_published_recently.admin_order_field = 'pub_date'
     #was_published_recently.boolean = True
