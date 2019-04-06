@@ -51,9 +51,7 @@ logger = logging.getLogger(__name__)
 #    return HttpResponse("Hello, world. You're at the polls index.")
 hebmonthdic = {'Jan': 'ינואר', 'Feb' : 'פברואר' , 'Mar' : 'מרץ', 'Apr': 'אפריל' , 'May' : 'מאי' , 'Jun' : 'יוני' , 'Jul' : 'יולי' , 'Aug' : 'אוגוסט' , 'Sep' : 'ספטמבר' , 'Oct' : 'אוקטובר' , 'Nov' : 'נובמבר' , 'Dec' : 'דצמבר' }
 
-hebdaydic   = {'Sun': 'ראשון','Mon': 'שני','Tue': 'שלישי','Wed': 'רביעי','Thu': 'חמישי','Fri': 'שישי','Sat': 'שבת'}
-
-
+#hebdaydic   = {'Sun': 'ראשון','Mon': 'שני','Tue': 'שלישי','Wed': 'רביעי','Thu': 'חמישי','Fri': 'שישי','Sat': 'שבת'}
         
 def home(request):
     """
@@ -126,42 +124,13 @@ def reviewes(request):
                                                    'meta_des':meta_des,
                                                  'meta_key':meta_key,
                                                   'reviewes':reviewesQuery})
-def ourTours(request):
-    """
-    Show home reviewes
-    """
-    OurToursQuery = OurTours.objects.filter(confirm=True)
-    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
-    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
-    meta_des = meta_des_heb + meta_des_en
-    meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
-    meta_key_en  = " cambridge college old market"
-    meta_key     = meta_key_heb + meta_key_en
-    return render(request, 'tour/our_tours.html', {'page_title':'הסיורים שלנו', 
-                                                   'meta_des':meta_des,
-                                                   'meta_key':meta_key,
-                                                   
-                                                  'ourTours':OurToursQuery})
-    
-    
-    
-#def find_your_day(request, view):
-#    """
-#    Show calendar of events this month
-#    """
-#    today = datetime.date.today()
-#    #return calendar(request, lToday.year, lToday.month)
-#    return bookTour(request=request,  pYear=today.year, pMonth=today.month, tripType=view)
 
-  
-
-#def old_calendar_view(request, pYear, pMonth, view):
+#def new_calendar_view(request, pYear, pMonth, view):
 #    """
 #    Show calendar of events this month
 #    """
 #   
 #    #return calendar(request, lToday.year, lToday.month)
-#    newCalendar= NewCalendar(request=request, year=pYear,  month=pMonth , view=view)
 #    if view == 'A':
 #        OurTour = ''
 #    else:
@@ -177,38 +146,11 @@ def ourTours(request):
 #    meta_key_en  = " cambridge college old market"
 #    meta_key     = meta_key_heb + meta_key_en
 #    print_child = (OurTour.priceChild) > 0
-#    return render(request, 'tour/calendar.html', {'page_title':OurTour.title,
+#    return render(request, 'tour/tour-details.html', {'page_title':OurTour.title,
 #                                                   'meta_des':meta_des,
 #                                                   'meta_key':meta_key,
 #                                                   'print_child':print_child,
-#                                                  'newCalendar':newCalendar,'ourTour':OurTour})
-
-def new_calendar_view(request, pYear, pMonth, view):
-    """
-    Show calendar of events this month
-    """
-   
-    #return calendar(request, lToday.year, lToday.month)
-    if view == 'A':
-        OurTour = ''
-    else:
-        OurToursQuery = OurTours.objects.filter(trip_type=view)
-        if len(OurToursQuery)!=1:
-            print('Raise exception')
-        OurTour = OurToursQuery[0]
-#    print(newCalendar)
-    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
-    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
-    meta_des = meta_des_heb + meta_des_en
-    meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
-    meta_key_en  = " cambridge college old market"
-    meta_key     = meta_key_heb + meta_key_en
-    print_child = (OurTour.priceChild) > 0
-    return render(request, 'tour/tour-details.html', {'page_title':OurTour.title,
-                                                   'meta_des':meta_des,
-                                                   'meta_key':meta_key,
-                                                   'print_child':print_child,
-                                                   'ourTour':OurTour})
+#                                                   'ourTour':OurTour})
     
 def payment(request ):
     form = PaymentForm(request.POST)
@@ -422,123 +364,6 @@ def bookTour(request,pYear, pMonth, tripType ):
                                                  'print_child': print_child,
                                                  'newCalendar':newCalendar})
 
-#def booking(request, pYear, pMonth, pDay, pHour, tripType):
-#
-#    
-#    # If this is a POST request then process the Form data
-#    #TyprDict = {'F': 'הרשמה לסיור משפחות', 'C': 'הרשמה לסיור קלאסי', 'B': 'הרשמה לאוטובוס'}
-#    # Britng the trip name in hebrew from db
-#    TripTypeQuery = OurTours.objects.filter(trip_type=tripType)
-#    title   =  TripTypeQuery[0].title
-#    deposit =  TripTypeQuery[0].deposit
-#    price =  TripTypeQuery[0].price
-#    priceChild =  TripTypeQuery[0].priceChild
-#    print_child = (TripTypeQuery[0].priceChild) > 0
-#    #title = TyprDict[tripType]
-#    stripe.api_key = settings.STRIPE_SECRET_KEY
-#   
-#    if request.method == 'POST':
-#        # Create a form instance and populate it with data from the request (binding):
-#        form = BookingForm(request.POST)
-#        # Check if the form is valid:
-#        if form.is_valid():
-#            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
-#            #book_inst.due_back = form.cleaned_data['renewal_date']
-#           # Get all infortamtion from form
-#            trip_date, trip_time, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum = form.get_data()
-#            
-#            #trip_date = datetime.datetime(pYear, pMonth, pDay, pHour)
-#            # Check iftrip exists
-#           
-#            
-#            try:
-#                token = request.POST['stripeToken']
-#                charge = stripe.Charge.create(
-#                    amount=deposit*100,
-#                    currency='gbp',
-#                    description='Advance payment',
-#                    source=token,
-#                    receipt_email = email,
-#                )
-#            except stripe.error.CardError as e:
-#                messages.info(request, "Your card has been declined.")
-#                return render(request, 'tour/failure.html', {'title':'failure', 'page_title':'failure'})
-#            
-#            # Create ne trip
-#            tripQuerySet = Trip.get_event(trip_date)
-#            if (len(tripQuerySet)==0):
-#                trip = Trip(trip_text='', trip_date=trip_date, trip_time=trip_time ,trip_type=tripType)
-#                trip.save()
-#            else:
-#                trip = tripQuerySet[0]
-#            
-#            # Create new client           
-#            client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=number_adults, number_of_children=number_child, pre_paid = deposit, total_payment = paymentSum)
-#            client.save()
-#            # create a transaction
-#            transaction = Transaction(client=client,
-#                            token=token, 
-#                            charge_id = charge.id,
-#                            amount=deposit,
-#                            success=True)
-#            # save the transcation (otherwise doesn't exist)
-#            transaction.save()
-#            
-#            # redirect to a new URL:
-#            #print("Added new client")
-#            #return HttpResponseRedirect(reverse('all-borrowed') )
-#            #sg_plain = render_to_string('templates/email.txt', {'some_params': some_params})
-#            msg_plain= 'DUMMY ONE'
-#            children = (client.number_of_children > 0)
-#            more_to_pay=(paymentSum-deposit)
-#            try:
-#                msg_html = render_to_string('emails/email_success.html', {'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'id': transaction.id, 'trip_type':title, 'client':client, 'print_children':children, 'more_to_pay':more_to_pay})
-#                #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
-#                emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-#                #cc =['yael.gati@cambridgeinhebrew.com']
-#                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[email], title=emailTitle, cc=settings.CC_EMAIL)
-#            except:
-#                print('Got an error...')
-#            #print(f'Debug {emailSuccess}')
-#            meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
-#            meta_des_en  = ""
-#            meta_des = meta_des_heb + meta_des_en
-#            meta_key_heb = "הרשמה הצלחה "
-#            meta_key_en  = " "
-#            meta_key     = meta_key_heb + meta_key_en
-#            return render(request, 'tour/success.html', {'title':'success', 'page_title':'ההרשמה הסתיימה בהצלחה', 
-#                                                          'meta_des':meta_des,
-#                                                          'meta_key':meta_key,
-#                                                         'trip_date':trip_date.strftime("%d-%m-%Y"), 'trip_time':trip_time.strftime("%H:%M"), 'deposit':deposit, 'more_to_pay':more_to_pay, 'id': transaction.id, 'trip_type':title, 'first':first_name, 'last': last_name })
-#           
-#
-#    # If this is a GET (or any other method) create the default form.
-#   # TODO, Double check date as avialable one, or already has a trip on that day. 
-#    proposed_date = datetime.datetime(pYear, pMonth, pDay, pHour)
-#    form = BookingForm(initial={'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
-#        
-#    tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
-#    triptime = proposed_date.strftime("%H:%M") 
-#    
-#    pageTitle=  'הזמנת ' +  title 
-#    meta_des_heb = "הזמנת סיור בקיימברידג בעברית  "
-#    meta_des_en  = "book your tour in Hebrew in Cambridge UK"
-#    meta_des = meta_des_heb + meta_des_en
-#    meta_key_heb = "הזמנת סיור עברית קיימברידג' "
-#    meta_key_en  = "book tour cambridge hebrew "
-#    meta_key     = meta_key_heb + meta_key_en
-#    return render(request, 'tour/booking.html', {'title':title, 'page_title' : pageTitle,
-#                                                  'meta_des':meta_des,
-#                                                  'meta_key':meta_key,
-#                                                 'form': form, 
-#                                                 'tripdate': tripdate, 
-#                                                 'triptime': triptime, 
-#                                                 'price':price, 
-#                                                 'priceChild':priceChild, 
-#                                                 'deposit':deposit, 
-#                                                 'print_child': print_child})
-
-
 
 def contactUs(request ):
     if request.method == 'POST':
@@ -662,31 +487,7 @@ def failure (request):
                                                 'page_title':'ההרשמה נכשלה'})
 
 
-#class GuideView(generic.ListView):
-#    template_name = 'tour/guide_view.html'
-#    context_object_name = 'latest_trip_list'
-#
-#    #def get_queryset(self):
-#    """
-#    Return the last five published questions (not including those set to be
-#    published in the future).
-#    """
-#        
-#        
-#        
-#    def get_queryset(self):
-#        filter_val = self.request.GET.get('filter', timezone.now())
-#        order = self.request.GET.get('orderby', 'trip_date')
-#        new_context = Trip.objects.filter(
-#                trip_date__gte=filter_val,
-#                ).order_by(order)
-#        return new_context
-#
-#    def get_context_data(self, **kwargs):
-#        context = super(GuideView, self).get_context_data(**kwargs)
-#        context['filter'] = self.request.GET.get('filter', timezone.now())
-#        context['orderby'] = self.request.GET.get('orderby','trip_date')
-#        return context
+
 # 
 class ClientView(generic.DetailView):
     template_name = 'tour/clients_in_tour.html'
