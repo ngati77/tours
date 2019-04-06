@@ -23,7 +23,6 @@ class OurToursSitemap(Sitemap):
         return datetime.now()
     
     def location(self, obj):
-        print(obj.trip_type)
         return '/tour_details/' + obj.trip_type
 
 
