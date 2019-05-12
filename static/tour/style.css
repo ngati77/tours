@@ -354,7 +354,7 @@ hr.short{
 
 .tips {
    
-   margin-right: 2rem;
+   margin-right: 1rem;
    margin-bottom: .5rem;
    padding: 0rem;
    
@@ -536,8 +536,14 @@ hr.light-100 {
 }
  
 */
+
 }
 @media (max-width: 576px) {
+
+.circle-icon {
+    top: -12%;
+    
+}
   .carousel-caption {
     top: 40%;
 }

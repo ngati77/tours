@@ -60,7 +60,7 @@ def home(request):
     #return render(request, 'tour/index.html', {'page_title':'home'})
 
     OurToursQuery = OurTours.objects.filter(confirm=True).order_by('order')
-    reviewesQuery = Review.objects.filter(confirm=True).order_by('-create_date')[:3]
+    reviewesQuery = Review.objects.filter(confirm=True).order_by('-create_date')[:5]
     logger.info('home page')
     meta_des_heb = "סיורים בקיימברידג' אנגליה, סיור בעיר יפיפיה מחוץ ללונדון. סיור חד יומי  "
     meta_des_en  = "Cambridge in hebrew - Guided tours in Hebrew. In the beautiful city Cambridge. This is a one day tour outside London "

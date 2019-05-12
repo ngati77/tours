@@ -34,10 +34,9 @@
             
             {% for review in reviewes %}
             <div class="review">
-                
-                
-               
+
                 <div class="review_header">
+                <div class="text-left mb-2"><i><b>{{ review.create_date|date:"d.m.Y" }}</b></i></div>
                      <i class="fa fa-quote-right" aria-hidden="true"></i>
                     <div class="row review_header" ><p>{{review.title}}</p> </div>
                 </div>
@@ -68,12 +67,25 @@
         <div class="col-sm-12 col-md-12 col-lg-8 order-sm-0 order-lg-1">
         <div class="row main_text">
             <p class="title1">זהו הזמן לגלות את קיימברידג', אחת הערים היפות והמיוחדות באירופה. </p>
+            <!--
             <p class="text1">
-            הצטרפו לסיור המודרך בעברית ותהנו מיום בילוי מקסים וחוויתי. במרחק של כ-50 דק' נסיעה ברכבת מלונדון, מחכה לכם פנינה אמיתית. יחד נגלה את העיר העתיקה ומבני הקולג'ים הנהדרים של אוניברסיטה, נשמע סיפורים על בני מלוכה ואנשים מעניינים בהיסטוריה ונחצה גשרים על נהר שבו סירות עץ משייטות לאיטן.        
+            הצטרפו לסיור המודרך בעברית ותהנו מיום בילוי מקסים וחוויתי. במרחק של כ-50 דק' נסיעה ברכבת מלונדון, מחכה לכם פנינה אמיתית. יחד נגלה את העיר העתיקה ומבני הקולג'ים הנהדרים של אוניברסיטה, נשמע סיפורים על בני מלוכה ואנשים מעניינים בהיסטוריה ונחצה גשרים על נהר שבו סירות עץ משייטות לאיטן.  
+                  
             </p>
-                   
+                -->  
+                  <p class="text1">
+            סיור פרטי בעיר העתיקה והקסומה של קיימברידג׳ 
+בואו לסיור מודרך בעברית ותהנו מיום בילוי מקסים וחוויתי.
+במרחק של כ-50 דק' נסיעה ברכבת מלונדון, מחכה לכם פנינה אמיתית. 
+סיור שלוקח אותכם אל תוך דפי ההיסטוריה בין המבנים המפוארים של הקולג׳ים.
+הסיור מלווה בהסברים וסיפורים על בני מלוכה ואנשים מעניינים וחשובים שחיו כאן.
+לבחירתכם מגוון סיורים פרטיים
    
-            <div class="row tips-row">
+            <div class="row tips-row d-flex justify-content-center">
+                <div class="col-sm-12 col-md-2 tips  ">
+                    <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
+                    <p>מגוון סיורים פרטיים.</p>
+                </div>
                 <div class="col-sm-12 col-md-2 tips  ">
                     <i class="fa fa-star  circle-icon "  style="color:white; font-size: 13px;"></i>
                     <p>בנינו עבורכם מסלול מעניין ביותר, העובר במקומות נפלאים בעיר.</p>
@@ -88,7 +100,7 @@
                 </div>
                 <div class="col-sm-12 col-md-2 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>ההדרכה מתבצעת בקבוצות קטנות ואינטימיות.</p>
+                    <p>ניתן לתאם איתנו איסוף מתחנת הרכבת.</p>
                 </div>
             </div>
           </div>
