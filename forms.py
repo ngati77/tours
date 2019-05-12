@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from datetime import date, datetime, time
-
+from captcha.fields import CaptchaField
  
     
 class BookingForm(forms.Form):
@@ -86,12 +86,15 @@ class PaymentForm(forms.Form):
         send_emails     = self.data['send_emails']
         return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails        
 
+
 class ContactForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
     last_name      = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
     email          = forms.EmailField(label ='', widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
     text           = forms.CharField(label  ='', widget=forms.Textarea(attrs={'cols':26,'placeholder': 'נושא הפנייה'}))
-
+    
+    #textdummy           = forms.CharField(hidden=True,required=False, label  ='')
+    captcha        = CaptchaField(label ='קצת חשבון',label_suffix="")
     
     def get_data(self):
         first_name      = self.cleaned_data['first_name']

@@ -125,32 +125,6 @@ def reviewes(request):
                                                  'meta_key':meta_key,
                                                   'reviewes':reviewesQuery})
 
-#def new_calendar_view(request, pYear, pMonth, view):
-#    """
-#    Show calendar of events this month
-#    """
-#   
-#    #return calendar(request, lToday.year, lToday.month)
-#    if view == 'A':
-#        OurTour = ''
-#    else:
-#        OurToursQuery = OurTours.objects.filter(trip_type=view)
-#        if len(OurToursQuery)!=1:
-#            print('Raise exception')
-#        OurTour = OurToursQuery[0]
-##    print(newCalendar)
-#    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
-#    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
-#    meta_des = meta_des_heb + meta_des_en
-#    meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
-#    meta_key_en  = " cambridge college old market"
-#    meta_key     = meta_key_heb + meta_key_en
-#    print_child = (OurTour.priceChild) > 0
-#    return render(request, 'tour/tour-details.html', {'page_title':OurTour.title,
-#                                                   'meta_des':meta_des,
-#                                                   'meta_key':meta_key,
-#                                                   'print_child':print_child,
-#                                                   'ourTour':OurTour})
     
 def payment(request ):
     form = PaymentForm(request.POST)
