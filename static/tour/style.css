@@ -448,11 +448,7 @@ hr.light-100 {
 
 }
 
-video {
-    width:'640';
-    height:'480';
 
-}
 
 /*---Media Queries --*/
 @media (max-width: 992px) {
@@ -544,11 +540,7 @@ video {
 }
  
 */
-video {
-    width:'320';
-    height:'240'; 
 
-}
 }
 @media (max-width: 576px) {
 
