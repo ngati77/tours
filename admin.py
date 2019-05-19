@@ -49,11 +49,13 @@ class ClientAdmin(admin.ModelAdmin):
         
         ('Payments',         {'fields': ['pre_paid']}),
         (None,               {'fields': ['total_payment']}),
+        (None,               {'fields': ['text']}),
         ('Trip',             {'fields': ['trip']}),
+        
         
     ]
     inlines         = [TransactionInline]
-    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails')
+    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','text')
     list_filter     = ['first_name']
     search_fields   = ['first_name']
     

@@ -221,6 +221,8 @@ class Clients(models.Model):
                                         default='a',
                                         )
     
+    text               = models.TextField(max_length=600)
+    
     #create_date      = models.DateTimeField('date create')
     
     def __str__(self):
