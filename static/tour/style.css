@@ -544,7 +544,11 @@ video {
 }
  
 */
+video {
+    width:'320';
+    height:'240'; 
 
+}
 }
 @media (max-width: 576px) {
 
