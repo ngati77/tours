@@ -49,7 +49,11 @@ logger = logging.getLogger(__name__)
 
 #def index(request):
 #    return HttpResponse("Hello, world. You're at the polls index.")
-hebmonthdic = {'Jan': 'ינואר', 'Feb' : 'פברואר' , 'Mar' : 'מרץ', 'Apr': 'אפריל' , 'May' : 'מאי' , 'Jun' : 'יוני' , 'Jul' : 'יולי' , 'Aug' : 'אוגוסט' , 'Sep' : 'ספטמבר' , 'Oct' : 'אוקטובר' , 'Nov' : 'נובמבר' , 'Dec' : 'דצמבר' }
+#hebmonthdic = {'Jan': 'ינואר', 'Feb' : 'פברואר' , 'Mar' : 'מרץ', 'Apr': 'אפריל' , 'May' : 'מאי' , 'Jun' : 'יוני' , 'Jul' : 'יולי' , 'Aug' : 'אוגוסט' , 'Sep' : 'ספטמבר' , 'Oct' : 'אוקטובר' , 'Nov' : 'נובמבר' , 'Dec' : 'דצמבר' }
+
+monthStr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul' , 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+
 
 #hebdaydic   = {'Sun': 'ראשון','Mon': 'שני','Tue': 'שלישי','Wed': 'רביעי','Thu': 'חמישי','Fri': 'שישי','Sat': 'שבת'}
         
@@ -590,13 +594,13 @@ def reportView(request):
                 'report': report[:-1],
                 'sum':   report[-1],
                 'filter_check_guide': check_guide,
-                'month'             : list(hebmonthdic.keys())[int(month)-1],
+                'month'             : monthStr[int(month)-1],
                 'year'              : year,
                 'request': request
             }
             # Check if need to send the pdf    
             if (output=='send_pdf'):
-                file_name='Report_' + list(hebmonthdic.keys())[int(month)-1] + '_' + str(year)  + '.pdf'
+                file_name='Report_' +  monthStr[int(month)-1] + '_' + str(year)  + '.pdf'
                 file = Render.render_to_file('pdf/report.html', file_name, params)
                 tour_emails.send_email_pdf(to=['noam.gati@gmail.com'],file=file, file_name=file_name)
             
@@ -678,13 +682,13 @@ def tripView(request):
             params = {
                 'report': report,
                 'filter_check_guide': check_guide,
-                'month'             : list(hebmonthdic.keys())[int(month)-1],
+                'month'             :  monthStr[int(month)-1],
                 'year'              : year,
                 'request': request
             }
             # Check if need to send the pdf    
             if (output=='send_pdf'):
-                file_name='Trips_' + list(hebmonthdic.keys())[int(month)-1] + '_' + str(year) + '.pdf'
+                file_name='Trips_' +  monthStr[int(month)-1] + '_' + str(year) + '.pdf'
                 file = Render.render_to_file('pdf/trip.html', file_name, params)
                 tour_emails.send_email_pdf(to=['noam.gati@gmail.com'],file=file, file_name=file_name)
                 
