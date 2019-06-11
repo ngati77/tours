@@ -9,7 +9,13 @@ Created on Sun Dec 16 07:38:21 2018
 import sys, os, django
 import datetime
 # append root folder of django project
-# could be solved with a relative path like os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..') which corresponds to the parent folder of the actual file.
+# could be solved with a relative path like 
+#os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..') which corresponds to the parent folder of the actual file.
+# Used locally
+#sys.path.append('c:/first_web/mysite')
+#os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+
+# This is needed
 sys.path.append('/home/ngati/cambridge')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings.production'
 django.setup()
