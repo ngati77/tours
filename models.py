@@ -251,7 +251,17 @@ class Contact(models.Model):
     last_name        = models.CharField(max_length=200)
     email            = models.EmailField(blank=True, default="")
     text             = models.TextField(max_length=600)
-    confirm          = models.BooleanField(default=False)
+    STATUS_MESSAGE = (
+    ('n', 'New'),
+    ('c', 'Confirmed'),
+    ('d', 'Done'),
+    )
+    confirm             = models.CharField(
+                                        max_length=1,
+                                        choices=STATUS_MESSAGE,
+                                        default='n',
+                                        )
+
     
     #create_date      = models.DateTimeField('date create')
 

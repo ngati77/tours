@@ -22,54 +22,107 @@
        </form>
   
    </div>
-
-
-    <ul class="title">
-      <li>trip id</li>
-      <li>תאריך</li>
-      <li>שעה</li>
-      <li>סוג סיור</li>
-       <li>מדריך</li>
-      <li>סטטוס</li>
-    </ul>
-     <ul class="data">
-      <li>{{ trip.id }}</li>
-      <li>{{ trip.trip_date|date:"d/m/Y" }}</li>
-      <li>{{ trip.trip_time|date:"H:i" }}</li>
-      <li>{{ trip.get_trip_type_display }}</li>
-      <li>{{ trip.get_trip_guide_display }}</li>
-      <li>{{ trip.get_status_display }}</li>
-    </ul>
+<table>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך סיור</td>
+      <td>שעה</td>
+      <td>מדריך</td>
+      <td>סוג סיור</td>
+      <td>נוצר בתאריך</td>
+    </tr>
     
-     <ul class="title">
-     <li>client id</li>
-     <li>שם פרטי</li>
-     <li>שם משפחה</li>
-     <li>ספר טלפון</li>
-     <li>דואר אלקטרוני</li>
-     <li>מבוגרים</li>
-     <li>ילדים</li>
-     <li>מקדמה</li>
-     <li>סה"כ</li>
-     </ul>
- 
-     {% for client in trip.clients_set.all %} 
-    <ul class="data">
-     <li>{{ client.id }}</li>
-     <li>{{ client.first_name }}</li>
-     <li>{{ client.last_name }}</li>
-     <li>{{ client.phone_number }}</li>
-     <li>{{ client.email }}</li>
-     <li>{{ client.number_of_people }}</li>
-     <li>{{ client.number_of_children }}</li>
-     <li>{{ client.pre_paid }}</li>
-     <li>{{ client.total_payment }}</li>
-     </ul>
-     {% endfor %}
+   
+     <tr class="data">
+     <td>{{ trip.id }}</td>
+     <td>{{ trip.trip_date|date:'d.m.Y' }}</td>
+     <td>{{ trip.trip_time|date:'H:i'  }}</td>
+     <td>{{ trip.get_trip_guide_display }}</td>
+     <td>{{ trip.get_trip_type_display }}</td>
+     <td>{{ trip.create_date|date:'d.m.Y' }}</td>
+     </tr>
+     </table>
+     {% for client in trip.clients_set.all %}
+      <table>
+      <tr class="title">
+     <td>client id</td>
+     <td>שם פרטי</td>
+     <td>שם משפחה</td>
+     <td>ספר טלפון</td>
+     <td>דואר אלקטרוני</td>
+     <td>מבוגרים</td>
+     <td>ילדים</td>
+     <td>מקדמה</td>
+     <td>סה"כ</td>
+     <td>הודעה</td>
+      </tr>
+      
+     <tr class="data">
+     <td> <button class="collapsible" id="n{{ client.id }}">{{ client.id }}</button></td>
+     <td>{{ client.first_name }}</td>
+     <td>{{ client.last_name }}</td>
+     <td>{{ client.phone_number }}</td>
+     <td>{{ client.email }}</td>
+     <td>{{ client.number_of_people }}</td>
+     <td>{{ client.number_of_children }}</td>
+     <td>{{ client.pre_paid }}</td>
+     <td>{{ client.total_payment }}</td>
+     <td>{{ client.text }}</td>
+     </tr>
+       
+     </table>
+     <div id="collapse_n{{client.id}}"  class="content"> 
+     <table>
+       {% for trans in client.transaction_set.all %}
+     <tr class="title">
+     <td>trans id</td>
+     <td>Date</td>
+     <td>Token </td>
+     <td>amount</td>
+     <td>charge_id</td>
+     </tr>
+      
+      <tr class="data">
+      <td>{{ trans.id }}</td>
+     <td>{{ trans.create_date|date:'d.m.Y' }}</td>
+     <td>{{ trans.token }}</td>
+     <td>{{ trans.amount }}</td>
+     <td>{{ trans.charge_id }}</td>
+      </tr>
+       {% endfor %}
+      </table>
+      </div>
+       
+        <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
+      {% endfor %}
+     <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
+
+   
     
    
           
  </div>
+ 
+ <script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = document.getElementById("collapse_" + this.id );
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
 {% endif %}
 
 

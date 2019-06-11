@@ -362,7 +362,7 @@ def contactUs(request ):
                 msg_html = render_to_string('emails/email_contact.html', {'first_name':first_name,'last_name':last_name, 'email':email, 'id': contact.id, 'text':text})
                 msg_plain = str(contact.id) + "מישהו יצר קשר פניה "#emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
                 emailTitle = "מישהו יצר קשר"
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.EMAIL_YAEL], title=emailTitle, cc=[settings.EMAIL_YAEL])
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.BCC_EMAIL], title=emailTitle, cc=[])
             except:
                 print('Got an error...')
             # Save contact here
@@ -606,8 +606,9 @@ def reportView(request):
             
             return Render.render('pdf/report.html', params)    
     else:
-        form = ReportForm()
-        report = []
+        today    = datetime.date.today()
+        form    = ReportForm(initial={'year' : today.year, 'month' : today.month})
+        report  = []
         check_guide = False
         return render(request, 'tour/report.html', {'title':'Report view',
                                                      'page_title' : 'דוח',
@@ -651,21 +652,21 @@ def tripView(request):
                          trip_date__year   = year,
                         ).order_by(order)
             # Scan all trips
-            if (len(tripQuerey)>0):
-                for trip in tripQuerey:
+            # if (len(tripQuerey)>0):
+                # for trip in tripQuerey:
                     # Create new entry in the report
-                    reportEntry = ReportEntry(trip.get_trip_type_display(), trip.trip_date.strftime("%d.%m.%y"), trip.get_trip_guide_display())
+                    # reportEntry = ReportEntry(trip.get_trip_type_display(), trip.trip_date.strftime("%d.%m.%y"), trip.get_trip_guide_display())
                     # Get all cilents from a trip hopefully more than one
-                    reportEntry.trip_time = trip.trip_time.strftime("%H:%M")
-                    reportEntry.trip_id   = trip.id
-                    clientQuerey = trip.clients_set.all()
+                    # reportEntry.trip_time = trip.trip_time.strftime("%H:%M")
+                    # reportEntry.trip_id   = trip.id
+                    # clientQuerey = trip.clients_set.all()
                     # Scan all clients, in the futrue need to scan the invoice
-                    for client in clientQuerey:
+                    #for client in clientQuerey:
                         
-                        reportEntry.total_people    += client.number_of_people
-                        reportEntry.total_children  += client.number_of_children
+                    #    reportEntry.total_people    += client.number_of_people
+                    #    reportEntry.total_children  += client.number_of_children
                     
-                    report.append(reportEntry)
+                    # report.append(reportEntry)
             # If requested view is html  
             if (output=='html'):
                 return render(request, 'tour/trip_view.html', {'title':'טיולים לחודש',
@@ -673,7 +674,7 @@ def tripView(request):
                                                      'meta_des':'',
                                                      'meta_key':'',
                                                      'form': form,
-                                                     'report': report,
+                                                     'report': tripQuerey,
                                                      'filter_check_guide': check_guide
                                                      })
             
@@ -695,15 +696,16 @@ def tripView(request):
             
             return Render.render('pdf/trip.html', params)    
     else:
-        form = ReportForm()
-        report = []
+        today           = datetime.date.today()
+        form = ReportForm(initial={'year' : today.year, 'month' : today.month})
+        tripQuerey = []
         check_guide = False
         return render(request, 'tour/trip_view.html', {'title':'טיולים לחודש',
                                                      'page_title' : 'טיולים לחודש',
                                                      'meta_des':'קיימברידג בעברית ',
                                                      'meta_key':'קמברידג',
                                                      'form': form,
-                                                     'report': report,
+                                                     'report': tripQuerey,
                                                      'filter_check_guide': check_guide
                                                      })
                 
@@ -734,7 +736,9 @@ def tasks(request):
                          trip_date__lte  = today
                         ).order_by('trip_date')
     
-    new_contact = Contact.objects.filter(confirm = False)
+    check_contact_spam = Contact.objects.filter(confirm = 'n')
+    
+    new_contact = Contact.objects.filter(confirm = 'c')
     
     new_review = Review.objects.filter(confirm = False)
     
@@ -753,6 +757,7 @@ def tasks(request):
                                                      'meta_key':'קמברידג',
                                                      'new_tours': new_tours,
                                                      'complete_tours': complete_tours,
+                                                     'check_contact_spam' : check_contact_spam,
                                                      'new_contact':new_contact,
                                                      'new_review':new_review,
                                                      'next_tours':next_tours,
@@ -852,7 +857,7 @@ def tour_complete(request, pk):
                     print("Can't create pdf")
                 try:
                     msg_plain = "תודה שטיילתם איתנו בקיימברדיג' היה לנו כייף"
-                    msg_html = render_to_string('emails/email_feedback.html')
+                    msg_html = render_to_string('emails/email_feedback.html', {'first_name':client.first_name})
                     title = "קיימברידג' בעברית- תודה שטיילתם איתנו"
                     tour_emails.send_email_msg_pdf( to=[client.email],
                                                    msg_html=msg_html, 
@@ -868,13 +873,46 @@ def tour_complete(request, pk):
     # Bring back the tasks        
     return tasks(request)
 
+def contact_not_spam(request, pk):
+    contact_query =  Contact.objects.filter(id  = pk)
+    if (len(contact_query)>0):
+        contact = contact_query[0]
+        contact.confirm = 'c'
+        contact.save()
+        # Now send email to adminstrator            
+        try:
+            msg_html = render_to_string('emails/email_contact.html', {'first_name':contact.first_name,'last_name':contact.last_name, 'email':contact.email, 'id': contact.id, 'text':contact.text})
+            msg_plain = str(contact.id) + "מישהו יצר קשר פניה "
+            emailTitle = "מישהו יצר קשר"
+            emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.CC_EMAIL], title=emailTitle, cc=[])
+        except:
+            print('Got an error...')
+            # Save contact here
+            meta_des_heb = "קיימברידג בעברית צור קשר  "
+            meta_des_en  = "contact Cambridge in Hebrew"
+            meta_des = meta_des_heb + meta_des_en
+            meta_key_heb = "צור קשר קיימברידג' "
+            meta_key_en  = "contact cambridge hebrew "
+            meta_key     = meta_key_heb + meta_key_en
+            return render(request, 'tour/contact_saved.html', {'title':'contact', 
+                                                               'meta_des':meta_des,
+                                                               'meta_key':meta_key,
+                                                               'page_title':'נחזור אלייך בהקדם', 
+                                                               'id': contact.id})
+
+    return tasks(request)
+
 def contact_confirm(request, pk):
     contact_query =  Contact.objects.filter(id  = pk)
     if (len(contact_query)>0):
         contact = contact_query[0]
-        contact.confirm = True
+        contact.confirm = 'd'
         contact.save()
     return tasks(request)
+
+
+
+
 
 
 def review_confirm(request, pk):

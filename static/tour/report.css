@@ -2,12 +2,17 @@
 * {box-sizing: border-box;}
 ul {list-style-type: none;}
 
-
+table, th, td {
+  border: 1px solid black;
+  padding:10px; 
+}
 
 .title {
   margin: 0;
   background-color: #ddd;
   text-align: right !important;
+  padding-right:0;
+  width: 100%;
   
 }
 
@@ -17,11 +22,15 @@ ul {list-style-type: none;}
   color: #666;
   text-align: center;
 }
-
+.more_text{
+    width: 40% !important;
+}
 .data {
   background: #eee;
   margin: 0;
   text-align: right !important;
+  padding-right:0;
+  width: 100%;
 }
 
 .data li {
@@ -34,10 +43,11 @@ ul {list-style-type: none;}
   color:     #124789;
 }
 
-
-.more_text {
-   width: 20%;
-
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
 }
 
 

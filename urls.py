@@ -37,6 +37,7 @@ urlpatterns = [
     path('tour_confirm/<int:pk>/',            views.tour_confirm, name="tour_confirm"),
     path('tour_complete/<int:pk>/',            views.tour_complete, name="tour_complete"),
     path('contact_confirm/<int:pk>/',            views.contact_confirm, name="contact_confirm"),
+    path('contact_not_spam/<int:pk>/',            views.contact_not_spam, name="contact_not_spam"),
     path('review_confirm/<int:pk>/',            views.review_confirm, name="review_confirm"),
 
 

@@ -25,35 +25,118 @@
        </form>
   
    </div>
+
 {% if report %}
 
-    <ul class="title">
-      <li>trip id</li>
-      <li>תאריך</li>
-      <li>שעה</li>
-      <li>מדריך</li>
-      <li>סוג סיור</li>
-      <li>מבוגרים</li>
-      <li>ילדים</li>
-    </ul>
+<div class="row p-1 bg-light text-blue">
+    <p>הסיורים הבאים</p>
+     </div>
+ {% for entry in report %}     
+<table>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך סיור</td>
+      <td>שעה</td>
+      <td>מדריך</td>
+      <td>סוג סיור</td>
+      <td>נוצר בתאריך</td>
+    </tr>
     
-    {% for entry in report %}
-     <ul class="data">
-     <li><a href="{% url 'tour:clientview' entry.trip_id %}">{{  entry.trip_id }}</a></li>
-     <li>{{  entry.trip_date }}</li>
-     <li>{{  entry.trip_time }}</li>
-     <li>{{  entry.trip_guide }}</li>
-     <li>{{  entry.trip_text }}</li>
-     <li>{{  entry.total_people }}</li>
-     <li>{{  entry.total_children }}</li>
-     </ul>
+   
+     <tr class="data">
+     <td>{{ entry.id }}</td>
+     <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
+     <td>{{ entry.trip_time|date:'H:i'  }}</td>
+     <td>{{ entry.get_trip_guide_display }}</td>
+     <td>{{ entry.get_trip_type_display }}</td>
+     <td>{{ entry.create_date|date:'d.m.Y' }}</td>
+     </tr>
+     </table>
+     {% for client in entry.clients_set.all %}
+      <table>
+      <tr class="title">
+     <td>client id</td>
+     <td>שם פרטי</td>
+     <td>שם משפחה</td>
+     <td>ספר טלפון</td>
+     <td>דואר אלקטרוני</td>
+     <td>מבוגרים</td>
+     <td>ילדים</td>
+     <td>מקדמה</td>
+     <td>סה"כ</td>
+     <td>הודעה</td>
+      </tr>
+      
+     <tr class="data">
+     <td> <button class="collapsible" id="n{{ client.id }}">{{ client.id }}</button></td>
+     <td>{{ client.first_name }}</td>
+     <td>{{ client.last_name }}</td>
+     <td>{{ client.phone_number }}</td>
+     <td>{{ client.email }}</td>
+     <td>{{ client.number_of_people }}</td>
+     <td>{{ client.number_of_children }}</td>
+     <td>{{ client.pre_paid }}</td>
+     <td>{{ client.total_payment }}</td>
+     <td>{{ client.text }}</td>
+     </tr>
+       
+     </table>
+     <div id="collapse_n{{client.id}}"  class="content"> 
+     <table>
+       {% for trans in client.transaction_set.all %}
+     <tr class="title">
+     <td>trans id</td>
+     <td>Date</td>
+     <td>Token </td>
+     <td>amount</td>
+     <td>charge_id</td>
+     </tr>
+      
+      <tr class="data">
+      <td>{{ trans.id }}</td>
+     <td>{{ trans.create_date|date:'d.m.Y' }}</td>
+     <td>{{ trans.token }}</td>
+     <td>{{ trans.amount }}</td>
+     <td>{{ trans.charge_id }}</td>
+      </tr>
+       {% endfor %}
+      </table>
+      </div>
+       
+        <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
+      {% endfor %}
+     <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
     {% endfor %}
    
 {% else %}
-    <div class="row p-1 bg-dark text-white">
-    <p>סליחה אבל אין סיורים....</p>
+    <div class="row p-1 bg-light text-blue">
+    <p>אין סיורים בעתיד</p>
      </div>
 {% endif %}
+
  </div>
 {% endif %}
+
+
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = document.getElementById("collapse_" + this.id );
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
 {% endblock %}

@@ -18,29 +18,30 @@
 <div class="row p-1 bg-light text-blue">
     <p>סיורים חדשים</p>
      </div>
+<table>
 
-    <ul class="title">
-      <li>id</li>
-      <li>תאריך סיור</li>
-      <li>שעה</li>
-      <li>מדריך</li>
-      <li>סוג סיור</li>
-      <li>נוצר בתאריך</li>
-      <li>אישור</li>
-    </ul>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך סיור</td>
+      <td>שעה</td>
+      <td>מדריך</td>
+      <td>סוג סיור</td>
+      <td>נוצר בתאריך</td>
+      <td>אישור</td>
+    </tr>
     
     {% for entry in new_tours %}
-     <ul class="data">
-     <li><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></li>
-     <li>{{  entry.trip_date|date:'d.m.Y' }}</li>
-     <li>{{  entry.trip_time|date:'H:i'  }}</li>
-     <li>{{  entry.get_trip_guide_display }}</li>
-     <li>{{  entry.get_trip_type_display }}</li>
-     <li>{{  entry.create_date|date:'d.m.Y' }}</li>
-     <li><a href="{% url  'tour:tour_confirm' entry.id %}" class="btn btn-tour reg-btn"> אישור סיור</a></li>
-     </ul>
+     <tr class="data">
+     <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
+     <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
+     <td>{{  entry.trip_time|date:'H:i'  }}</td>
+     <td>{{  entry.get_trip_guide_display }}</td>
+     <td>{{  entry.get_trip_type_display }}</td>
+     <td>{{  entry.create_date|date:'d.m.Y' }}</td>
+     <td><a href="{% url  'tour:tour_confirm' entry.id %}" class="btn btn-tour reg-btn"> אישור סיור</a></td>
+     </tr>
     {% endfor %}
-   
+ </table>  
 {% else %}
     <div class="row p-1 bg-light text-blue">
     <p>אין סיורים חדשים</p>
@@ -59,29 +60,29 @@
 <div class="row p-1 bg-light text-blue">
     <p>סיורים שהסתיימו</p>
      </div>
-
-    <ul class="title">
-      <li>id</li>
-      <li>תאריך</li>
-      <li>שעה</li>
-      <li>מדריך</li>
-      <li>סוג סיור</li>
-      <li>אישור</li>
-    </ul>
+<table>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך</td>
+      <td>שעה</td>
+      <td>מדריך</td>
+      <td>סוג סיור</td>
+      <td>אישור</td>
+    </tr>
     
     {% for entry in complete_tours %}
-     <ul class="data">
-     <li><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></li>
-     <li>{{  entry.trip_date|date:'d.m.Y' }}</li>
-     <li>{{  entry.trip_time|date:'H:i' }}</li>
-     <li>{{  entry.get_trip_guide_display }}</li>
-     <li>{{  entry.get_trip_type_display }}</li>
-     <li><a href="{% url  'tour:tour_complete' entry.id %}" class="btn btn-tour reg-btn"> סיום סיור</a></li>
-     </ul>
+     <tr class="data">
+     <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
+     <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
+     <td>{{  entry.trip_time|date:'H:i' }}</td>
+     <td>{{  entry.get_trip_guide_display }}</td>
+     <td>{{  entry.get_trip_type_display }}</td>
+     <td><a href="{% url  'tour:tour_complete' entry.id %}" class="btn btn-tour reg-btn"> סיום סיור</a></li>
+     </tr>
     {% endfor %}
-   
+</table>  
 {% else %}
-    <div class="row p-1 bg-light text-blue">
+    <div class="row p-1 bg-tdght text-blue">
     <p>אין סיורים ממתינים לסיום</p>
      </div>
 {% endif %}
@@ -90,32 +91,68 @@
     Change status to confirm - once they answer the message
 -->
 
+{% if check_contact_spam %}
+<div class="row p-1 bg-light text-blue">
+    <p>האם הודעת זבל</p>
+     </div>
+     <table>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך</td>
+      <td>שם פרטי</td>
+      <td>שם משפחה</td>
+      <td>דואל</td>
+      <td  class="more_text">הודעה</td>
+      <td>אישור</td>
+    </tr>
+    
+    {% for entry in check_contact_spam %}
+     <tr class="data">
+     <td>{{  entry.id }}</td>
+     <td>{{  entry.create_date|date:'d.m.Y' }}</a></td>
+     <td>{{  entry.first_name }}</td>
+     <td>{{  entry.last_name }}</td>
+     <td>{{  entry.email }}</td>
+     <td  class="more_text">{{  entry.text }}</td>
+     <td><a href="{% url  'tour:contact_not_spam' entry.id %}" class="btn btn-tour reg-btn">לא ספאם</a></td>
+     
+     </tr>
+    {% endfor %}
+   <table>
+{% else %}
+    <div class="row p-1 bg-light text-blue">
+    <p>אין הודעות זבל</p>
+     </div>
+{% endif %}
+
+
 {% if new_contact %}
 <div class="row p-1 bg-light text-blue">
     <p>יצרו קשר ומחכים למענה</p>
      </div>
-    <ul class="title">
-      <li>id</li>
-      <li>תאריך</li>
-      <li>שם פרטי</li>
-      <li>שם משפחה</li>
-      <li>דואל</li>
-      <li  class="more_text">הודעה</li>
-      <li>אישור</li>
-    </ul>
+     <table>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך</td>
+      <td>שם פרטי</td>
+      <td>שם משפחה</td>
+      <td>דואל</td>
+      <td  class="more_text">הודעה</td>
+      <td>אישור</td>
+    </tr>
     
     {% for entry in new_contact %}
-     <ul class="data">
-     <li>{{  entry.id }}</li>
-     <li>{{  entry.create_date|date:'d.m.Y' }}</a></li>
-     <li>{{  entry.first_name }}</li>
-     <li>{{  entry.last_name }}</li>
-     <li>{{  entry.email }}</li>
-     <li  class="more_text">{{  entry.text }}</li>
-     <li><a href="{% url  'tour:contact_confirm' entry.id %}" class="btn btn-tour reg-btn">יצרתי קשר</a></li>
-     </ul>
+     <tr class="data">
+     <td>{{  entry.id }}</td>
+     <td>{{  entry.create_date|date:'d.m.Y' }}</a></td>
+     <td>{{  entry.first_name }}</td>
+     <td>{{  entry.last_name }}</td>
+     <td>{{  entry.email }}</td>
+     <td  class="more_text">{{  entry.text }}</td>
+     <td><a href="{% url  'tour:contact_confirm' entry.id %}" class="btn btn-tour reg-btn">יצרתי קשר</a></td>
+     </tr>
     {% endfor %}
-   
+   <table>
 {% else %}
     <div class="row p-1 bg-light text-blue">
     <p>אין פניות חדשות</p>
@@ -131,27 +168,28 @@
 <div class="row p-1 bg-light text-blue">
     <p>משובים חדשים</p>
      </div>
-    <ul class="title">
-      <li>id</li>
-      <li>תאריך</li>
-      <li>שם פרטי</li>
-      <li>כותרת</li>
-      <li  class="more_text">הודעה</li>
-      <li>אישור</li>
+     <table>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך</td>
+      <td>שם פרטי</td>
+      <td>כותרת</td>
+      <td  class="more_text">הודעה</td>
+      <td>אישור</td>
 
-    </ul>
+    </tr>
     
     {% for entry in new_review %}
-     <ul class="data">
-     <li>{{  entry.id }}</li>
-     <li>{{  entry.create_date|date:'d.m.Y' }}</li>
-     <li>{{  entry.first_name }}</li>
-     <li>{{  entry.title }}</li>
-     <li class="more_text">{{  entry.review_text }}</li>
-     <li><a href="{% url  'tour:review_confirm' entry.id %}" class="btn btn-tour reg-btn">אישור משוב</a></li>
-     </ul>
+     <tr class="data">
+     <td>{{  entry.id }}</td>
+     <td>{{  entry.create_date|date:'d.m.Y' }}</td>
+     <td>{{  entry.first_name }}</td>
+     <td>{{  entry.title }}</td>
+     <td class="more_text">{{  entry.review_text }}</td>
+     <td><a href="{% url  'tour:review_confirm' entry.id %}" class="btn btn-tour reg-btn">אישור משוב</a></td>
+     </tr>
     {% endfor %}
-   
+   </table>
 {% else %}
     <div class="row p-1 bg-light text-blue">
     <p>אין משובים חדשים</p>
@@ -166,25 +204,59 @@
 <div class="row p-1 bg-light text-blue">
     <p>הסיורים הבאים</p>
      </div>
-
-    <ul class="title">
-      <li>id</li>
-      <li>תאריך סיור</li>
-      <li>שעה</li>
-      <li>מדריך</li>
-      <li>סוג סיור</li>
-      <li>נוצר בתאריך</li>
-    </ul>
+ {% for entry in next_tours %}     
+<table>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך סיור</td>
+      <td>שעה</td>
+      <td>מדריך</td>
+      <td>סוג סיור</td>
+      <td>נוצר בתאריך</td>
+    </tr>
     
-    {% for entry in next_tours %}
-     <ul class="data">
-     <li><a href="{% url 'tour:clientview' entry.id %}">{{ entry.id }}</a></li>
-     <li>{{ entry.trip_date|date:'d.m.Y' }}</li>
-     <li>{{ entry.trip_time|date:'H:i'  }}</li>
-     <li>{{ entry.get_trip_guide_display }}</li>
-     <li>{{ entry.get_trip_type_display }}</li>
-     <li>{{ entry.create_date|date:'d.m.Y' }}</li>
-     </ul>
+   
+     <tr class="data">
+     <td><a href="{% url 'tour:clientview' entry.id %}">{{ entry.id }}</a></td>
+     <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
+     <td>{{ entry.trip_time|date:'H:i'  }}</td>
+     <td>{{ entry.get_trip_guide_display }}</td>
+     <td>{{ entry.get_trip_type_display }}</td>
+     <td>{{ entry.create_date|date:'d.m.Y' }}</td>
+     </tr>
+     </table>
+     
+      <table>
+      <tr class="title">
+      <td>client id</td>
+     <td>שם פרטי</td>
+     <td>שם משפחה</td>
+     <td>ספר טלפון</td>
+     <td>דואר אלקטרוני</td>
+     <td>מבוגרים</td>
+     <td>ילדים</td>
+     <td>מקדמה</td>
+     <td>סה"כ</td>
+      <td>הודעה</td>
+      </tr>
+      {% for client in entry.clients_set.all %}
+      <tr class="data">
+       <td>{{ client.id }}</td>
+     <td>{{ client.first_name }}</td>
+     <td>{{ client.last_name }}</td>
+     <td>{{ client.phone_number }}</td>
+     <td>{{ client.email }}</td>
+     <td>{{ client.number_of_people }}</td>
+     <td>{{ client.number_of_children }}</td>
+     <td>{{ client.pre_paid }}</td>
+     <td>{{ client.total_payment }}</td>
+     <td>{{ client.text }}</td>
+      </tr>
+       {% endfor %}
+      </table>
+     <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
     {% endfor %}
    
 {% else %}
@@ -199,25 +271,25 @@
 <div class="row p-1 bg-light text-blue">
     <p>החופשות הבאות הבאים</p>
      </div>
-
-    <ul class="title">
-      <li>id</li>
-      <li>מדריך</li>
-      <li>תאריך התחלה</li>
-      <li>תאריך סיום</li>
+<table>
+    <tr class="title">
+      <td>id</td>
+      <td>מדריך</td>
+      <td>תאריך התחלה</td>
+      <td>תאריך סיום</td>
      
-    </ul>
+    </tr>
     
     {% for entry in next_vacations %}
-     <ul class="data">
-     <li>{{ entry.id }}</li>
-     <li>{{ entry.get_guide_vacation_display }}</li>
-     <li>{{ entry.vac_start_date|date:'d.m.Y' }}</li>
-     <li>{{ entry.vac_end_date|date:'d.m.Y' }}</li>
+     <tr class="data">
+     <td>{{ entry.id }}</td>
+     <td>{{ entry.get_guide_vacation_display }}</td>
+     <td>{{ entry.vac_start_date|date:'d.m.Y' }}</td>
+     <td>{{ entry.vac_end_date|date:'d.m.Y' }}</td>
      
-     </ul>
+     </tr>
     {% endfor %}
-   
+   </table>
 {% else %}
     <div class="row p-1 bg-light text-blue">
     <p>אין חופשות בעתיד</p>
