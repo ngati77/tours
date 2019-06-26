@@ -5,31 +5,31 @@
 	
 
 {% block content %}
+<div class="container-fluid">
 
-<div class="row">
-    <div class="col-md-3 success"></div>
-
-    <div class="col-md-6 success">
-    <h3><font color="blue"> תודה שהזמנתם איתנו סיור בקיימברידג'</font></h3>
-      <h3><font color="blue">אפשר להתחיל להתרגש </font></h3>
-      <hr>
-     <h3>ההרשמה הסתיימה בהצלחה</h3>
-      <p class="lead"><strong> נשלח מייל אישור עם פרטי הסיור ופרטי הגעה</strong></p>
-      <p>אישור הזמנה {{id}}</p>
-      <hr>
-      <p>נשמח לראותכם בתאריך {{trip_date}}</p>
-      <p>בשעה {{trip_time}}</p>
-      <div class="space">
-      <p>נתקבל תשלום של {{deposit}}</p>
-      <p>יתרה לתשלום {{more_to_pay}}</p>
-      </div>
-      </p>
-      <p class="lead">
-        <a class="btn btn-runner" href="{% url  'tour:home'  %}" role="button">בחזרה לדף הבית</a>
-      </p>
-      
+    <div class="row d-flex justify-content-center text-right">
+    
+        <div class="col-md-6 ">
+        <h3><font color="blue"> תודה שהזמנתם איתנו סיור בקיימברידג'</font></h3>
+          <h3><font color="blue">אפשר להתחיל להתרגש </font></h3>
+          <hr>
+         <h3>ההרשמה הסתיימה בהצלחה</h3>
+          <p class="lead"><strong> נשלח מייל אישור עם פרטי הסיור ופרטי הגעה</strong></p>
+          <p>אישור הזמנה {{id}}</p>
+          <hr>
+          <p>נשמח לראותכם בתאריך {{trip_date}}</p>
+          <p>בשעה {{trip_time}}</p>
+          <div class="space">
+          <p>נתקבל תשלום של {{deposit}}</p>
+          <p>יתרה לתשלום {{more_to_pay}}</p>
+          </div>
+          </p>
+          <p class="lead">
+            <a class="btn btn-runner" href="{% url  'tour:home'  %}" role="button">בחזרה לדף הבית</a>
+          </p>
+          
+        </div>
     </div>
-    <div class="col-md-3 success"></div>
 </div>
 
 {% endblock %}

@@ -1,0 +1,131 @@
+
+* {box-sizing: border-box;}
+ul {list-style-type: none;}
+
+.month {
+  padding: 20px 25px;
+  width: 100%;
+  background: #1abc9c;
+  text-align: center;
+}
+
+.month ul {
+  margin: 0;
+  padding: 0;
+}
+
+.month ul li {
+  color: white;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.month .prev {
+  float: left;
+  padding-top: 10px;
+}
+
+.month .next {
+  float: right;
+  padding-top: 10px;
+}
+
+.weekdays {
+  margin: 0;
+  padding: 10px 0;
+  background-color: #ddd;
+  
+}
+
+.datedate{
+    margin-top: 1em;
+    font-size: 18px;
+    color:     blue;
+}
+.timetime{
+    margin-top: .5em;
+    margin-bottom: .5em;
+    font-size: 18px;
+    color:     blue;
+}
+
+.weekdays li {
+  display: inline-block;
+  width: 12%;
+  color: #666;
+  text-align: center;
+}
+
+.days {
+  padding: 3px 0;
+  background: #eee;
+  margin: 0;
+}
+
+.days li {
+  list-style-type: none;
+  display: inline-block;
+  width: 12%;
+  text-align: center;
+  margin-bottom: 5px;
+  font-size:12px;
+  color:     #124789;
+}
+
+.days li .active {
+  padding: 3px;
+  border: 1px solid #124789;
+  
+  
+}
+
+.days li .vacation {
+  padding: 3px;
+  border: 1px solid #ff0000;
+  
+  
+}
+.days li .active:hover {
+  background-color: #124789;
+  color:white
+}
+.days li .active:focus {
+  background-color: red;
+}
+.sum {
+  width: 100%;
+  margin: 0;
+  padding: 10px 0;
+  background-color: #ddd;
+  
+}
+.sum li {
+  display: inline-block;
+  width: 22%;
+  color: #666;
+  text-align: center;
+}
+.sumsum  {
+  border-top: 2px solid #124789;
+}
+
+#id_confirm_use, #id_send_emails {
+    float: right;
+    margin-left : 10px;
+   
+}
+/* Add media queries for smaller screens */
+@media screen and (max-width:720px) {
+  .weekdays li, .days li {width: 12%;}
+  .days li .active {padding: 1px;}
+}
+
+@media screen and (max-width: 420px) {
+  .weekdays li, .days li {width: 12%;}
+  .days li .active {padding: 1px;}
+}
+
+@media screen and (max-width: 290px) {
+  .weekdays li, .days li {width: 11%;}
+}

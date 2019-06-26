@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-md navbar-light bg-light sticky-top">
 <div class="container-fluid">
     <a class="navbar-brand" href="{% url  'tour:home'  %}"><img src="{% static 'tour/images/logo/logo_cambridge.png' %}">
-    <h5 class="navbar-text navbar-first-line"><b> קיימברידג' בעברית</b> <br> סיורים מודרכים בעברית</h5>
+    <h5 class="navbar-text navbar-first-line"><b>קיימברידג' בעברית</b><br>סיורים מודרכים בעברית</h5>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" 
     data-target="#navbarResponsive">
@@ -18,10 +18,10 @@
           הסיורים
                 </a>
                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
-                   <a class="dropdown-item" href="{% url  'tour:find_your_day' %}/C ">סיור קלאסי</a>
-                   <a class="dropdown-item" href="{% url  'tour:find_your_day' %}/F ">סיור משפחות</a>
-                   <a class="dropdown-item" href="{% url  'tour:find_your_day' %}/W ">סיור חורפי</a>
-                   <a class="dropdown-item" href="{% url  'tour:find_your_day' %}/P ">שייט</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/C ">סיור קלאסי</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/F ">סיור משפחות</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/W ">סיור חורפי</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/P ">שייט</a>
                  </div>
             </li>
            
@@ -32,16 +32,40 @@
                 <a class="nav-link" href="{% url  'tour:team'  %}">מי אנחנו</a>
             </li>
              <li class="nav-item">
+                <a class="nav-link" href="{% url  'tour:gallery'  %}">הגלריה</a>
+            </li>
+             <li class="nav-item">
                 <a class="nav-link" href="{% url  'tour:contact'  %}">צור קשר</a>
             </li>
+            
             {% if request.user.is_authenticated %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url  'tour:guideview'  %}">Guide</a> 
-            </li>
+            
+          <!---  <li class="nav-item"> --->
+          <!---       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> --->
+        <!---  Guide --->
+        <!---        </a> --->
+        <!---          <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right"> --->
+                <!-- <a class="nav-link" href="{% url  'tour:trip_view'  %}">הטיולים הבאים</a> -->
+              <!--   <a class="dropdown-item" href="{% url  'tour:book_tour_today' %}/A ">לוח שנה</a>-->
+              <!--    <a class="dropdown-item" href="{% url  'logout' %}">logout</a> -->
+        <!---         </div> --->
+       <!---     </li> --->
+           
             {% endif %}
+           
             {% if request.user.is_superuser %}
             <li class="nav-item">
-                <a class="nav-link" href="{% url  'admin:index'  %}">Admin</a> 
+                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Admin
+                </a>
+                 <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
+                   <a class="dropdown-item" href="{% url  'tour:tasks' %} ">משימות</a>
+                   <a class="dropdown-item" href="{% url  'tour:book_tour_today' %}/A ">לוח שנה</a>
+                   <a class="dropdown-item" href="{% url  'tour:report-view' %}">דוחות</a> 
+                   <a class="nav-link" href="{% url  'tour:trip_view'  %}">מצא סיור</a>
+                  
+                   <a class="dropdown-item" href="{% url  'admin:index' %}">Admin</a>
+                 </div>
             </li>
             {% endif %}
             
@@ -49,5 +73,6 @@
         </ul>
     </div>
 </div>
+
 </nav>
 

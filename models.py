@@ -114,8 +114,6 @@ class OurTours(models.Model):
     description2       = models.TextField(max_length=600)
     description3       = models.TextField(max_length=600)
     duration           = models.TextField(max_length=200)
-    meetingPoint       = models.TextField(max_length=600)
-    gettingThere       = models.TextField(max_length=600)
     price              = models.IntegerField(default=0)
     priceChild         = models.IntegerField(default=0)
     deposit            = models.IntegerField(default=0)
@@ -168,7 +166,13 @@ class Trip(models.Model):
             )
     
     def __str__(self):
-        return self.trip_text
+#        print('Trip indo')
+#        print('Trip date: ')
+#        print(self.trip_date)
+#        print('Trip time: ')
+#        print(self.trip_time)
+#        print(type(self.trip_time))
+        return str(self.id)
     
     
  
@@ -181,7 +185,9 @@ class Trip(models.Model):
             return False
     @staticmethod
     def get_event(date):
-        return Trip.objects.filter(trip_date=date)
+        return Trip.objects.filter(
+                                ~Q(status='b'),
+                                trip_date=date)
      
     #was_published_recently.admin_order_field = 'pub_date'
     #was_published_recently.boolean = True
@@ -207,11 +213,15 @@ class Clients(models.Model):
     total_payment      = models.IntegerField(default=0)
     pre_paid           = models.IntegerField(default=0)
     create_date        = models.DateTimeField(default=timezone.now)
+    confirm_use        = models.BooleanField(default=False)
+    send_emails        = models.BooleanField(default=False)
     status             = models.CharField(
                                         max_length=1,
                                         choices=STATUS_CLIENT,
                                         default='a',
                                         )
+    
+    text               = models.TextField(max_length=600)
     
     #create_date      = models.DateTimeField('date create')
     
@@ -231,7 +241,31 @@ class Transaction(models.Model):
         return str(self.client_id)
 
   
-class NewCalendar:
+                
+class Contact(models.Model):
+    '''
+    This class hold the information regarding contact
+    '''
+    create_date      = models.DateTimeField(default=timezone.now)
+    first_name       = models.CharField(max_length=200)
+    last_name        = models.CharField(max_length=200)
+    email            = models.EmailField(blank=True, default="")
+    text             = models.TextField(max_length=600)
+    STATUS_MESSAGE = (
+    ('n', 'New'),
+    ('c', 'Confirmed'),
+    ('d', 'Done'),
+    )
+    confirm             = models.CharField(
+                                        max_length=1,
+                                        choices=STATUS_MESSAGE,
+                                        default='n',
+                                        )
+
+    
+    #create_date      = models.DateTimeField('date create')
+
+class Calendar:
     
     def __init__(self, request, year, month, view):
         daydict = {'Sun':1, 'Mon':2, 'Tue':3, 'Wed':4, 'Thu':5, 'Fri':6, 'Sat':7}
@@ -270,7 +304,7 @@ class NewCalendar:
         #Start from previous month
         dayCount = LastDayInPrevMonth.day - daydict[firstDayOfMonth.strftime("%a")] + 2
         _month =   LastDayInPrevMonth.month
-        _year  =   LastDayInPrevMonth.year
+        _year  =   1977
         
         for i in range (1,43):
             # Moving to current month
@@ -284,7 +318,7 @@ class NewCalendar:
                 monthCount = 'nextMonth'
                 dayCount =1
                 _month =   self.nextMonth
-                _year  =   self.nextMonthYear
+                _year  =   1977
             
             dayInMonth = datetime.date(_year, _month, dayCount)
                 
@@ -302,8 +336,8 @@ class NewCalendar:
                 
     def __str__(self):
         
-        for week in self.Pack7Days:
-            for day in week:
+        for day7 in self.Pack7Days.dayInCalendar:
+            for day in day7:
                 print('fill: ' + day.fill)
                 print('dayNumStr: ' + day.dayNumStr)
         
@@ -324,23 +358,26 @@ class DayInCalendar:
         # Remove days were guide is on vacation and tour isn't possible
         
         if (dateInCalendar < today):
-            self.fill =    "day col-sm sm-hide p-2 border border-left-0 border-top-0 text-truncate bg-light text-right"
+            self.fill =    ""
         elif (dateInCalendar == today):
-           self.fill =    "day col-sm p-2 border text-truncate border-success text-right"
+           self.fill =    "active"
         else:
-           self.fill =    "day col-sm p-2 border border-left-0 border-top-0 text-truncate text-right"
+           self.fill =    ""
         
-        if (dateInCalendar.day==1):
-            self.dayNumStr     =  str(dateInCalendar.day) + '    .....   ' + hebmonthdic[dateInCalendar.strftime("%b")]
+#        if (dateInCalendar.day==1):
+#            self.dayNumStr     =  str(dateInCalendar.day) + '    .....   ' + hebmonthdic[dateInCalendar.strftime("%b")]
+#        else:
+        if self.year == 1977:
+            self.dayNumStr     =  ""
         else:
             self.dayNumStr     =  str(dateInCalendar.day)
             
-        self.dayNameHeb    = hebdict[dateInCalendar.strftime("%a")]
-        
         # Querey guide holiday
         guideVacationQuery   = GuideVacation.objects.filter(vac_start_date__lte=dateInCalendar,
                                                         vac_end_date__gte=dateInCalendar) 
-        # If date belong to previous month maker it gray
+        self.attr = False
+        self.vac = False
+        # Only gor Managment
         if (request.user.is_authenticated and view == 'A'):
 #        if (False):
             # If user then bring relevant data of:
@@ -348,36 +385,27 @@ class DayInCalendar:
             # Days off for user
             tripQuery = Trip.objects.filter(trip_date=dateInCalendar)
             
-             
+            #for trip in tripQuery:
+            #Check if we have a trip this day
+            if len(tripQuery)>0:
+            # Check for unconfirmed trips
+                if (tripQuery[0].status  != 'b'):
+                    self.attr = True
+                    self.id   = dateInCalendar.strftime('%d_%m_%Y')
+                    self.id   += "-"+ tripQuery[0].trip_time.strftime('%H_%M')
             
-            
-            for trip in tripQuery:
-                # Check for unconfirmed trips
-                if (trip.status == 'n'):
-                    bg_color =  'bg-warning'
-                elif trip.status == 'd': 
-                    bg_color = 'bg-primary'
-                elif trip.status == 'e':
-                    bg_color = 'bg-success'
-                else:
-                    bg_color = 'bg-dark'
-
-                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small " + bg_color + " text-white"
-                text  = trip.get_trip_type_display() + ' Tour'
-                link  = 'tour:clientview'
-                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=int(trip.trip_time.strftime('%H')), trip_type=trip.trip_type, trip_id= trip.id))
-                
+            if len(guideVacationQuery)>0:
+                self.vac = True
             # Now print day off    
-            for vac in guideVacationQuery:
-                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small bg-info text-white"
-                text  = 'Vaction ' + vac.guide_vacation
-                link  = None  
-                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=11, trip_type='C', trip_id =1))
-                
+#            for vac in guideVacationQuery:
+#                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small bg-info text-white"
+#                text  = 'Vaction ' + vac.guide_vacation
+#                link  = None  
+#                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=11, trip_type='C', trip_id =1))
             
-        # This is a client here or admin that looks on avaliable trips!!!
-        # Still need to add an option to cancel trip if guide is on vacation
+        
         elif (dateInCalendar > today):
+            
             # Check specific day in the week
             availableDateQuery0     = TripAvailabilty.objects.filter(Q(ava_select_day    =   dateInCalendar.strftime('%a')))
             # Check for all days
@@ -406,6 +434,14 @@ class DayInCalendar:
                 # As it was canceled move to the next item in the lisy
                 if (canceled):
                     continue
+                
+                for vac in guideVacationQuery:
+                    if (vac.vac_cancel_all) or (vac.vac_cancel_family and view=='F') or (vac.vac_cancel_classy and view=='C'):
+                        canceled = True
+                        break
+                # Guide on holiday there is no tour on this day
+                if (canceled):
+                    continue
                     
                 # Check if their is already a different trip on this day, we don't want two trips on the same day
                 tripQuery = Trip.objects.filter(trip_date__year  = dateInCalendar.year,
@@ -417,7 +453,7 @@ class DayInCalendar:
               
                 # We found a trip let's check if it is a different one.
                 for trip in tripQuery:
-                    if (trip.trip_type != view):
+                    if (trip.status  != 'b' and trip.trip_type != view):
                         canceled = True
                         break
                 if (canceled):
@@ -425,43 +461,16 @@ class DayInCalendar:
                     
                 bg_color = 'bg-success'    
                 #attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small "+ bg_color + " text-white"
-                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small text-white"
-                #text  = tripAvailabilty.ava_time.strftime('%H:%M') + '  ' +   TRIP_TYPE_HEB[tripAvailabilty.ava_trip_type]
-                text  = tripAvailabilty.ava_time.strftime('%H:%M') 
-                link  = 'tour:booking'
-                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=int(tripAvailabilty.ava_time.strftime('%H')), 
-                                             trip_type=view,  trip_id= 1))
+                self.attr = True
+                self.id   = dateInCalendar.strftime('%d_%m_%Y')
+                self.id   += "-"+ tripAvailabilty.ava_time.strftime('%H_%M')
                 
             
                 
                 
-            self.year  = dateInCalendar.year
-            self.month = dateInCalendar.month
-            self.day   = dateInCalendar.day
-            
-            ########################
-     
-class EventAttr:
-    def __init__(self, attr, text, link, hour, trip_type, trip_id):
-        self.attr = attr
-        self.text = text
-        self.link = link
-        self.hour = hour
-        self.trip_type =trip_type
-        self.id   = trip_id
-                
-class Contact(models.Model):
-    '''
-    This class hold the information regarding contact
-    '''
-    create_date      = models.DateTimeField(default=timezone.now)
-    first_name       = models.CharField(max_length=200)
-    last_name        = models.CharField(max_length=200)
-    email            = models.EmailField(blank=True, default="")
-    text             = models.TextField(max_length=600)
-    confirm          = models.BooleanField(default=False)
-    
-    #create_date      = models.DateTimeField('date create')
+
+
+
     
     def __str__(self):
         return self.first_name

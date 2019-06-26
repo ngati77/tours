@@ -6,6 +6,9 @@ from .models import Contact
 
 from django.contrib.admin import AdminSite
 from django.http import HttpResponse
+from .tour_emails import tour_emails 
+from django.template.loader import render_to_string
+from django.conf import settings
 # Create your models here.
 
 
@@ -27,6 +30,13 @@ class TransactionInline(admin.TabularInline):
     extra = 3
 
 
+    
+    
+    
+    
+
+
+
 class ClientAdmin(admin.ModelAdmin):
    
     fieldsets = [
@@ -39,14 +49,49 @@ class ClientAdmin(admin.ModelAdmin):
         
         ('Payments',         {'fields': ['pre_paid']}),
         (None,               {'fields': ['total_payment']}),
+        (None,               {'fields': ['text']}),
+        ('Trip',             {'fields': ['trip']}),
+        
         
     ]
     inlines         = [TransactionInline]
-    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment')
+    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','text')
     list_filter     = ['first_name']
     search_fields   = ['first_name']
-
-
+    
+    
+    def send_email_again(self, request, queryset):
+        for client in queryset:
+            trip = client.trip
+            OurToursQuery = OurTours.objects.filter(trip_type=trip.trip_type)
+            transaction=client.transaction_set.all()[0]
+            if len(OurToursQuery)!=1:
+                print('Raise exception')
+            title = OurToursQuery[0].title
+            msg_plain= 'DUMMY ONE'
+            children = (client.number_of_children > 0)
+            more_to_pay=(client.total_payment-client.pre_paid)
+            try:
+                msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
+                                                                          'trip_time':trip.trip_time.strftime('%H:%M'), 
+                                                                          'id': transaction.id, 
+                                                                          'trip_type':title, 
+                                                                          'client':client, 
+                                                                          'print_children':children, 
+                                                                          'more_to_pay':more_to_pay})
+                #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
+                emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+                #cc =['yael.gati@cambridgeinhebrew.com']
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
+            except:
+                print('Got an error... sending email...')
+    
+            self.message_user(request, "%s successfully send email to ." % client.email)
+    
+    send_email_again.short_description = "Resending the email to the specific client"
+    actions = [send_email_again]
+    
+    
 class TransactionAdmin(admin.ModelAdmin):
    
     fieldsets = [
@@ -56,8 +101,10 @@ class TransactionAdmin(admin.ModelAdmin):
         (None,               {'fields': ['amount']}),
         (None,               {'fields': ['token']}),
         (None,               {'fields': ['success']}),
+        (None,               {'fields': ['client']}),
+        
     ]
-    list_display    = ('id','charge_id', 'create_date', 'amount' ,'success')
+    list_display    = ('id','charge_id', 'create_date', 'amount' ,'success','client')
     list_filter     = ['create_date']
     search_fields   = ['create_date']
     
@@ -161,8 +208,6 @@ class OurTourAdmin(admin.ModelAdmin):
         (None,               {'fields': ['description2']}),
         (None,               {'fields': ['description3']}),
         (None,               {'fields': ['duration']}),
-        (None,               {'fields': ['meetingPoint']}),
-        (None,               {'fields': ['gettingThere']}),
         (None,               {'fields': ['price']}),
         (None,               {'fields': ['priceChild']}),
         (None,               {'fields': ['deposit']}),

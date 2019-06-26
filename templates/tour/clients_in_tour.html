@@ -1,0 +1,136 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+{% block head %}
+
+  <!-- CSS for each example: -->
+  <link rel="stylesheet" type="text/css" href="{% static 'tour/report.css' %}" data-rel-css="" />
+{% endblock %} 
+
+{% block content %}
+
+
+{% if request.user.is_authenticated %}
+<div class="container-fluid">
+  <div class="row d-flex bg-light text-dark contact">
+      <form action="{% url 'tour:trip_pdf' trip.id %}" method="post" >
+                        {% csrf_token %}
+                       
+                        <div class="row">          
+                       <button id="rep_html"   class="btn btn-runner1" value="rep_html">צור דוח</button>
+                       </div>
+       </form>
+  
+   </div>
+<table>
+    <tr class="title">
+      <td>id</td>
+      <td>תאריך סיור</td>
+      <td>שעה</td>
+      <td>מדריך</td>
+      <td>סוג סיור</td>
+      <td>נוצר בתאריך</td>
+    </tr>
+    
+   
+     <tr class="data">
+     <td>{{ trip.id }}</td>
+     <td>{{ trip.trip_date|date:'d.m.Y' }}</td>
+     <td>{{ trip.trip_time|date:'H:i'  }}</td>
+     <td>{{ trip.get_trip_guide_display }}</td>
+     <td>{{ trip.get_trip_type_display }}</td>
+     <td>{{ trip.create_date|date:'d.m.Y' }}</td>
+     </tr>
+     </table>
+     {% for client in trip.clients_set.all %}
+      <table>
+      <tr class="title">
+     <td>client id</td>
+     <td>שם פרטי</td>
+     <td>שם משפחה</td>
+     <td>ספר טלפון</td>
+     <td>דואר אלקטרוני</td>
+     <td>מבוגרים</td>
+     <td>ילדים</td>
+     <td>מקדמה</td>
+     <td>סה"כ</td>
+     <td>הודעה</td>
+      </tr>
+      
+     <tr class="data">
+     <td> <button class="collapsible" id="n{{ client.id }}">{{ client.id }}</button></td>
+     <td>{{ client.first_name }}</td>
+     <td>{{ client.last_name }}</td>
+     <td>{{ client.phone_number }}</td>
+     <td>{{ client.email }}</td>
+     <td>{{ client.number_of_people }}</td>
+     <td>{{ client.number_of_children }}</td>
+     <td>{{ client.pre_paid }}</td>
+     <td>{{ client.total_payment }}</td>
+     <td>{{ client.text }}</td>
+     </tr>
+       
+     </table>
+     <div id="collapse_n{{client.id}}"  class="content"> 
+     <table>
+       {% for trans in client.transaction_set.all %}
+     <tr class="title">
+     <td>trans id</td>
+     <td>Date</td>
+     <td>Token </td>
+     <td>amount</td>
+     <td>charge_id</td>
+     </tr>
+      
+      <tr class="data">
+      <td>{{ trans.id }}</td>
+     <td>{{ trans.create_date|date:'d.m.Y' }}</td>
+     <td>{{ trans.token }}</td>
+     <td>{{ trans.amount }}</td>
+     <td>{{ trans.charge_id }}</td>
+      </tr>
+       {% endfor %}
+      </table>
+      </div>
+       
+        <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
+      {% endfor %}
+     <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
+
+   
+    
+   
+          
+ </div>
+ 
+ <script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = document.getElementById("collapse_" + this.id );
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
+{% endif %}
+
+
+
+
+   
+
+{% endblock %}
+<!--<li><a href="{% url  'tour:detail' tour.id %}">{{ tour.trip_date }} {{ tour.trip_type }}</a></li>-->
+
+    

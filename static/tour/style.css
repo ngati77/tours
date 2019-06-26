@@ -4,11 +4,17 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
     display: block;
 }
+
+* {box-sizing: border-box;}
+ul {list-style-type: none;}
+
+
 html, body {
     height: 100%;
     width: 100%;
     /*font-family: 'Poppins', sans-serif;*/
     font-family: 'Heebo', sans-serif;
+    /*font-family: Verdana, sans-serif*/
     color: #222;  
     background-color: white;  
 }
@@ -32,23 +38,24 @@ html, body {
     
 }
 
+
+
 .navbar-first-line{
-    position:absolute;
     height: 30%;
     width:   40%;
     transform: translateY(30%);
     font-size: 17px;
     text-align:right;
+    margin-right: .6rem;
+}
+.navbar-en-line{
+    height: 30%;
+    width:   40%;
+    transform: translateY(30%);
+    font-size: 17px;
+    text-align:left;
     padding-right: 0.4em;
 }
-.navbar-second-line{
-    position:absolute;
-    height: 25%;
-    width:   100%;
-    right:-62.5%;
-    top: 55%;
-}
-
 .nav-link {
     font-size: 1.1em;
 }
@@ -85,8 +92,16 @@ html, body {
 .contact {
     margin-right:1em;
 }
-
-
+.fb_logo_size{
+    width:40%!important;
+    height: 100%;
+}
+.image_in_site {
+    width:80%;
+    border-radius:10%;
+    background-color:white;
+    
+}
 .carousel-caption h4{
     position: absolute;
     left: 100px;
@@ -107,15 +122,20 @@ html, body {
 }
 
 .jumbotron {
-    padding: 2rem;
     border-radius: 2;
     background-color: white;
-    margin-right: 2em;
     margin-top: 1em;
 }    
 
+.main_text{
+     margin-top: .6em;
+     margin-right: .6em;
+
+}
 .runner {
     background-color:#f1f1f1;
+    margin-top:30px;
+    margin-left:1em;
 }
 
 .btn-tour {
@@ -126,9 +146,8 @@ html, body {
     border: 2px solid #124789!important;
     color:     #124789;
     text-align: right;
-    width: 140px;
     margin-bottom: 0.2rem!important;
-  
+     margin-right: 0rem!important;
     margin-top: 0.2rem!important;
 }
 
@@ -151,7 +170,6 @@ html, body {
     border: 2px solid #124789!important;
     color:     #124789;
     text-align: right;
-    width: 190px;
     margin-bottom: 0.2rem!important;
     margin-right: 1rem!important;
     margin-top: 0.2rem!important;
@@ -164,7 +182,6 @@ html, body {
     border: 2px solid #124789!important;
     color:     #124789;
     text-align: right;
-    width: 190px;
     margin-bottom: 0.2rem!important;
     margin-right: 0.1rem!important;
     margin-top: 0.2rem!important;
@@ -322,10 +339,10 @@ hr.light{
 
 .tips-row {
   
-   margin-right: 0rem;
+   margin-right: 3rem;
    margin-left: 0rem;
    margin-top: 0rem;
-   margin-bottom: 0rem;
+   margin-bottom: 1rem;
    padding: 0rem;
    
 }
@@ -340,13 +357,14 @@ hr.short{
 
 .tips {
    
-   margin-right: 0rem;
+   margin-right: 1rem;
+   margin-bottom: .5rem;
    padding: 0rem;
    
 }
 
 .card-title{
-
+    margin-top:.6em;
     text-align:right;
 }
 
@@ -354,6 +372,8 @@ hr.short{
      text-align:right;
 
 }
+
+
 
 .tips p{
    font-size:14px;
@@ -375,15 +395,15 @@ hr.short{
     border-radius:100%;
     padding:.3em;
     left:45%;
-    top: 5%;
+    top: -8%;
     
 }
 
 .arrow1 {
-   margin-right: 110px;
+   margin-right: 1em;
 }
 .arrow2 {
-   margin-right: 65px;
+   margin-right: 1em;
 }
 .review {
    margin-top: 1rem;
@@ -399,10 +419,11 @@ hr.short{
 
 .meeting_point{
    text-align:right;
-   margin: 1rem;
+   margin-top: 1rem;
+   margin-bottom: 1rem;
    padding-right: 1rem;
    background-color: #f1f1f1; 
-   border-radius:10%;
+   border-radius:5%;
 
 }
 .text-center {
@@ -426,6 +447,9 @@ hr.light-100 {
     margin-left: 2rem;
 
 }
+
+
+
 /*---Media Queries --*/
 @media (max-width: 992px) {
 
@@ -435,13 +459,10 @@ hr.light-100 {
 
 }
 
-    .navbar-brand  {
-    width: 250px;
-    }
     .navbar-brand img {
     width: 30%;
-    height: 30%;
-    
+    height: 50%;
+   
 }
     .jumbotron {
     margin-top: 1rem;
@@ -452,7 +473,9 @@ hr.light-100 {
     font-size:150%;
     font-weight: 300%;
 }
-    
+    .reg-btn{
+        font-size:80%
+    }
 }
   
 @media (max-width: 768px) {
@@ -467,11 +490,19 @@ hr.light-100 {
     width:100px;
 }
 */
+.tips-row {
+   margin-right: 0rem;
+}
+.tips {
+   margin-right: 0rem;
+}
+
+ .navbar-brand img {
+    width: 20%;
  .disapear_md {
      display: none;
      
 }
-
 
 .carousel-caption {
     top: 45%;
@@ -499,13 +530,24 @@ hr.light-100 {
     padding: .2rem;
     
 } 
+.reg-btn{
+        font-size:50%
+    }
+
 /*.footer-centre li {
    font-size: 1em;
    padding-right: .5rem;
 }
+ 
 */
+
 }
 @media (max-width: 576px) {
+
+.circle-icon {
+    top: -12%;
+    
+}
   .carousel-caption {
     top: 40%;
 }
@@ -513,6 +555,16 @@ hr.light-100 {
     .footer_image{
     width:100px;
 }
+
+.main_text{
+     margin-top: 0em;
+     margin-right: 0em;
+
+}
+.jumbotron {
+    margin-right: 0em;
+    margin-left:0em!important;
+}  
 /*    .social p {
     font-size: 1.5em;
     padding: .0rem;
@@ -551,7 +603,22 @@ hr.light-100 {
 .contact {
     margin-right:.1em;
 }
-
+.reg-btn{
+        font-size:100%
+    }
+.tips {
+   
+   margin-right: 0rem;
+   
+    }
+    
+    .tips-row {
+  
+   margin-right: 0rem;
+   
+}
+    
+    
 }
 
 
@@ -579,9 +646,6 @@ figure {
   height: 100%;
 }
 /*--- Bootstrap Padding Fix --*/
-[class*="col-"] {
-    padding: 1rem;
-}
 
 .runner1{
     margin-top:80px;

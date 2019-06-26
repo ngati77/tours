@@ -5,9 +5,9 @@
 {% block content %}
 
 <div class="container-fluid">
-    <div class="row d-flex bg-light text-dark contact">
+    <div class="row d-flex  justify-content-center bg-light text-dark contact "> 
             
-        <div class="col-md-12 col-lg-4 form">
+        <div class="col-sm-12 col-md-5  ">
             <div class="row">
                 <form action="{% url 'tour:contact' %}" method="post" >
                     {% csrf_token %}
@@ -21,9 +21,9 @@
                 </form>
             </div>
         </div>
-        <div class="col-md-12 col-lg-5 form">
+        <div class="col-sm-8 col-md-4 ">
        <div class="row">
-          <img src="https://cambridgeinhebrew.com/media/Gallery/2018/12/bridge-374048_1920_640x474_1.jpg">
+          <img class="image_in_site" src="https://cambridgeinhebrew.com/media/Gallery/2018/12/bridge-374048_1920_640x474_1.jpg">
         </div>
          </div>
     </div>
