@@ -808,6 +808,8 @@ def tour_complete(request, pk):
             # Scan all clients
             for client in clientQuerey:
                 transactionArray = []
+                if client.status != 'a':
+                    continue
                 if client.total_payment > client.pre_paid:
                     # Create Cache transaction  
                     try:
