@@ -203,6 +203,14 @@ class Clients(models.Model):
     ('b', 'Canceled'),
     ('c', 'Canceled and refund'),
 )
+    FOUND_US = (
+    ('a', 'גוגל'),
+    ('b', 'פייסבוק'),
+    ('c', 'שאל לונדוני'),
+    ('d', 'כתבה'),
+    ('e', 'המלצה מחבר/ה'),
+    ('f', 'אחר'),
+)
     trip             = models.ForeignKey(Trip, on_delete=models.CASCADE)
     first_name       = models.CharField(max_length=200)
     last_name        = models.CharField(max_length=200)
@@ -219,6 +227,11 @@ class Clients(models.Model):
                                         max_length=1,
                                         choices=STATUS_CLIENT,
                                         default='a',
+                                        )
+    found_us             = models.CharField(
+                                        max_length=1,
+                                        choices=FOUND_US,
+                                        default='f',
                                         )
     
     text               = models.TextField(max_length=600)

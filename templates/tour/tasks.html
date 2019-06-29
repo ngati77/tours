@@ -237,11 +237,16 @@
      <td>ילדים</td>
      <td>מקדמה</td>
      <td>סה"כ</td>
-      <td>הודעה</td>
+     <td>הודעה</td>
+     <td>מצא אותנו</td>
       </tr>
       {% for client in entry.clients_set.all %}
-      <tr class="data">
-       <td>{{ client.id }}</td>
+      {% if client.status == 'a' %}
+          <tr class="data">
+      {% else %}
+       <tr class="data_cancel">
+       {% endif %}
+     <td>{{ client.id }}</td>
      <td>{{ client.first_name }}</td>
      <td>{{ client.last_name }}</td>
      <td>{{ client.phone_number }}</td>
@@ -251,6 +256,7 @@
      <td>{{ client.pre_paid }}</td>
      <td>{{ client.total_payment }}</td>
      <td>{{ client.text }}</td>
+     <td>{{ client.get_found_us_display }}</td>
       </tr>
        {% endfor %}
       </table>

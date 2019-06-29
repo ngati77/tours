@@ -133,7 +133,7 @@ def reviewes(request):
 def payment(request ):
     form = PaymentForm(request.POST)
     if request.method == 'POST':
-        title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, text = form.get_data() 
+        title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, found_us, text = form.get_data() 
         stripe.api_key = settings.STRIPE_SECRET_KEY
         deposit = int(deposit)
         try:
@@ -161,7 +161,7 @@ def payment(request ):
             trip = tripQuerySet[0]
         # Create new client           
         client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
-                         number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails, text = text)
+                         number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails, found_us = found_us ,text = text)
 #            
         client.save()
         transaction = Transaction(client=client,
@@ -251,7 +251,7 @@ def bookTour(request,pYear, pMonth, tripType ):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']
            # Get all infortamtion from form
-            title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, text  = form.get_data()
+            title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, found_us ,text  = form.get_data()
             #trip_date = datetime.datetime(pYear, pMonth, pDay, pHour)
             # Check iftrip exists
   
@@ -284,6 +284,7 @@ def bookTour(request,pYear, pMonth, tripType ):
                                                
                                                'confirm_use': confirm_use, 
                                                'send_emails': send_emails,
+                                               'found_us'   : found_us,
                                                'text'       : text,
                                                'deposit':deposit,
                                                'paymentSum':paymentSum})
@@ -549,6 +550,8 @@ def reportView(request):
                     clientQuerey = trip.clients_set.all()
                     # Scan all clients, in the futrue need to scan the invoice
                     for client in clientQuerey:
+                        if client.status != 'a':
+                            continue
                         reportEntry.total_people    += client.number_of_people
                         reportEntry.total_children  += client.number_of_children
                         reportEntry.total_deposit   += client.pre_paid

@@ -65,9 +65,14 @@
      <td>מקדמה</td>
      <td>סה"כ</td>
      <td>הודעה</td>
+     <td>מצא אותנו</td>
       </tr>
-      
-     <tr class="data">
+      {% if client.status == 'a' %}
+          <tr class="data">
+      {% else %}
+       <tr class="data_cancel">
+       {% endif %}
+   
      <td> <button class="collapsible" id="n{{ client.id }}">{{ client.id }}</button></td>
      <td>{{ client.first_name }}</td>
      <td>{{ client.last_name }}</td>
@@ -78,6 +83,7 @@
      <td>{{ client.pre_paid }}</td>
      <td>{{ client.total_payment }}</td>
      <td>{{ client.text }}</td>
+     <td>{{ client.get_found_us_display }}</td>
      </tr>
        
      </table>
