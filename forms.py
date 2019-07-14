@@ -18,6 +18,7 @@ FOUND_US = (
     ('a', 'גוגל'),
     ('b', 'פייסבוק'),
     ('c', 'שאל לונדוני'),
+    ('g', 'ארטנטיבי'),
     ('d', 'כתבה'),
     ('e', 'המלצה מחבר/ה'),
     ('f', 'אחר'),
@@ -37,7 +38,7 @@ class BookingForm(forms.Form):
     number_child   = forms.IntegerField(max_value = 10, min_value =0, label ='מספר ילדים עד גיל 12')
     confirm_use    = forms.BooleanField(label ='אני מסכים שפרטי ישמרו כדי ליצור קשר לגבי הסיור',label_suffix="")
     send_emails    = forms.BooleanField(required=False, label ='אני מעוניין להצטרף לרשימת התפוצה',label_suffix="")
-    found_us       = forms.ChoiceField(choices=FOUND_US, label ='איך הגעתם אלינו')
+    found_us       = forms.ChoiceField(choices=FOUND_US, label ='איך הגעתם אלינו',initial='f')
     text           = forms.CharField(required=False, label  ='', widget=forms.Textarea(attrs={'placeholder': 'שדה לא חובה - אנא הוסיפו כמה פרטים על עצמכם כדי שנדע את מי אנו פוגשים. אם ובתה / משפחה / פנסיונריות . כאן זה גם המקום לכתוב אם ישנה איזה מגבלה או משהו אחר שאנו צריכים להיות מודעים אליו. תודה'}))
     deposit        = forms.IntegerField(widget = forms.HiddenInput())
     price          = forms.IntegerField(widget = forms.HiddenInput())

@@ -203,10 +203,12 @@ class Clients(models.Model):
     ('b', 'Canceled'),
     ('c', 'Canceled and refund'),
 )
+    
     FOUND_US = (
     ('a', 'גוגל'),
     ('b', 'פייסבוק'),
     ('c', 'שאל לונדוני'),
+    ('g', 'ארטנטיבי'),
     ('d', 'כתבה'),
     ('e', 'המלצה מחבר/ה'),
     ('f', 'אחר'),

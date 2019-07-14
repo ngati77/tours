@@ -14,51 +14,68 @@
         }
         html {
             font-family: David;
-            font-size: 11pt;
+            font-size: 10pt;
             text-align:right;
         }
-        .table {
-            width: 100%;
-            max-width: 100%;
-            margin-bottom: 5px;
-            background-color: #fff;
-        }
-        .table th,
-        .table td {
-            padding: 5px;
-            vertical-align: top;
-            border-top: 1px solid #000;
-            text-align: center;
-        }
-        .table thead th {
-            vertical-align: bottom;
-            border-bottom: 2px solid #000;
-        }
-        .table tbody + tbody {
-            border-top: 2px solid #000;
-        }
-        .table .table {
-            background-color: #fff;
-        }
-        .list-group {
-            display: block;
-            width: 100%;
-            list-style: none;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-        .list-group p {
-            width: 100%;
-            height: 20px;
-            line-height: 20px;
-            list-style: none;
-            font-size: 1.1em;
-        }
-         .card  h2{
-            padding: 5px;
-            vertical-align: top;
-            text-align: center;
-        }
+       
+* {box-sizing: border-box;}
+ul {list-style-type: none;}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+  white-space: nowrap;
+   border: 1px solid black;
+  padding:3px; 
+}
+
+td {
+   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+   border: 1px solid black;
+  padding:3px; 
+}
+
+th {
+  border: 1px solid black;
+  padding:3px; 
+}
+
+.title {
+  margin: 0;
+  background-color: #ddd;
+  text-align: right !important;
+  padding-right:0;
+  width: 100%;
+  
+}
+
+.more_text{
+    width: 40% !important;
+}
+.data {
+  background: #eee;
+  margin: 0;
+  text-align: right !important;
+  padding-right:0;
+  width: 100%;
+}
+
+.data_cancel {
+  background: #F56A6A;
+  margin: 0;
+  text-align: right !important;
+  padding-right:0;
+  width: 100%;
+}
+
+
+.content {
+  margin: 18px 18px;
+}
+
+
         
     </style>
 </head>
@@ -72,34 +89,82 @@
       <h3>Date: {{ month }} {{ year }}</h3>
         </div>
 
+    {% for entry in report %}
+    <table>
+    <thead>
+    <tr class="title">
+      <td>נוצר בתאריך</td>
+      <td>סוג סיור</td>
+      <td>מדריך</td>
+       <td>שעה</td>
+       <td>תאריך סיור</td>
+       <td>id</td>
+    </tr>
+    </thead>
+    
+     <tbody>
+     <tr class="data">
+     
+     <td>{{ entry.create_date|date:'d.m.Y' }}</td>
+     <td>{{ entry.get_trip_type_display }}</td>
+     <td>{{ entry.get_trip_guide_display }}</td>
+     <td>{{ entry.trip_time|date:'H:i'  }}</td>
+     <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
+     <td>{{ entry.id }}</td>
+     </tr>
+      </tbody>
+     </table>
+     <div class="row content"></div>
+     {% for client in entry.clients_set.all %}
+      <table>
+       <thead>
+      <tr class="title">
+      <td>מצא אותנו</td>
+      <td>הודעה</td>
+      <td>סה"כ</td>
+      <td>מקדמה</td>
+      <td>ילדים</td>
+      <td>מבוגרים</td>
+      <td>דואר אלקטרוני</td>
+      <td>מספר טלפון</td>
+      <td>שם משפחה</td>
+      <td>שם פרטי</td>
+      <td>client id</td>
+      </tr>
+       </thead>
+       <tbody>
+      {% if client.status == 'a' %}
+          <tr class="data">
+      {% else %}
+       <tr class="data_cancel">
+       {% endif %}
+     <td>{{ client.get_found_us_display }}</td>
+     <td>{{ client.text }}</td>
+     <td>{{ client.total_payment }}</td>
+      <td>{{ client.pre_paid }}</td>
+     <td>{{ client.number_of_children }}</td>
+     <td>{{ client.number_of_people }}</td>
+      <td>{{ client.email }}</td>
+    <td>{{ client.phone_number }}</td>
+     <td>{{ client.last_name }}</td>
+     <td>{{ client.first_name }}</td>
+     <td>{{ client.id }}</td>
+     
+     </tr>
+        </tbody>
+     </table>
+     
        
-
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Guide</th>
-                <th>Tour</th>
-                <th>Adults</th>
-                <th>Child</th>
-            </tr>
-            </thead>
-            <tbody>
-            {%  for entry in report %}
-                <tr>
-<!--                    <td>{{ sale.created_at | date:"d/m/Y" }}</td>  -->
-                    <td>{{  entry.trip_date }}</td>
-                    <td>{{  entry.trip_time }}</td>
-                    <td>{{  entry.trip_guide  }}</td>
-                    <td>{{ entry.trip_text }}</td>
-                    <td>{{ entry.total_people }}</td>
-                     <td>{{  entry.total_children }}</td>
-                </tr>
-           
-            {% endfor %}
-            </tbody>
-        </table>
+        <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
+      {% endfor %}
+     <div class="row p-1 bg-light text-blue">
+    <p></p>
+     </div>
+     <div class="row content"></div>
+    {% endfor %}
+        
     </div>
 </div>
 

@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 
 
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -557,14 +557,21 @@ def reportView(request):
                         reportEntry.total_deposit   += client.pre_paid
                         reportEntry.total_gross     += client.total_payment
                     
-                    # How much the guide earn from this tour
-                    reportEntry.total_guide_exp = reportEntry.calc_guide_payment(trip_type = trip.trip_type,
+                    # If Yael Gati is the guide for this tour. then we don't need to pay her!!!
+                    if (trip.trip_guide=='YG'):
+                        reportEntry.total_guide_exp = 0
+                        reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense
+                        reportEntry.guide_payback = 0
+                    else:
+                        
+                        # How much the guide earn from this tour
+                        reportEntry.total_guide_exp = reportEntry.calc_guide_payment(trip_type = trip.trip_type,
                                                                           adult     = reportEntry.total_people,
                                                                           children  = reportEntry.total_children)
-                    # how much we earend
-                    reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
-                    # Now that we know how much the guide earn we can calculate home amount he needs to return
-                    reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
+                        # how much we earend
+                        reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
+                        # Now that we know how much the guide earn we can calculate home amount he needs to return
+                        reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
                     
                     reportEntry.trip_id         = trip.id
                     # Gather the sum here
@@ -684,7 +691,7 @@ def tripView(request):
             # The view is pdf, therefore Create param dictionary for the pdf
             #print(list(hebmonthdic.keys())[int(month)-1])
             params = {
-                'report': report,
+                'report': tripQuerey,
                 'filter_check_guide': check_guide,
                 'month'             :  monthStr[int(month)-1],
                 'year'              : year,
@@ -778,7 +785,7 @@ def tour_confirm(request, pk):
         tour = tours_query[0]
         tour.status = 'a'
         tour.save()
-    return tasks(request)
+    return  redirect('tour:tasks')
 
 # This class is used in the report.html
 class TransactionEntry: 
@@ -876,7 +883,7 @@ def tour_complete(request, pk):
         
     
     # Bring back the tasks        
-    return tasks(request)
+    return  redirect('tour:tasks')
 
 def contact_not_spam(request, pk):
     contact_query =  Contact.objects.filter(id  = pk)
@@ -905,7 +912,8 @@ def contact_not_spam(request, pk):
                                                                'page_title':'נחזור אלייך בהקדם', 
                                                                'id': contact.id})
 
-    return tasks(request)
+    return  redirect('tour:tasks')
+
 
 def contact_confirm(request, pk):
     contact_query =  Contact.objects.filter(id  = pk)
@@ -913,7 +921,8 @@ def contact_confirm(request, pk):
         contact = contact_query[0]
         contact.confirm = 'd'
         contact.save()
-    return tasks(request)
+    return  redirect('tour:tasks')
+
 
 
 
@@ -926,4 +935,4 @@ def review_confirm(request, pk):
         review = review_query[0]
         review.confirm = True
         review.save()
-    return tasks(request)
+    return  redirect('tour:tasks')
