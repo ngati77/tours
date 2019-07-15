@@ -640,7 +640,6 @@ def tripView(request):
         form = ReportForm(request.POST)
         # We get field called 'rating' a number from 1 to 10
         # Check if the form is valid:
-        report = []
         if form.is_valid():
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']

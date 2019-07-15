@@ -40,6 +40,7 @@
       <td>מדריך</td>
       <td>סוג סיור</td>
       <td>נוצר בתאריך</td>
+       <td>סטטוס</td>
     </tr>
     
    
@@ -50,6 +51,7 @@
      <td>{{ entry.get_trip_guide_display }}</td>
      <td>{{ entry.get_trip_type_display }}</td>
      <td>{{ entry.create_date|date:'d.m.Y' }}</td>
+      <td>{{ entry.get_status_display }}</td>
      </tr>
      </table>
      {% for client in entry.clients_set.all %}

@@ -83,18 +83,19 @@ table {
     <table>
     <thead>
     <tr class="title">
+      <td>סטטוס</td>
       <td>נוצר בתאריך</td>
       <td>סוג סיור</td>
       <td>מדריך</td>
        <td>שעה</td>
        <td>תאריך סיור</td>
-       <td>id</td>
+       <td>מספר סיור</td>
     </tr>
     </thead>
     
      <tbody>
      <tr class="data">
-     
+     <td>{{ entry.get_status_display }}</td>
      <td>{{ entry.create_date|date:'d.m.Y' }}</td>
      <td>{{ entry.get_trip_type_display }}</td>
      <td>{{ entry.get_trip_guide_display }}</td>
@@ -117,8 +118,8 @@ table {
       <td width="30">מבוגר</td>
       <td>דואר אלקטרוני</td>
       <td>מספר טלפון</td>
-      <td>שם משפחה</td>
-      <td>שם פרטי</td>
+      <td  width="120">שם משפחה</td>
+      <td  width="120">שם פרטי</td>
       <td width="30">id</td>
       </tr>
        </thead>
@@ -136,8 +137,8 @@ table {
      <td width="30">{{ client.number_of_people }}</td>
       <td >{{ client.email }}</td>
     <td>{{ client.phone_number }}</td>
-     <td>{{ client.last_name }}</td>
-     <td>{{ client.first_name }}</td>
+     <td  width="120">{{ client.last_name }}</td>
+     <td  width="120">{{ client.first_name }}</td>
      <td width="30">{{ client.id }}</td>
      
      </tr>
