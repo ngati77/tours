@@ -80,6 +80,7 @@ table {
         </div>
 
     {% for entry in report %}
+      {% if entry.status != 'b' %}
     <table>
     <thead>
     <tr class="title">
@@ -106,7 +107,7 @@ table {
       </tbody>
      </table>
      <div class="row content"></div>
-     {% for client in entry.clients_set.all %}
+     
       <table>
        <thead>
       <tr class="title">
@@ -124,11 +125,10 @@ table {
       </tr>
        </thead>
        <tbody>
-      {% if client.status == 'a' %}
+       {% for client in entry.clients_set.all %}
+       {% if client.status == 'a' %}
           <tr class="data">
-      {% else %}
-       <tr class="data_cancel">
-       {% endif %}
+      
      <td>{{ client.get_found_us_display }}</td>
      <td>{{ client.text }}</td>
      <td width="30">{{ client.total_payment }}</td>
@@ -140,8 +140,9 @@ table {
      <td  width="120">{{ client.last_name }}</td>
      <td  width="120">{{ client.first_name }}</td>
      <td width="30">{{ client.id }}</td>
-     
      </tr>
+      {% endif %}
+       {% endfor %}
         </tbody>
      </table>
      
@@ -149,11 +150,12 @@ table {
         <div class="row p-1 bg-light text-blue">
     <p></p>
      </div>
-      {% endfor %}
+     
      <div class="row p-1 bg-light text-blue">
     <p></p>
      </div>
      <div class="row content"></div>
+     {% endif %}
     {% endfor %}
         
     </div>
