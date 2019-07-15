@@ -9,7 +9,7 @@
             src: url("tours/static/tour/fonts/david.ttf");
         }
         @page {
-            size: A4;
+            size: A4 landscape;
             margin: 1cm;
         }
         html {
@@ -18,35 +18,25 @@
             text-align:right;
         }
        
-* {box-sizing: border-box;}
-ul {list-style-type: none;}
+
 
 table {
-  table-layout: fixed;
-  width: 100%;
-  white-space: nowrap;
-   border: 1px solid black;
-  padding:3px; 
-}
-
-td {
-   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-   border: 1px solid black;
-  padding:3px; 
-}
-
-th {
   border: 1px solid black;
   padding:3px; 
+  margin-top:10px;
+  
 }
 
+
+
+
+
+
 .title {
-  margin: 0;
+  
   background-color: #ddd;
   text-align: right !important;
-  padding-right:0;
+  padding-right:2px;
   width: 100%;
   
 }
@@ -58,7 +48,7 @@ th {
   background: #eee;
   margin: 0;
   text-align: right !important;
-  padding-right:0;
+  padding-right:2px;
   width: 100%;
 }
 
@@ -121,15 +111,15 @@ th {
       <tr class="title">
       <td>מצא אותנו</td>
       <td>הודעה</td>
-      <td>סה"כ</td>
-      <td>מקדמה</td>
-      <td>ילדים</td>
-      <td>מבוגרים</td>
+      <td width="30">סה"כ</td>
+      <td width="30">שולם</td>
+      <td width="30">ילד</td>
+      <td width="30">מבוגר</td>
       <td>דואר אלקטרוני</td>
       <td>מספר טלפון</td>
       <td>שם משפחה</td>
       <td>שם פרטי</td>
-      <td>client id</td>
+      <td width="30">id</td>
       </tr>
        </thead>
        <tbody>
@@ -140,15 +130,15 @@ th {
        {% endif %}
      <td>{{ client.get_found_us_display }}</td>
      <td>{{ client.text }}</td>
-     <td>{{ client.total_payment }}</td>
-      <td>{{ client.pre_paid }}</td>
-     <td>{{ client.number_of_children }}</td>
-     <td>{{ client.number_of_people }}</td>
-      <td>{{ client.email }}</td>
+     <td width="30">{{ client.total_payment }}</td>
+      <td width="30">{{ client.pre_paid }}</td>
+     <td width="30">{{ client.number_of_children }}</td>
+     <td width="30">{{ client.number_of_people }}</td>
+      <td >{{ client.email }}</td>
     <td>{{ client.phone_number }}</td>
      <td>{{ client.last_name }}</td>
      <td>{{ client.first_name }}</td>
-     <td>{{ client.id }}</td>
+     <td width="30">{{ client.id }}</td>
      
      </tr>
         </tbody>

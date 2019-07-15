@@ -7,10 +7,13 @@ table {
   white-space: normal!important;
 }
 
-td {
-  word-wrap: break-word;
+table td 
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
 }
-
 table, th, td {
   border: 1px solid black;
   padding:10px; 
