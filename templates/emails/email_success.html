@@ -16,8 +16,9 @@
       <h2>אישור הזמנה</h2>
        <p class="lead"><strong>שם: {{client.first_name}} {{client.last_name}}</strong></p>
       <p class="lead">סוג הסיור: {{trip_type}}</p>
-      <p> נשמח לראותכם בתאריך {{trip_date}}</p>
-      <p>  בשעה {{trip_time}}</p>
+      <p> נשמח לראותכם בתאריך {{trip_date|date:'d.m.Y' }}</p>
+      <p>  בשעה {{trip_time|date:'H:i'  }}</p>
+      
       <p>מספר מטיילים: {{client.number_of_people}}</p>
        {% if print_children %}
       <p>מספר ילדים: {{client.number_of_children}}</p>
@@ -42,12 +43,14 @@
       </p>
       <hr>
       <div class="space"></div>
+      {% if NotFree %}
       <p>נתקבל תשלום של {{client.pre_paid}}
     פאונד
       </p>
       <p>יתרה לתשלום {{more_to_pay}}
        פאונד
       </p>
+      {% endif %}
       </div>
        <hr>
       </p>

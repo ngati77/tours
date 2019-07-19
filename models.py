@@ -34,6 +34,7 @@ TRIP_TYPE = (
         ('B', 'Bus'),
         ('P', 'Punting'),
         ('A', 'All'),
+        ('E','FREE'),
         )
 #TRIP_TYPE_HEB = {'C': 'סיור קלאסי','F': 'סיור משפחות','B': 'אוטובוס מלונדון','P': 'סיור פרטי'} 
 
@@ -184,10 +185,11 @@ class Trip(models.Model):
         else:
             return False
     @staticmethod
-    def get_event(date):
+    def get_event(date,trip_type):
         return Trip.objects.filter(
                                 ~Q(status='b'),
-                                trip_date=date)
+                                trip_date=date,
+                                trip_type=trip_type)
      
     #was_published_recently.admin_order_field = 'pub_date'
     #was_published_recently.boolean = True
@@ -434,21 +436,21 @@ class DayInCalendar:
                     continue
                 canceled = False
                 # Check if the trip was canceld
-                noneAvailableDateQuery = TripAvailabilty.objects.filter(ava_no_trip_day__year  = dateInCalendar.year,
-                                                                        ava_no_trip_day__month = dateInCalendar.month,
-                                                                        ava_no_trip_day__day   = dateInCalendar.day,
-                                                                        ava_no_trip_day__hour  = tripAvailabilty.ava_time.hour
-                                                                        )
-                for noneAvailableDate in noneAvailableDateQuery:
-                    #print(noneAvailableDate.ava_no_trip_day.strftime("%Y-%M-%D-%H"))
-                    if noneAvailableDate.ava_trip_type == 'A' or noneAvailableDate.ava_trip_type == tripAvailabilty.ava_trip_type:
-                        #print("TRUE")
-                        # Break from nearset for
-                        canceled = True
-                        break
-                # As it was canceled move to the next item in the lisy
-                if (canceled):
-                    continue
+#                noneAvailableDateQuery = TripAvailabilty.objects.filter(ava_no_trip_day__year  = dateInCalendar.year,
+#                                                                        ava_no_trip_day__month = dateInCalendar.month,
+#                                                                        ava_no_trip_day__day   = dateInCalendar.day,
+#                                                                        ava_no_trip_day__hour  = tripAvailabilty.ava_time.hour
+#                                                                        )
+#                for noneAvailableDate in noneAvailableDateQuery:
+#                    #print(noneAvailableDate.ava_no_trip_day.strftime("%Y-%M-%D-%H"))
+#                    if noneAvailableDate.ava_trip_type == 'A' or noneAvailableDate.ava_trip_type == tripAvailabilty.ava_trip_type:
+#                        #print("TRUE")
+#                        # Break from nearset for
+#                        canceled = True
+#                        break
+#                # As it was canceled move to the next item in the lisy
+#                if (canceled):
+#                    continue
                 
                 for vac in guideVacationQuery:
                     if (vac.vac_cancel_all) or (vac.vac_cancel_family and view=='F') or (vac.vac_cancel_classy and view=='C'):
@@ -463,6 +465,8 @@ class DayInCalendar:
                                                 trip_date__month = dateInCalendar.month,
                                                 trip_date__day   = dateInCalendar.day,
                                                 trip_time__hour  = tripAvailabilty.ava_time.hour,
+                                                trip_time__minute  = tripAvailabilty.ava_time.minute,
+                                                trip_time__second  = tripAvailabilty.ava_time.second
                                                 
                                                 )
               

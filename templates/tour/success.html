@@ -10,19 +10,21 @@
     <div class="row d-flex justify-content-center text-right">
     
         <div class="col-md-6 ">
-        <h3><font color="blue"> תודה שהזמנתם איתנו סיור בקיימברידג'</font></h3>
+        <h3><font color="blue"> תודה {{first}} שהזמנת איתנו סיור בקיימברידג'</font></h3>
           <h3><font color="blue">אפשר להתחיל להתרגש </font></h3>
           <hr>
-         <h3>ההרשמה הסתיימה בהצלחה</h3>
+         <h3>ההרשמה ל{{trip_type}} הסתיימה בהצלחה</h3>
           <p class="lead"><strong> נשלח מייל אישור עם פרטי הסיור ופרטי הגעה</strong></p>
           <p>אישור הזמנה {{id}}</p>
           <hr>
-          <p>נשמח לראותכם בתאריך {{trip_date}}</p>
-          <p>בשעה {{trip_time}}</p>
+          <p>נשמח לראותכם בתאריך {{trip_date|date:'d.m.Y' }}</p>
+          <p>בשעה {{trip_time|date:'H:i'  }}</p>
+           {% if NotFree %}
           <div class="space">
           <p>נתקבל תשלום של {{deposit}}</p>
           <p>יתרה לתשלום {{more_to_pay}}</p>
           </div>
+          {% endif %}
           </p>
           <p class="lead">
             <a class="btn btn-runner" href="{% url  'tour:home'  %}" role="button">בחזרה לדף הבית</a>

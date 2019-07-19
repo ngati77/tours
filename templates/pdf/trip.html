@@ -113,15 +113,15 @@ table {
       <tr class="title">
       <td>מצא אותנו</td>
       <td>הודעה</td>
-      <td width="30">סה"כ</td>
-      <td width="30">שולם</td>
-      <td width="30">ילד</td>
-      <td width="30">מבוגר</td>
+      <td width="33">סהכ</td>
+      <td width="33">שלם</td>
+      <td width="33">ילד</td>
+      <td width="33">מבגר</td>
       <td>דואר אלקטרוני</td>
       <td>מספר טלפון</td>
       <td  width="120">שם משפחה</td>
       <td  width="120">שם פרטי</td>
-      <td width="30">id</td>
+      <td width="33">id</td>
       </tr>
        </thead>
        <tbody>
@@ -131,15 +131,15 @@ table {
       
      <td>{{ client.get_found_us_display }}</td>
      <td>{{ client.text }}</td>
-     <td width="30">{{ client.total_payment }}</td>
-      <td width="30">{{ client.pre_paid }}</td>
-     <td width="30">{{ client.number_of_children }}</td>
-     <td width="30">{{ client.number_of_people }}</td>
+     <td width="33">{{ client.total_payment }}</td>
+      <td width="33">{{ client.pre_paid }}</td>
+     <td width="33">{{ client.number_of_children }}</td>
+     <td width="33">{{ client.number_of_people }}</td>
       <td >{{ client.email }}</td>
     <td>{{ client.phone_number }}</td>
      <td  width="120">{{ client.last_name }}</td>
      <td  width="120">{{ client.first_name }}</td>
-     <td width="30">{{ client.id }}</td>
+     <td width="33">{{ client.id }}</td>
      </tr>
       {% endif %}
        {% endfor %}

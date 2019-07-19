@@ -16,6 +16,7 @@
         <div class="col-sm-9 col-md-6 col-lg-5 form">
             <h3><font color="blue"> טופס הרשמה לסיור </font></h3>
             <h4> סוג הסיור: {{title}}</h4>
+             {% if NotFree %}
             <p> מחיר למבוגר: {{price}} פאונד</p>
              {% if print_child %}
               <p>מחיר לילד בגיל 3-12: {{priceChild}} פאונד</p>
@@ -23,6 +24,7 @@
               <p>ילדים עד גיל 12 חינם</p>
               {% endif %}
               </p>
+              {% endif %}
          
             
  <!--           
@@ -77,7 +79,7 @@
                     <table >
                     {{ form.as_p }}
                     </table>
-                                   
+            {% if NotFree %}                      
             <p>אנו מבקשים תשלום מקדמה על מנת להבטיח את מקומכם בסיור</p>
             <p>התשלום הוא מאובטח, פרטי כרטיס האשראי אינם נשמרים במערכת</p>
             <p>התשלום מבוצע באמצעות  stripe</p>
@@ -125,17 +127,11 @@
             
             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
             <p><a target="_blank" href="https://www.globes.co.il/portal/instrument.aspx?instrumentid=10436">גלובס שער המרה פאונד שקל</a></p>
               <button class="btn btn-runner" id="pay_button">המשך לתשלום</button>
+              {% else %}
+              <button class="btn btn-runner" id="pay_button">להרשמה</button>
+              {% endif %}
             </form>
         </div>
 

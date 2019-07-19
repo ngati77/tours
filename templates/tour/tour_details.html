@@ -38,11 +38,15 @@
                     <p>{{ourTour.duration}}</p>
                     <div class="meeting_point">
                         <p><u> עלות הסיור </u></p>
-                        <p>{{ourTour.price}} פאונד למבוגר </p>
-                        {% if print_child %}
-                        <p>{{ourTour.priceChild}} פאונד ילדים בגיל 3-12 </p>
+                        {% if NotFree %}
+                            <p>{{ourTour.price}} פאונד למבוגר </p>
+                            {% if print_child %}
+                            <p>{{ourTour.priceChild}} פאונד ילדים בגיל 3-12 </p>
+                            {% else %}
+                            <p>ילדים עד גיל 12 חינם</p>
+                            {% endif %}
                         {% else %}
-                        <p>ילדים עד גיל 12 חינם</p>
+                        <p>חינם</p>
                         {% endif %}
                     </div>
                     <div class="meeting_point">  
