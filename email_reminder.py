@@ -20,13 +20,13 @@ sys.path.append('/home/ngati/cambridge')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings.production'
 django.setup()
 
-from django.core.mail import send_mail
-
 from tours.tour_emails import tour_emails
 from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 
-from tours.models import  Trip, Clients
+from tours.models import  Trip, Clients, OurTours
+
 def main():
     # Search for trips tomorrw
     tomorrow      = datetime.datetime.now() + datetime.timedelta(days=1)
@@ -41,15 +41,19 @@ def main():
     
     # Now find the clients and send an email 
     for trip in tripQuery:
+        ourTours = get_object_or_404(OurTours, trip_type=trip.trip_type)
+        NotFree = (ourTours.price != 0)
         clientQuerey = trip.clients_set.filter(status = 'a')
         for client in clientQuerey:
             msg_plain= 'תזכורת לסיור מחר'
             more_to_pay=str(client.total_payment-client.pre_paid)
+            
             try:
                 msg_html = render_to_string('emails/email_reminder.html', { 
                                                                       'trip_time':trip.trip_time, 
                                                                       'client':client, 
-                                                                      'more_to_pay':more_to_pay})
+                                                                      'more_to_pay':more_to_pay,
+                                                                      'NotFree':NotFree})
                 emailTitle = "תזכורת לסיור מחר"
                 #cc =['yael.gati@cambridgeinhebrew.com']
                 emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)

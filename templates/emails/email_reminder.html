@@ -17,8 +17,10 @@
       <p>:כתובת</p>
       <p class="lead">The Fitzwilliam Museum</p>
       <p>Trumpington St, Cambridge CB2 1RB</p>
-     
-       <p> אנא זיכרו להביא איתכם כסף מזומן כדי לשלם למדריך את יתרת התשלום {{more_to_pay}} פאונד</p>
+      {% if NotFree %}
+      <p> אנא זיכרו להביא איתכם כסף מזומן כדי לשלם למדריך את יתרת התשלום {{more_to_pay}} פאונד</p>
+      {% else %}
+      <p> נשמח לטיפים לפי שביעות רצונכם</p>
        <hr>
      
        <p>טלפון בזמן הטיול: {{client.phone_number}}</p>

@@ -880,35 +880,52 @@ def tour_complete(request, pk):
         2. Create invice
         3. Send email with request for feedback
     '''
-    tours_query =  Trip.objects.filter(id  = pk)
-    if (len(tours_query)>0):
-        trip = tours_query[0]
-        if trip.status == 'a':
-            # Change trip status to complete    
-            trip.status = 'e'
-            trip.save()
-            clientQuerey = trip.clients_set.all()
-            
-            # Scan all clients
-            for client in clientQuerey:
-                transactionArray = []
-                if client.status != 'a':
-                    continue
-                if client.total_payment > client.pre_paid:
-                    # Create Cache transaction  
-                    try:
-                        transaction = Transaction(
-                                        client          =  client,
-                                        token           =  'Cash',
-                                        amount          =  (client.total_payment - client.pre_paid),
-                                        charge_id       =  'Cash',
-                                        success         =  True)
-                        transaction.save()
-                    except:
-                        print ('problem creating transaction')
-                            
-                #'Now create the invoice'
-                
+    trip = get_object_or_404(Trip, pk=pk)
+    
+    #tours_query =  Trip.objects.filter(id  = pk)
+    #if (len(tours_query)>0):
+    #    trip = tours_query[0]
+    if trip.status == 'a':
+        # First thing to avoid races -  Change trip status to complete    
+        trip.status = 'e'
+        trip.save()
+        
+        ourTours = get_object_or_404(OurTours, trip_type=trip.trip_type)
+        CreateInvoice = (ourTours.price != 0)
+        #Let's see if it is a free tour
+        
+        clientQuerey = trip.clients_set.all()
+        
+        # If it is a free tour, we don't need to send invoice to the clients
+        # We just need to send the email....
+        
+        
+        # This isn't  a free tour we are going to make invice and send email with attachment
+        # Scan all clients
+        for client in clientQuerey:
+            transactionArray = []
+            if client.status != 'a':
+                continue
+            # Free tour will skip this if statement 
+            if client.total_payment > client.pre_paid:
+                # Create Cache transaction  
+                try:
+                    transaction = Transaction(
+                                    client          =  client,
+                                    token           =  'Cash',
+                                    amount          =  (client.total_payment - client.pre_paid),
+                                    charge_id       =  'Cash',
+                                    success         =  True)
+                    transaction.save()
+                except:
+                    print ('problem creating transaction')
+                        
+            #'Now create the invoice'
+            # Prepare the email content
+            msg_plain = "תודה שטיילתם איתנו בקיימברדיג' היה לנו כייף"
+            msg_html = render_to_string('emails/email_feedback.html', {'first_name':client.first_name})
+            title = "קיימברידג' בעברית- תודה שטיילתם איתנו"
+            if (CreateInvoice):
                 transactionQuerey = client.transaction_set.all()
                 amount = 0
                 for tran in transactionQuerey:
@@ -942,9 +959,7 @@ def tour_complete(request, pk):
                 except:
                     print("Can't create pdf")
                 try:
-                    msg_plain = "תודה שטיילתם איתנו בקיימברדיג' היה לנו כייף"
-                    msg_html = render_to_string('emails/email_feedback.html', {'first_name':client.first_name})
-                    title = "קיימברידג' בעברית- תודה שטיילתם איתנו"
+                
                     tour_emails.send_email_msg_pdf( to=[client.email],
                                                    msg_html=msg_html, 
                                                    msg_plain=msg_plain, 
@@ -954,6 +969,13 @@ def tour_complete(request, pk):
                                                    title=title)
                 except:
                     print("Can't send email")
+            else:
+                try:
+                    
+                    #cc =['yael.gati@cambridgeinhebrew.com']
+                    emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=title, cc=[settings.EMAIL_YAEL])
+                except:
+                    print('Got an error... sending email...')
         
     
     # Bring back the tasks        
@@ -973,33 +995,16 @@ def contact_not_spam(request, pk):
     except:
         print('Got an error...')
         # Save contact here
-        meta_des_heb = "קיימברידג בעברית צור קשר  "
-        meta_des_en  = "contact Cambridge in Hebrew"
-        meta_des = meta_des_heb + meta_des_en
-        meta_key_heb = "צור קשר קיימברידג' "
-        meta_key_en  = "contact cambridge hebrew "
-        meta_key     = meta_key_heb + meta_key_en
-        return render(request, 'tour/contact_saved.html', {'title':'contact', 
-                                                           'meta_des':meta_des,
-                                                           'meta_key':meta_key,
-                                                           'page_title':'נחזור אלייך בהקדם', 
-                                                           'id': contact.id})
+        
 
     return  redirect('tour:tasks')
 
 
 def contact_confirm(request, pk):
-    contact_query =  Contact.objects.filter(id  = pk)
-    if (len(contact_query)>0):
-        contact = contact_query[0]
-        contact.confirm = 'd'
-        contact.save()
+    contact = get_object_or_404(OurTours, pk=pk)
+    contact.confirm = 'd'
+    contact.save()
     return  redirect('tour:tasks')
-
-
-
-
-
 
 
 def review_confirm(request, pk):

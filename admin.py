@@ -8,7 +8,9 @@ from django.contrib.admin import AdminSite
 from django.http import HttpResponse
 from .tour_emails import tour_emails 
 from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404
 from django.conf import settings
+
 # Create your models here.
 
 
@@ -65,22 +67,23 @@ class ClientAdmin(admin.ModelAdmin):
     def send_email_again(self, request, queryset):
         for client in queryset:
             trip = client.trip
-            OurToursQuery = OurTours.objects.filter(trip_type=trip.trip_type)
-            transaction=client.transaction_set.all()[0]
-            if len(OurToursQuery)!=1:
-                print('Raise exception')
-            title = OurToursQuery[0].title
+            #OurToursQuery = OurTours.objects.filter(trip_type=trip.trip_type)
+            ourTours = get_object_or_404(OurTours, trip_type=trip.trip_type)
+            NotFree = (ourTours.price != 0)
+            #if len(OurToursQuery)!=1:
+            #    print('Raise exception')
+            #title = OurToursQuery[0].title
             msg_plain= 'DUMMY ONE'
             children = (client.number_of_children > 0)
             more_to_pay=(client.total_payment-client.pre_paid)
             try:
-                msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
-                                                                          'trip_time':trip.trip_time.strftime('%H:%M'), 
-                                                                          'id': transaction.id, 
-                                                                          'trip_type':title, 
+                msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date, 
+                                                                          'trip_time':trip.trip_time, 
+                                                                          'trip_type':ourTours.title, 
                                                                           'client':client, 
                                                                           'print_children':children, 
-                                                                          'more_to_pay':more_to_pay})
+                                                                          'more_to_pay':more_to_pay,
+                                                                          'NotFree':NotFree})
                 #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
                 emailTitle = "סיור בקיימברידג' - אישור הזמנה"
                 #cc =['yael.gati@cambridgeinhebrew.com']
