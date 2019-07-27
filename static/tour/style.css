@@ -411,6 +411,13 @@ hr.short{
    border-radius:10%;
 }
 
+.link_page {
+   border-width:  1px;
+   margin: 1.5rem;
+   padding: 2rem;
+   background-color: #f1f1f1; 
+}
+
 .meeting_point{
    text-align:right;
    margin-top: 1rem;

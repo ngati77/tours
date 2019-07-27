@@ -237,49 +237,7 @@ def payment(request):
             # save the transcation (otherwise doesn't exist)
         transaction.save()
         return send_succes_email(request, client)
-#        msg_plain= 'DUMMY ONE'
-#        children = (client.number_of_children > 0)
-#        more_to_pay=(client.total_payment-client.pre_paid)
-#        try:
-#            msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
-#                                                                      'trip_time':trip.trip_time, 
-#                                                                      'trip_type':title, 
-#                                                                      'client':client, 
-#                                                                      'print_children':children, 
-#                                                                      'more_to_pay':more_to_pay,
-#                                                                      'NotFree':True})
-#            #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
-#            emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-#            #cc =['yael.gati@cambridgeinhebrew.com']
-#            emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[email], title=emailTitle, cc=settings.CC_EMAIL)
-#        except:
-#            print('Got an error... sending email...')
-#        #print(f'Debug {emailSuccess}')
-#        meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
-#        meta_des_en  = ""
-#        meta_des = meta_des_heb + meta_des_en
-#        meta_key_heb = "הרשמה הצלחה "
-#        meta_key_en  = " "
-#        meta_key     = meta_key_heb + meta_key_en
-#        #print(trip)
-#        return render(request, 'tour/success.html', {'title':'תשלום הצליח', 'page_title':'ההרשמה הסתיימה בהצלחה', 
-#                                                          'meta_des':meta_des,
-#                                                          'meta_key':meta_key,
-#                                                          'trip_date':trip.trip_date.strftime("%d-%m-%Y"),
-#                                                          'trip_time':trip.trip_time, 
-#                                                          'deposit':deposit, 
-#                                                          'more_to_pay':more_to_pay, 
-#                                                          'id': client.id, 
-#                                                          'trip_type':title, 
-#                                                          'first':first_name, 
-#                                                          'last': last_name })
-    
-#    meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
-#    meta_des_en  = "cambridge in hebrew payment"
-#    meta_des = meta_des_heb + meta_des_en
-#    meta_key_heb = "תשלום "
-#    meta_key_en  = "payment "
-#    meta_key     = meta_key_heb + meta_key_en
+
     return render(request, 'tour/failure.html', {'title':'failure payment end', 'page_title':'failure'})
     
 
@@ -377,21 +335,25 @@ def bookTour(request,pYear, pMonth, tripType ):
     #TyprDict = {'F': 'הרשמה לסיור משפחות', 'C': 'הרשמה לסיור קלאסי', 'B': 'הרשמה לאוטובוס'}
     # Britng the trip name in hebrew from db
    
-    #TripTypeQuery = OurTours.objects.filter(trip_type=tripType)
-    ourTours = get_object_or_404(OurTours, trip_type=tripType)
-    NotFree = (ourTours.price != 0)
-    #if (len(TripTypeQuery)>0):
-    title       = ourTours.title
-    deposit     = ourTours.deposit
-    price       = ourTours.price
-    priceChild  = ourTours.priceChild
-    print_child = ourTours.priceChild > 0
-    #else:
-    #    title   = ''
-    #    deposit = 0
-    #    price =  0
-    #    priceChild =  0
-    #    print_child = 0
+    TripTypeQuery = OurTours.objects.filter(trip_type=tripType)
+    #ourTours = get_object_or_404(OurTours, trip_type=tripType)
+   
+    
+    if (len(TripTypeQuery)>0):
+        ourTours    = TripTypeQuery[0]
+        NotFree     = (ourTours.price != 0)
+        title       = ourTours.title
+        deposit     = ourTours.deposit
+        price       = ourTours.price
+        priceChild  = ourTours.priceChild
+        print_child = ourTours.priceChild > 0
+    else:
+        title   = ''
+        deposit = 0
+        price =  0
+        priceChild =  0
+        print_child = 0
+        NotFree     = True
     # If this is a GET (or any other method) create the default form.
    # TODO, Double check date as avialable one, or already has a trip on that day. 
 #    proposed_date = datetime.datetime(pYear, pMonth, 1, 11)
@@ -806,7 +768,10 @@ def tripPdf(request, pk):
                 
             
     return Render.render('pdf/trip_details.html', params)    
-   
+
+
+def links(request): 
+     return render(request, 'tour/links.html')
     
     
 def tasks(request):
@@ -1001,7 +966,7 @@ def contact_not_spam(request, pk):
 
 
 def contact_confirm(request, pk):
-    contact = get_object_or_404(OurTours, pk=pk)
+    contact = get_object_or_404(Contact, pk=pk)
     contact.confirm = 'd'
     contact.save()
     return  redirect('tour:tasks')

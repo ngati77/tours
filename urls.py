@@ -33,6 +33,7 @@ urlpatterns = [
     path('trip_pdf/<int:pk>/', views.tripPdf, name='trip_pdf'),
     path('payment',          views.payment, name="payment"),
     path('tasks',            views.tasks, name="tasks"),
+    path('links',            views.links, name="links"),
     
     path('tour_confirm/<int:pk>/',            views.tour_confirm, name="tour_confirm"),
     path('tour_complete/<int:pk>/',            views.tour_complete, name="tour_complete"),
