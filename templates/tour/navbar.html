@@ -18,11 +18,11 @@
           הסיורים
                 </a>
                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/E ">סיור חינמי</a>
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/C ">סיור קלאסי</a>
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/F ">סיור משפחות</a>
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/W ">סיור חורפי</a>
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/P ">שייט</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Free ">סיור חינמי</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Classic ">סיור קלאסי</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Family ">סיור משפחות</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Winter ">סיור חורפי</a>
+                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Punting ">שייט</a>
                  </div>
             </li>
            
@@ -38,7 +38,14 @@
              <li class="nav-item">
                 <a class="nav-link" href="{% url  'tour:contact'  %}">צור קשר</a>
             </li>
-            
+               <li  class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          מידע נוסף
+                </a>
+                 <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
+                   <a class="dropdown-item" href="{% url  'tour:privacy' %}">מדיניות פרטיות</a>
+                 </div>
+            </li>
             {% if request.user.is_authenticated %}
             
           <!---  <li class="nav-item"> --->
@@ -61,7 +68,7 @@
                 </a>
                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
                    <a class="dropdown-item" href="{% url  'tour:tasks' %} ">משימות</a>
-                   <a class="dropdown-item" href="{% url  'tour:book_tour_today' %}/A ">לוח שנה</a>
+                   <a class="dropdown-item" href="{% url  'tour:book_tour_today' %}/All ">לוח שנה</a>
                    <a class="dropdown-item" href="{% url  'tour:report-view' %}">דוחות</a> 
                    <a class="nav-link" href="{% url  'tour:trip_view'  %}">מצא סיור</a>
                   

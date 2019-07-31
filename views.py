@@ -9,7 +9,7 @@ from django.views import generic
 
 from django.utils import timezone
 
-from .models import Trip, Clients, Review, Gallery, Calendar
+from .models import Trip, Clients, Review, Gallery, Calendar, ReportEntry
 from .models import OurTours, Guide, Transaction, Contact, GuideVacation
 
 from .tour_emails import tour_emails 
@@ -53,7 +53,15 @@ logger = logging.getLogger(__name__)
 
 monthStr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul' , 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-
+trip_type_dic_rev = {
+        'Classic':'C',
+        'Family':'F',
+        'Winter':'W',
+        'Bus':'B',
+        'Punting':'P',
+        'All':'A',
+        'Free':'E',
+        }
 
 #hebdaydic   = {'Sun': 'ראשון','Mon': 'שני','Tue': 'שלישי','Wed': 'רביעי','Thu': 'חמישי','Fri': 'שישי','Sat': 'שבת'}
         
@@ -184,14 +192,10 @@ def send_succes_email(request,client):
     return render(request,'tour/success.html', {'title':'תשלום הצליח', 'page_title':'ההרשמה הסתיימה בהצלחה', 
                                                       'meta_des':  meta_des,
                                                       'meta_key':  meta_key,
-                                                      'trip_date': client.trip.trip_date,
-                                                      'trip_time': client.trip.trip_time, 
-                                                      'deposit':   client.pre_paid, 
+                                                      'client':    client,
                                                       'more_to_pay':more_to_pay, 
-                                                      'id':        client.id, 
-                                                      'trip_type': ourTours.title, 
-                                                      'first':     client.first_name, 
-                                                      'last':      client.last_name })
+                                                      'trip_type': ourTours.title 
+                                                      })
             
 def payment(request):
     form = PaymentForm(request.POST)
@@ -213,22 +217,9 @@ def payment(request):
             return render(request, 'tour/failure.html', {'title':'failure', 'page_title':'failure'})
         
         # We made a payment, greaty lat's create trip and client
-        client = create_new_trip_client(title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, found_us ,text)
+        trip_type_letter = trip_type_dic_rev[trip_type]
+        client = create_new_trip_client(title, trip_date, trip_time, trip_type_letter, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, found_us ,text)
                
-#        date = [int(x) for x in trip_date.split("-")]
-#        dateClass = datetime.date(date[0],date[1],date[2])
-#        tripQuerySet = Trip.get_event(dateClass)
-#        # If need a new trip
-#        if (len(tripQuerySet)==0):
-#            trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time ,trip_type=trip_type)
-#            trip.save()
-#        else:
-#            trip = tripQuerySet[0]
-#        # Create new client           
-#        client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
-#                         number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails, found_us = found_us ,text = text)
-##            
-#        client.save()
         transaction = Transaction(client=client,
                             token=token, 
                             charge_id = charge.id,
@@ -241,9 +232,11 @@ def payment(request):
     return render(request, 'tour/failure.html', {'title':'failure payment end', 'page_title':'failure'})
     
 
-def tour_details(request, tripType='Ç'):
+def tour_details(request, tripType='Classic'):
+    
+    trip_type_letter = trip_type_dic_rev[tripType]
     #OurToursQuery = OurTours.objects.filter(trip_type=tripType)
-    ourTours = get_object_or_404(OurTours, trip_type=tripType)
+    ourTours = get_object_or_404(OurTours, trip_type=trip_type_letter)
 #    if len(OurToursQuery)!=1:
 #        print('Raise exception')
 #    OurTour = OurToursQuery[0]
@@ -267,7 +260,7 @@ def bookTourToday(request, tripType ):
      today = datetime.date.today()
      return bookTour(request,today.year, today.month, tripType )
             
-def bookTour(request,pYear, pMonth, tripType ):
+def bookTour(request,pYear=1977, pMonth=1, tripType='Classic' ):
     if request.method == 'POST':
         # Create a form instance and populate it with data from the request (binding):
         form = BookingForm(request.POST)
@@ -277,21 +270,12 @@ def bookTour(request,pYear, pMonth, tripType ):
             #book_inst.due_back = form.cleaned_data['renewal_date']
            # Get all infortamtion from form
             title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, found_us ,text  = form.get_data()
-            #trip_date = datetime.datetime(pYear, pMonth, pDay, pHour)
-            # Check iftrip exists
-  
-            # It is useful if we want to prevent one person
-#            date = [int(x) for x in trip_date.split("-")]
-#            dateClass = datetime.date(date[0],date[1],date[2])
-#            tripQuerySet = Trip.get_event(dateClass)
-#            # Check if a trip already exist, if no let's make sure we have more than one person
-#            if (len(tripQuerySet)==0 and (number_adults + number_child)==1):
-#                print("Sorry we need more people TODO")
-                #trip.save()
+           
             # If it is  a free tour, no need to go to payment
-            ourTours = get_object_or_404(OurTours, trip_type=trip_type)
+            trip_type_letter = trip_type_dic_rev[trip_type]
+            ourTours = get_object_or_404(OurTours, trip_type=trip_type_letter)
             if (ourTours.price==0):
-                client = create_new_trip_client(title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, found_us ,text)
+                client = create_new_trip_client(title, trip_date, trip_time, trip_type_letter, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, found_us ,text)
                 return send_succes_email(request, client)
 #            return payment(request, trip=trip, client=client )
             meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
@@ -334,8 +318,8 @@ def bookTour(request,pYear, pMonth, tripType ):
     # If this is a POST request then process the Form data
     #TyprDict = {'F': 'הרשמה לסיור משפחות', 'C': 'הרשמה לסיור קלאסי', 'B': 'הרשמה לאוטובוס'}
     # Britng the trip name in hebrew from db
-   
-    TripTypeQuery = OurTours.objects.filter(trip_type=tripType)
+    trip_type_letter = trip_type_dic_rev[tripType]
+    TripTypeQuery = OurTours.objects.filter(trip_type=trip_type_letter)
     #ourTours = get_object_or_404(OurTours, trip_type=tripType)
    
     
@@ -510,41 +494,6 @@ class ClientView(generic.DetailView):
     template_name = 'tour/clients_in_tour.html'
     model = Trip
 
-# This class is used in the report.html
-class ReportEntry: 
-    def __init__(self, trip_text, trip_date, trip_guide):
-        self.trip_text       = trip_text
-        self.trip_date       = trip_date
-        self.trip_guide      = trip_guide
-
-        self.trip_time       = ''
-        self.trip_id         = 0
-        self.total_people    = 0
-        self.total_children  = 0
-
-        self.total_deposit   = 0
-        self.total_gross     = 0
-        self.total_guide_exp = 0
-        self.other_expense   = 0
-        self.guide_payback   = 0
-        self.total_neto      = 0
-        
-    """
-    Return report between range of guides and according to the guide
-    """
-    # This function calculate how much money the guide owe the company
-    def calc_guide_payment(self, trip_type ,adult, children):
-        # Before calculating Guide salary check if children are paying
-        ChildAccount    = OurTours.objects.filter(trip_type=trip_type)[0].priceChild>0
-        # If children are account take the number of them otherwise set it to zero
-        childNum        = children if ChildAccount else 0
-        # Just add chidren to people
-        totalPeople     = adult +  childNum
-        # if more than 2 peole than we have extra to add
-        extraPeople     = (totalPeople-2) if totalPeople > 2 else 0
-        # Base amount 40 + 5 Pound per person
-        return (40 + 5 * extraPeople)    
-
 
 #######################################################
 def reportView(request):
@@ -581,47 +530,11 @@ def reportView(request):
             if (len(tripQuerey)>0):
                 reportsum = ReportEntry("sum", "sum", "sum")
                 for trip in tripQuerey:
-                    # Create new entry in the report
-                    reportEntry = ReportEntry(trip.get_trip_type_display(), trip.trip_date.strftime("%d.%m.%y"), trip.get_trip_guide_display())
-                    # Get all cilents from a trip hopefully more than one
-                    clientQuerey = trip.clients_set.all()
-                    # Scan all clients, in the futrue need to scan the invoice
-                    for client in clientQuerey:
-                        if client.status != 'a':
-                            continue
-                        reportEntry.total_people    += client.number_of_people
-                        reportEntry.total_children  += client.number_of_children
-                        reportEntry.total_deposit   += client.pre_paid
-                        reportEntry.total_gross     += client.total_payment
                     
-                    # If Yael Gati is the guide for this tour. then we don't need to pay her!!!
-                    if (trip.trip_guide=='YG'):
-                        reportEntry.total_guide_exp = 0
-                        reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense
-                        reportEntry.guide_payback = 0
-                    else:
-                        
-                        # How much the guide earn from this tour
-                        reportEntry.total_guide_exp = reportEntry.calc_guide_payment(trip_type = trip.trip_type,
-                                                                          adult     = reportEntry.total_people,
-                                                                          children  = reportEntry.total_children)
-                        # how much we earend
-                        reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
-                        # Now that we know how much the guide earn we can calculate home amount he needs to return
-                        reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
-                    
-                    reportEntry.trip_id         = trip.id
                     # Gather the sum here
-                    reportsum.total_people      += reportEntry.total_people
-                    reportsum.total_children    += reportEntry.total_children
-                    reportsum.total_deposit     += reportEntry.total_deposit
-                    reportsum.total_gross       += reportEntry.total_gross
-                    reportsum.guide_payback     += reportEntry.guide_payback   
-                    reportsum.total_guide_exp   += reportEntry.total_guide_exp
-                    reportsum.total_neto        += reportEntry.total_neto
+                    reportEntry = trip.get_trip_sum()
+                    reportsum   += reportEntry
                   
-                   
-                   
                     report.append(reportEntry)
                 report.append(reportsum)
             # If requested view is html  
@@ -772,7 +685,13 @@ def tripPdf(request, pk):
 
 def links(request): 
      return render(request, 'tour/links.html')
-    
+
+def privacy(request): 
+     return render(request, 'tour/privacy.html', {'title':'מדיניות פרטיות',
+                                                     'page_title' : 'מדיניות פרטיות',
+                                                     'meta_des':'מדיניות פרטיות ',
+                                                     'meta_key':'מדיניות פרטיות'
+                                                     })
     
 def tasks(request):
     today           = datetime.date.today()
@@ -894,9 +813,11 @@ def tour_complete(request, pk):
                 transactionQuerey = client.transaction_set.all()
                 amount = 0
                 for tran in transactionQuerey:
-                    tType = 'אשראי'
+                    tType = 'Card / אשראי'
                     if tran.token == 'Cash':
-                        tType = 'מזומן'
+                        tType = 'Cash / מזומן'
+                    elif tran.token == 'bank':
+                        tType = 'Bank Payment / העברה בנקית'
                     amount += tran.amount
                     tranEntry = TransactionEntry(payment_type   = tType,
                                                  payment_date   = tran.create_date,

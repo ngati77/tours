@@ -54,47 +54,68 @@ class ClientAdmin(admin.ModelAdmin):
         (None,               {'fields': ['total_payment']}),
         (None,               {'fields': ['text']}),
         (None,               {'fields': ['status']}),
+        ('Admin',            {'fields': ['admin_comment']}),
         ('Trip',             {'fields': ['trip']}),
         
         
     ]
     inlines         = [TransactionInline]
-    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','found_us','text','status')
+    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','found_us','text','status','admin_comment')
     list_filter     = ['first_name']
-    search_fields   = ['first_name']
+    search_fields   = ['first_name','last_name']
     
-    
-    def send_email_again(self, request, queryset):
+    def send_success_email(self, request, queryset):
+        emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+        emailType = 'emails/email_success.html'
         for client in queryset:
-            trip = client.trip
-            #OurToursQuery = OurTours.objects.filter(trip_type=trip.trip_type)
-            ourTours = get_object_or_404(OurTours, trip_type=trip.trip_type)
-            NotFree = (ourTours.price != 0)
-            #if len(OurToursQuery)!=1:
-            #    print('Raise exception')
-            #title = OurToursQuery[0].title
-            msg_plain= 'DUMMY ONE'
-            children = (client.number_of_children > 0)
-            more_to_pay=(client.total_payment-client.pre_paid)
-            try:
-                msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date, 
-                                                                          'trip_time':trip.trip_time, 
-                                                                          'trip_type':ourTours.title, 
-                                                                          'client':client, 
-                                                                          'print_children':children, 
-                                                                          'more_to_pay':more_to_pay,
-                                                                          'NotFree':NotFree})
-                #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
-                emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-                #cc =['yael.gati@cambridgeinhebrew.com']
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
-            except:
-                print('Got an error... sending email...')
-    
-            self.message_user(request, "%s successfully send email to ." % client.email)
-    
-    send_email_again.short_description = "Resending the email to the specific client"
-    actions = [send_email_again]
+            self.send_email_again(request, emailTitle, client, emailType)
+            
+    def send_update_trip_email(self, request, queryset):
+        emailTitle = "סיור בקיימברידג' - עידכון פרטים: "
+        emailType = 'emails/email_success.html'
+        for client in queryset:
+            emailTitle = emailTitle + client.admin_comment 
+            self.send_email_again(request, emailTitle, client,emailType)
+            
+    def send_cancelaion_trip_email(self, request, queryset):
+        emailTitle = "סיור בקיימברידג' - ביטול סיור: "
+        emailType = 'emails/email_cancelation.html'
+        for client in queryset:
+            emailTitle = emailTitle + client.admin_comment 
+            self.send_email_again(request, emailTitle, client,emailType)
+            
+    def send_email_again(self, request, emailTitle, client, emailType):
+        trip = client.trip
+        #OurToursQuery = OurTours.objects.filter(trip_type=trip.trip_type)
+        ourTours = get_object_or_404(OurTours, trip_type=trip.trip_type)
+        NotFree = (ourTours.price != 0)
+        #if len(OurToursQuery)!=1:
+        #    print('Raise exception')
+        #title = OurToursQuery[0].title
+        msg_plain= 'DUMMY ONE'
+        children = (client.number_of_children > 0)
+        more_to_pay=(client.total_payment-client.pre_paid)
+        try:
+            msg_html = render_to_string(emailType, {'trip_date':trip.trip_date, 
+                                                                      'trip_time':trip.trip_time, 
+                                                                      'trip_type':ourTours.title, 
+                                                                      'client':client, 
+                                                                      'print_children':children, 
+                                                                      'more_to_pay':more_to_pay,
+                                                                      'NotFree':NotFree})
+            #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
+            #emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+            #cc =['yael.gati@cambridgeinhebrew.com']
+            emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
+        except:
+            print('Got an error... sending email...')
+
+        self.message_user(request, "%s successfully send email to ." % client.email)
+# 
+    send_success_email.short_description        = "Resending confirmation email to a specific client"   
+    send_update_trip_email.short_description    = "Update client details"   
+    send_cancelaion_trip_email.short_description    = "Cancel trip email"
+    actions = [send_success_email, send_update_trip_email, send_cancelaion_trip_email]
     
     
 class TransactionAdmin(admin.ModelAdmin):

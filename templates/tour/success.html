@@ -10,22 +10,26 @@
     <div class="row d-flex justify-content-center text-right">
     
         <div class="col-md-6 ">
-        <h3><font color="blue"> תודה {{first}} שהזמנת איתנו סיור בקיימברידג'</font></h3>
+        <h3><font color="blue"> תודה {{client.first_name}} שהזמנת איתנו סיור בקיימברידג'</font></h3>
           <h3><font color="blue">אפשר להתחיל להתרגש </font></h3>
           <hr>
          <h3>ההרשמה ל{{trip_type}} הסתיימה בהצלחה</h3>
-          <p class="lead"><strong> נשלח מייל אישור עם פרטי הסיור ופרטי הגעה</strong></p>
-          <p>אישור הזמנה {{id}}</p>
+             <p>אישור הזמנה {{client.id}}</p>
           <hr>
-          <p>נשמח לראותכם בתאריך {{trip_date|date:'d.m.Y' }}</p>
-          <p>בשעה {{trip_time|date:'H:i'  }}</p>
+          <p>נשמח לראותכם בתאריך {{client.trip.trip_date|date:'d.m.Y' }}</p>
+          <p>בשעה {{client.trip.trip_time|date:'H:i'  }}</p>
            {% if NotFree %}
           <div class="space">
-          <p>נתקבל תשלום של {{deposit}}</p>
+          <p>נתקבל תשלום של {{client.pre_paid}}</p>
           <p>יתרה לתשלום {{more_to_pay}}</p>
           </div>
           {% endif %}
-          </p>
+         <hr>
+
+          <p class="lead"><strong> נשלח מייל אישור עם פרטי הסיור ופרטי הגעה למייל {{client.email}}</strong></p>
+          <p class="lead">במידה ולא קיבלתם מייל אנא בידקו את הכתובת מייל וצרו איתנו קשר</p>
+          <p class="lead">ישלח גם מייל תזכורת יום לפני הסיור</p>
+       
           <p class="lead">
             <a class="btn btn-runner" href="{% url  'tour:home'  %}" role="button">בחזרה לדף הבית</a>
           </p>

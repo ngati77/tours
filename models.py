@@ -8,6 +8,7 @@ from django.db.models import Q
 
 
 
+
 TRIP_DAYS = (
     ('Non', 'None'),    
     ('Sun', 'ראשון'),  
@@ -167,12 +168,6 @@ class Trip(models.Model):
             )
     
     def __str__(self):
-#        print('Trip indo')
-#        print('Trip date: ')
-#        print(self.trip_date)
-#        print('Trip time: ')
-#        print(self.trip_time)
-#        print(type(self.trip_time))
         return str(self.id)
     
     
@@ -184,6 +179,46 @@ class Trip(models.Model):
             return True
         else:
             return False
+        
+    def get_trip_sum(self):
+        '''
+        This function summerise the total incomne of a trip
+        
+        '''
+        reportEntry = ReportEntry(self.get_trip_type_display(), self.trip_date.strftime("%d.%m.%y"), self.get_trip_guide_display())
+        # Get all cilents from a trip hopefully more than one
+        clientQuerey = self.clients_set.all()
+        # Scan all clients, in the futrue need to scan the invoice
+        for client in clientQuerey:
+            if client.status != 'a':
+                continue
+            reportEntry.total_people    += client.number_of_people
+            reportEntry.total_children  += client.number_of_children
+            reportEntry.total_deposit   += client.pre_paid
+            reportEntry.total_gross     += client.total_payment
+        
+        # If Yael Gati is the guide for this tour. then we don't need to pay her!!!
+        if (self.trip_guide=='YG'):
+            reportEntry.total_guide_exp = 0
+            reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense
+            reportEntry.guide_payback = 0
+        else:
+            
+            # How much the guide earn from this tour
+            reportEntry.total_guide_exp = reportEntry.calc_guide_payment(trip_type = self.trip_type,
+                                                              adult     = reportEntry.total_people,
+                                                              children  = reportEntry.total_children)
+            # how much we earend
+            reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
+            # Now that we know how much the guide earn we can calculate home amount he needs to return
+            reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
+        
+        reportEntry.trip_id         = self.id
+        
+        return reportEntry
+        
+        
+        
     @staticmethod
     def get_event(date,trip_type):
         return Trip.objects.filter(
@@ -238,7 +273,8 @@ class Clients(models.Model):
                                         default='f',
                                         )
     
-    text               = models.TextField(max_length=600)
+    text                = models.TextField(max_length=600, blank=True)
+    admin_comment       = models.TextField(max_length=80, blank=True)
     
     #create_date      = models.DateTimeField('date create')
     
@@ -281,6 +317,56 @@ class Contact(models.Model):
 
     
     #create_date      = models.DateTimeField('date create')
+
+
+# This class is used in the report.html
+class ReportEntry: 
+    def __init__(self, trip_text, trip_date, trip_guide):
+        self.trip_text       = trip_text
+        self.trip_date       = trip_date
+        self.trip_guide      = trip_guide
+
+        self.trip_time       = ''
+        self.trip_id         = 0
+        self.total_people    = 0
+        self.total_children  = 0
+
+        self.total_deposit   = 0
+        self.total_gross     = 0
+        self.total_guide_exp = 0
+        self.other_expense   = 0
+        self.guide_payback   = 0
+        self.total_neto      = 0
+        
+    """
+    Return report between range of guides and according to the guide
+    """
+    # This function calculate how much money the guide owe the company
+    def calc_guide_payment(self, trip_type ,adult, children):
+        # Before calculating Guide salary check if children are paying
+        ChildAccount    = OurTours.objects.filter(trip_type=trip_type)[0].priceChild>0
+        # If children are account take the number of them otherwise set it to zero
+        childNum        = children if ChildAccount else 0
+        # Just add chidren to people
+        totalPeople     = adult +  childNum
+        # if more than 2 peole than we have extra to add
+        extraPeople     = (totalPeople-2) if totalPeople > 2 else 0
+        # Base amount 40 + 5 Pound per person
+        return (40 + 5 * extraPeople) 
+
+    def __add__(self, reportEntry):
+        '''
+        New operator to add 
+        '''
+        self.total_people      += reportEntry.total_people
+        self.total_children    += reportEntry.total_children
+        self.total_deposit     += reportEntry.total_deposit
+        self.total_gross       += reportEntry.total_gross
+        self.guide_payback     += reportEntry.guide_payback   
+        self.total_guide_exp   += reportEntry.total_guide_exp
+        self.total_neto        += reportEntry.total_neto
+        return self
+        
 
 class Calendar:
     
@@ -395,7 +481,7 @@ class DayInCalendar:
         self.attr = False
         self.vac = False
         # Only gor Managment
-        if (request.user.is_authenticated and view == 'A'):
+        if (request.user.is_authenticated and view == 'All'):
 #        if (False):
             # If user then bring relevant data of:
             # Planned trips for user
@@ -432,7 +518,7 @@ class DayInCalendar:
                    
             for tripAvailabilty in availableDateQuery:
                 #print(tripAvailabilty.ava_trip_type)
-                if (tripAvailabilty.ava_trip_type != 'A' and tripAvailabilty.ava_trip_type != view):
+                if (tripAvailabilty.get_ava_trip_type_display() != 'All' and tripAvailabilty.get_ava_trip_type_display() != view):
                     continue
                 canceled = False
                 # Check if the trip was canceld
@@ -453,7 +539,7 @@ class DayInCalendar:
 #                    continue
                 
                 for vac in guideVacationQuery:
-                    if (vac.vac_cancel_all) or (vac.vac_cancel_family and view=='F') or (vac.vac_cancel_classy and view=='C'):
+                    if (vac.vac_cancel_all) or (vac.vac_cancel_family and view=='Family') or (vac.vac_cancel_classy and view=='Classic'):
                         canceled = True
                         break
                 # Guide on holiday there is no tour on this day

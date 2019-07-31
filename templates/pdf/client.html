@@ -17,7 +17,7 @@
             text-align:right;
         }
         @page {
-            size: A4;
+            size: A4 landscape;
             margin: 1cm;
         }
         .table {
@@ -88,21 +88,17 @@
       <h2>Cambridge in Hebrew - Client invoice No. {{client.id}}</h2>
         </div>
 
-         <h3> שם לקוח:{{client.first_name}} {{client.last_name}}</h3>
-         <h3> מס' לקוח:{{client.id}}</h3>
-         <h3>תאריך: {{sum.payment_date|date:"d/m/Y" }}</h3>
-         <h3>מספר מבוגרים: {{client.number_of_people}}</h3>
-         {% if children %}
-            <h3>מספר ילדים: {{client.number_of_children}}</h3>
-         {% endif %}
-
+         <h3>customer name: {{client.first_name}} {{client.last_name}} :שם לקוח</h3>
+         <h3>customer id: {{client.id}} :מס' לקוח</h3>
+         <h3>Date: {{sum.payment_date|date:"d/m/Y" }} :תאריך</h3>
+         
         <table class="table">
             <thead>
             <tr>
-                <th> סכום בפאונד</th>
-                <th>אסמכתא</th>
-                <th>אמצעי תשלום</th>
-                <th>תאריך</th>
+                <th>amount pounds / סכום בפאונד</th>
+                <th>Reference / אסמכתא </th>
+                <th>Payment type / אמצעי תשלום</th>
+                <th>Date  / תאריך</th>
                 
                
             </tr>

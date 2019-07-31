@@ -17,7 +17,11 @@
       'google_business_vertical': 'travel'
     }]
   });
-</script>
+  </script>
+  
+  <!-- Event snippet for sign up conversion page In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. --> 
+  
+
 {% endblock %}   
 	
 
@@ -86,7 +90,7 @@
 
    <p class="timetime" id="date"> תאריך:   </p>
    <p class="timetime" id="time"> שעה:     </p>          
-            <form action="{% url 'tour:book-tour' 1 1 'C' %}" method="post" >
+            <form action="{% url 'tour:book-tour' %}" method="post" >
                     {% csrf_token %}
                      
                     <table >
@@ -143,7 +147,7 @@
             <p><a target="_blank" href="https://www.globes.co.il/portal/instrument.aspx?instrumentid=10436">גלובס שער המרה פאונד שקל</a></p>
               <button class="btn btn-runner" id="pay_button">המשך לתשלום</button>
               {% else %}
-              <button class="btn btn-runner" id="pay_button">להרשמה</button>
+              <button class="btn btn-runner" id="pay_button" >להרשמה</button>
               {% endif %}
             </form>
         </div>
