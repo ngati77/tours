@@ -515,10 +515,13 @@ class DayInCalendar:
             availableDateQuery1     = TripAvailabilty.objects.filter(Q(ava_select_day    =   'All'))
             availableDateQuery = availableDateQuery1 | availableDateQuery0
             
-                   
+            #print("day: " + dateInCalendar.strftime('%d_%m_%Y'))       
+            #print("view: " + view)       
             for tripAvailabilty in availableDateQuery:
+                #print("avaliable: " + tripAvailabilty.get_ava_trip_type_display())       
                 #print(tripAvailabilty.ava_trip_type)
                 if (tripAvailabilty.get_ava_trip_type_display() != 'All' and tripAvailabilty.get_ava_trip_type_display() != view):
+                    #print("Skip this tour")
                     continue
                 canceled = False
                 # Check if the trip was canceld
@@ -544,6 +547,7 @@ class DayInCalendar:
                         break
                 # Guide on holiday there is no tour on this day
                 if (canceled):
+                    #print("Skip this tour no guides")
                     continue
                     
                 # Check if their is already a different trip on this day, we don't want two trips on the same day
@@ -555,10 +559,13 @@ class DayInCalendar:
                                                 trip_time__second  = tripAvailabilty.ava_time.second
                                                 
                                                 )
-              
+                #print("how many trips we have:")
+                #print(len(tripQuery))
                 # We found a trip let's check if it is a different one.
                 for trip in tripQuery:
-                    if (trip.status  != 'b' and trip.trip_type != view):
+                    #print("trip type: "+ trip.get_trip_type_display())
+                    #print("view2 : "+ view)
+                    if (trip.status  != 'b' and trip.get_trip_type_display() != view):
                         canceled = True
                         break
                 if (canceled):
