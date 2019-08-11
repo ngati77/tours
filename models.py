@@ -2,12 +2,7 @@ from django.db import models
 import datetime
 from django.utils import timezone
 from django.db.models import Q
-
-
-
-
-
-
+from django.shortcuts import get_object_or_404
 
 TRIP_DAYS = (
     ('Non', 'None'),    
@@ -75,9 +70,10 @@ class TripAvailabilty(models.Model):
         choices=TRIP_DAYS,
         default='Non',
     )
-    ava_time = models.TimeField('If every day trip enter time', blank=True, null=True)
+    ava_time = models.TimeField('If every day trip enter time')
 
-    ava_no_trip_day  = models.DateTimeField('Cancel trip option on this day',blank=True, null=True)
+
+    ava_trip_day  = models.DateField('Eiher limit trip data, Or set trip on a specific day',blank=True, null=True)
     
               
         
@@ -166,7 +162,7 @@ class Trip(models.Model):
             choices=STATUS_TRIP,
             default='n',
             )
-    
+    total_payment      = models.IntegerField(default=0, blank=True, null=True)
     def __str__(self):
         return str(self.id)
     
@@ -189,6 +185,7 @@ class Trip(models.Model):
         # Get all cilents from a trip hopefully more than one
         clientQuerey = self.clients_set.all()
         # Scan all clients, in the futrue need to scan the invoice
+        reportEntry.trip_id         = self.id
         for client in clientQuerey:
             if client.status != 'a':
                 continue
@@ -197,6 +194,9 @@ class Trip(models.Model):
             reportEntry.total_deposit   += client.pre_paid
             reportEntry.total_gross     += client.total_payment
         
+        # If it is a free tour, then the anount is in the trip total amount
+        if (reportEntry.total_gross == 0):
+            reportEntry.total_gross = self.total_payment
         # If Yael Gati is the guide for this tour. then we don't need to pay her!!!
         if (self.trip_guide=='YG'):
             reportEntry.total_guide_exp = 0
@@ -213,7 +213,7 @@ class Trip(models.Model):
             # Now that we know how much the guide earn we can calculate home amount he needs to return
             reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
         
-        reportEntry.trip_id         = self.id
+        
         
         return reportEntry
         
@@ -344,15 +344,26 @@ class ReportEntry:
     # This function calculate how much money the guide owe the company
     def calc_guide_payment(self, trip_type ,adult, children):
         # Before calculating Guide salary check if children are paying
-        ChildAccount    = OurTours.objects.filter(trip_type=trip_type)[0].priceChild>0
-        # If children are account take the number of them otherwise set it to zero
-        childNum        = children if ChildAccount else 0
-        # Just add chidren to people
-        totalPeople     = adult +  childNum
-        # if more than 2 peole than we have extra to add
-        extraPeople     = (totalPeople-2) if totalPeople > 2 else 0
-        # Base amount 40 + 5 Pound per person
-        return (40 + 5 * extraPeople) 
+        ourTour = get_object_or_404(OurTours, trip_type=trip_type)
+        # If it is a payed our then
+        if ourTour.price > 0:
+            ChildAccount    = ourTour.priceChild > 0
+            # If children are account take the number of them otherwise set it to zero
+            childNum        = children if ChildAccount else 0
+            # Just add chidren to people
+            totalPeople     = adult +  childNum
+            # if more than 2 peole than we have extra to add
+            extraPeople     = (totalPeople-2) if totalPeople > 2 else 0
+            # Base amount 40 + 5 Pound per person
+            return (40 + 5 * extraPeople)
+        # It is a free tour, guide ge 50% with minimum of 40
+        
+        else:
+            if (self.total_gross < 40):
+                return 40
+            else:
+                return self.total_gross/2.0
+            
 
     def __add__(self, reportEntry):
         '''
@@ -509,37 +520,23 @@ class DayInCalendar:
         
         elif (dateInCalendar > today):
             
-            # Check specific day in the week
-            availableDateQuery0     = TripAvailabilty.objects.filter(Q(ava_select_day    =   dateInCalendar.strftime('%a')))
+            # Check specific day in the week (Sun/Mon/Tue/...)
+            availableDateQuery0     = TripAvailabilty.objects.filter(ava_select_day = dateInCalendar.strftime('%a'))
             # Check for all days
-            availableDateQuery1     = TripAvailabilty.objects.filter(Q(ava_select_day    =   'All'))
-            availableDateQuery = availableDateQuery1 | availableDateQuery0
+            availableDateQuery1     = TripAvailabilty.objects.filter(ava_select_day    =   'All')
+            availableDateQuery2     = TripAvailabilty.objects.filter(ava_trip_day__lte =   dateInCalendar)
+            availableDateQuery      = availableDateQuery2 | availableDateQuery1 | availableDateQuery0
             
-            #print("day: " + dateInCalendar.strftime('%d_%m_%Y'))       
             #print("view: " + view)       
             for tripAvailabilty in availableDateQuery:
-                #print("avaliable: " + tripAvailabilty.get_ava_trip_type_display())       
-                #print(tripAvailabilty.ava_trip_type)
+                # Check if on the day we have either all tours or the specific tour that we need
                 if (tripAvailabilty.get_ava_trip_type_display() != 'All' and tripAvailabilty.get_ava_trip_type_display() != view):
                     #print("Skip this tour")
                     continue
+                # Now we check if the time has passed or we have a tour on this specific day
+                if (tripAvailabilty.ava_trip_day != None and tripAvailabilty.ava_trip_day < dateInCalendar ):
+                    continue
                 canceled = False
-                # Check if the trip was canceld
-#                noneAvailableDateQuery = TripAvailabilty.objects.filter(ava_no_trip_day__year  = dateInCalendar.year,
-#                                                                        ava_no_trip_day__month = dateInCalendar.month,
-#                                                                        ava_no_trip_day__day   = dateInCalendar.day,
-#                                                                        ava_no_trip_day__hour  = tripAvailabilty.ava_time.hour
-#                                                                        )
-#                for noneAvailableDate in noneAvailableDateQuery:
-#                    #print(noneAvailableDate.ava_no_trip_day.strftime("%Y-%M-%D-%H"))
-#                    if noneAvailableDate.ava_trip_type == 'A' or noneAvailableDate.ava_trip_type == tripAvailabilty.ava_trip_type:
-#                        #print("TRUE")
-#                        # Break from nearset for
-#                        canceled = True
-#                        break
-#                # As it was canceled move to the next item in the lisy
-#                if (canceled):
-#                    continue
                 
                 for vac in guideVacationQuery:
                     if (vac.vac_cancel_all) or (vac.vac_cancel_family and view=='Family') or (vac.vac_cancel_classy and view=='Classic'):
@@ -559,8 +556,6 @@ class DayInCalendar:
                                                 trip_time__second  = tripAvailabilty.ava_time.second
                                                 
                                                 )
-                #print("how many trips we have:")
-                #print(len(tripQuery))
                 # We found a trip let's check if it is a different one.
                 for trip in tripQuery:
                     #print("trip type: "+ trip.get_trip_type_display())

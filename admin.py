@@ -158,11 +158,12 @@ class TripAdmin(admin.ModelAdmin):
        
         ('Date information', {'fields': ['create_date'],'classes': ['collapse']}),
         ('Comments',         {'fields': ['trip_text']}),
+        (None,               {'fields': ['total_payment']}),
        
         
     ]
     inlines         = [ClientsInline]
-    list_display    = ('id','trip_type', 'trip_date', 'trip_time' ,'trip_guide' ,'status','create_date')
+    list_display    = ('id','trip_type', 'trip_date', 'trip_time' ,'trip_guide' ,'status','create_date','total_payment')
     list_filter     = ['trip_date']
     search_fields   = ['trip_text']
     actions         = ['track_trip']
@@ -173,11 +174,11 @@ class TripAvailabiltyAdmin(admin.ModelAdmin):
         (None,               {'fields': ['ava_trip_type']}),
         ('Date information', {'fields': ['ava_time']}),
         (None,               {'fields': ['ava_select_day']}),
-        ('Date information', {'fields': ['ava_no_trip_day']}),
+        ('Date information', {'fields': ['ava_trip_day']}),
        
     ]
-    list_display    = ('ava_trip_type', 'ava_time','ava_select_day','ava_no_trip_day')
-    list_filter     = ['ava_no_trip_day']
+    list_display    = ('ava_trip_type', 'ava_time','ava_select_day','ava_trip_day')
+    list_filter     = ['ava_trip_day']
     search_fields   = ['ava_select_day']
 
 class GuideVacationAdmin(admin.ModelAdmin):
