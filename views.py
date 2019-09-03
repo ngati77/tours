@@ -241,7 +241,7 @@ def tour_details(request, tripType='Classic'):
 #        print('Raise exception')
 #    OurTour = OurToursQuery[0]
 #    print(newCalendar)
-    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
+    meta_des_heb = "סיורים בקיימברידג' אנגליה"
     meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
     meta_des = meta_des_heb + meta_des_en
     meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "

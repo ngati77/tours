@@ -12,8 +12,13 @@
       <img width=50% src="https://cambridgeinhebrew.com/media/Gallery/2018/12/Cambridge_Kings_college.jpg">
       <h3><font color="blue"> הי {{client.first_name}}</font></h3>
       <h3><font color="blue"> איזה כיף הסיור שלנו מחר</font></h3>
-      
+      {% if NotFree %}
+      <p></p>
+      {% else %}
+      <p>חשוב - אנא השיבו לכל המכותבים למייל ואשרו הגעה. ניתן גם באמצעות האתר או מספר הטלפון של המדריכה.</p>
+      {% endif %}
       <p >אנו מזכירים לך להגיע בשעה {{trip_time|date:"H:i"}} למוזיאון הפיצווילאמס בקיימברידג׳</p>
+      <p><font color="blue">המדריכה ממתינה בכניסה הימנית של המוזיאון, מתחת לעמודי האבן הגבוהים</font></p>
       <p>:כתובת</p>
       <p class="lead">The Fitzwilliam Museum</p>
       <p>Trumpington St, Cambridge CB2 1RB</p>
@@ -30,7 +35,7 @@
        <p>{{client.text}}</p>
       <hr>
       <p>(**שם המדריכה  שלכם יעל רימון (מכותבת למייל</p>
-       <p>מספר הטלפון של יעל: 07305317171</p>
+       <p>מספר הטלפון של יעל: 00447305317171</p>
       <hr>
       
       <h2>הוראות הגעה ברכבת מלונדון</h2>

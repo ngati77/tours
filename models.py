@@ -359,7 +359,7 @@ class ReportEntry:
         # It is a free tour, guide ge 50% with minimum of 40
         
         else:
-            if (self.total_gross < 40):
+            if (self.total_gross < 80):
                 return 40
             else:
                 return self.total_gross/2.0
