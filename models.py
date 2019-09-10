@@ -274,7 +274,7 @@ class Clients(models.Model):
                                         )
     
     text                = models.TextField(max_length=600, blank=True)
-    admin_comment       = models.TextField(max_length=80, blank=True)
+    admin_comment       = models.TextField(max_length=120, blank=True)
     
     #create_date      = models.DateTimeField('date create')
     

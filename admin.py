@@ -78,7 +78,7 @@ class ClientAdmin(admin.ModelAdmin):
             self.send_email_again(request, emailTitle, client,emailType)
             
     def send_cancelaion_trip_email(self, request, queryset):
-        emailTitle = "סיור בקיימברידג' - ביטול סיור: "
+        emailTitle = "סיור בקיימברידג' - ביטול סיור"
         emailType = 'emails/email_cancelation.html'
         for client in queryset:
             emailTitle = emailTitle   
