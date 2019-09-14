@@ -85,12 +85,18 @@
     <div class="card">
         <div class="card-header">
 <!--            <h3>Sales Report - {{ today | date:"d/m/Y" }}</h3>-->
-      <h2>Cambridge in Hebrew - Client invoice No. {{client.id}}</h2>
+      <h2 style="text-align:center">Cambridge in Hebrew - Client invoice No. {{client.id}}</h2>
+      <h3 style="text-align:left">Address:</h3> 
+      <p style="text-align:left">27 Marshall Road</p>
+      <p style="text-align:left">Cambridge, Cambrdigeshire</p>
+      <p style="text-align:left">CB1 7TY</p>
+      <h3 style="text-align:left">Phone:</h3>
+      <p style="text-align:left">+447578560505</p>
         </div>
 
-         <h3>customer name: {{client.first_name}} {{client.last_name}} :שם לקוח</h3>
-         <h3>customer id: {{client.id}} :מס' לקוח</h3>
-         <h3>Date: {{sum.payment_date|date:"d/m/Y" }} :תאריך</h3>
+         <h3 style="text-align:center">customer name:              {{client.first_name}} {{client.last_name}}              :שם לקוח</h3>
+         <h3 style="text-align:center">customer id:                {{client.id}}                                           :מס' לקוח</h3>
+         <h3 style="text-align:center">Date:                       {{sum.payment_date|date:"d/m/Y" }}                      :תאריך</h3>
          
         <table class="table">
             <thead>

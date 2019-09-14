@@ -140,7 +140,7 @@ class Trip(models.Model):
     '''
     trip_text   = models.CharField(max_length=200, blank=True)
     trip_date   = models.DateField('Tour date')
-    trip_time   = models.TimeField('Tour time', blank=True)
+    trip_time   = models.TimeField('Tour time')
     create_date = models.DateTimeField(default=timezone.now)
     
     

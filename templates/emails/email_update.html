@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="he"
+    dir = "rtl">
+<head>
+
+</head>
+<body>
+
+<div class="row" align="right">
+
+    <div class="col-12 success" align="right">
+      <img width=50% src="https://cambridgeinhebrew.com/media/Gallery/2018/12/Cambridge_Kings_college.jpg">
+      <h3><font color="blue">קיימברידג' בעברית</font></h3>
+      <h3><font color="blue">עדכון הזמנה </font></h3>
+      
+      <p>{{client.admin_comment}}</p>
+       <p class="lead"><strong>שם: {{client.first_name}} {{client.last_name}}</strong></p>
+      <p class="lead">סוג הסיור: {{trip_type}}</p>
+      <p> נשמח לראותכם בתאריך {{trip_date|date:'d.m.Y' }}</p>
+      <p>  בשעה {{trip_time|date:'H:i'  }}</p>
+      
+      <p>מספר מטיילים: {{client.number_of_people}}</p>
+       {% if print_children %}
+      <p>מספר ילדים: {{client.number_of_children}}</p>
+      {% endif %}
+     
+       <p>טלפון בזמן הטיול: {{client.phone_number}}</p>
+         <p> {{client.email}} :דוא"ל</p>
+       <p>הערות:</p>  
+       <p>{{client.text}}</p>
+      <hr>
+      {% if NotFree %}
+      <p>אל דאגה - אנחנו נשלח אליכם מייל תזכורת יום  לפני הסיור בשעה 11:00</p>
+      {% else %}
+      <p>שימו לב - כדי למנוע מצב שהמדריכה מחכה ללקוח שאינו מגיע אנחנו ניצור איתכם קשר יום לפני הסיור ונבקש אישור הגעה נוסף, במידה ולא נקבל אישור השתתפותכם בסיור תבוטל.</p>
+      <p>{{client.text}}</p>
+      {% endif %}
+      <hr>
+      <p>(**שם המדריכה  שלכם יעל רימון (מכותבת למייל</p>
+       <p>מספר הטלפון של יעל: 07305317171</p>
+      <hr>
+      <h3><font color="blue">נקודת המפגש</font></h3>
+      <p>מוזיאון הפיצוויליאמס</p>
+      <p"><strong>Fitzwilliam Museum</strong></p>
+      <p><font color="blue">המדריכה ממתינה בכניסה הימנית של המוזיאון, מתחת לעמודי האבן הגבוהים</font></p>
+      <p>:כתובת</p>
+      <p>Trumpington St, Cambridge CB2 1RB</p>
+       <a href="https://www.google.co.uk/maps/place/The+Fitzwilliam+Museum/@52.1998685,0.1199856,15z/data=!4m5!3m4!1s0x0:0xb0140168bdc0b72c!8m2!3d52.1998685!4d0.1199856">מפה</a>
+      <p>הכנסו לאווירת הטיול ותתחילו להתרגש בעזרת 
+       <a href="http://www.facebook.com/Cambridgeinhebrew">דף הפייסבוק שלנו</a> 
+      </p>
+      <hr>
+      <div class="space"></div>
+      {% if NotFree %}
+      <p>נתקבל תשלום של {{client.pre_paid}}
+    פאונד
+      </p>
+      <p>יתרה לתשלום {{more_to_pay}}
+       פאונד
+      </p>
+      {% else %}
+      <p> הסיור מבוסס על טיפים לפי שביעות רצונכם</p>
+      {% endif %}
+      </div>
+       <hr>
+      </p>
+       <hr>
+      <p>
+      אם רוצים לשנות את יום הסיור אפשר להודיע 3 ימים לפני.<br>
+לעידכונים והודעות ניתן לשלוח מייל<br>
+ cambridgeinhebrew@gmail.com
+ </p>
+  
+ <p>
+     עקבו אחרנו בפייסבוק
+<br>         www.facebook.com/cambridgeinhebrew/ 
+ </p>
+ <p>
+     ובאינסטגרם
+<br>         https://www.instagram.com/cambridge_beivrit 
+ </p>
+ <h3>נתראה בסיור </h3>
+ <h3>יעל גתי</h3>
+   <hr> 
+      
+      
+      <h2>הוראות הגעה ברכבת מלונדון</h2>
+      <p><strong>לעיתים יש שינויים בזמני הרכבות, שימו לב לשעות כשאתם מגיעים לתחנה</strong></p>
+ 
+ <p> CBG עלו על רכבת שיוצאת  ב9:42 מתחנת קינגס קרוס בלונדון אל קימברידג<br> (ולא קיימברידג׳ צפון)</p>
+ <p>משך הנסיעה 50 דקות.</p>
+ <p><u>בבקשה אל תאחרו, תכננו לעצמכם מינימום הגעה לתחנה של חצי שעה מראש</u></p>
+<p>*ישנה עוד רכבת בשעה 10:04 בבקשה אל תעלו עליה כי היא רכבת מאספת ותגיעו לכאן רק ב11:30</p>
+ <p><strong> :קניית הכרטיסים לרכבת</strong></p>
+
+<p>
+אם אתם מעל 3,
+מומלץ לרכוש את הכרטיסים בקופת הכרטיסים ברכבת<br>
+תבקשו כרטיס קבוצתי (מעל 3 זה קבוצה),זהו המחיר המשתם ביותר<br>
+אני לא ממליצה לרכוש כרטיסים מראש באף אתר<br>
+כדאי להגיע קצת לפני כי לפעמים יש תור בקופה 
+      </p>
+ 
+ <p>לאחר מכן, מונית מתחנת הרכבת בקיימברידג׳ לנקודת המפגש משך נסיעה של 7 דקות</p>
+ 
+ <p>עלות לזוג 5-6 פאונד, מ3 אנשים יגבו מכם 3 פאונדים נוספים</p>
+      
+
+    
+</div>
+
+</body>
+</html>

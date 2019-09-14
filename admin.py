@@ -71,10 +71,10 @@ class ClientAdmin(admin.ModelAdmin):
             self.send_email_again(request, emailTitle, client, emailType)
             
     def send_update_trip_email(self, request, queryset):
-        emailTitle = "סיור בקיימברידג' - עידכון פרטים: "
-        emailType = 'emails/email_success.html'
+        emailTitle = "סיור בקיימברידג' - עידכון הזמנה "
+        emailType = 'emails/email_update.html'
         for client in queryset:
-            emailTitle = emailTitle + client.admin_comment 
+            emailTitle = emailTitle
             self.send_email_again(request, emailTitle, client,emailType)
             
     def send_cancelaion_trip_email(self, request, queryset):

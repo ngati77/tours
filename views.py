@@ -149,8 +149,9 @@ def create_new_trip_client(*args):
     if (len(tripQuerySet)==0):
         trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time ,trip_type=trip_type)
         trip.save()
-    else:
-        trip = tripQuerySet[0]
+    # Repeat to solve the time format in the email    
+    tripQuerySet = Trip.get_event(dateClass, trip_type)    
+    trip = tripQuerySet[0]
     # Create new client           
     client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
                      number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails, found_us = found_us ,text = text)
@@ -168,9 +169,7 @@ def send_succes_email(request,client):
     children = (client.number_of_children > 0)
     more_to_pay=(client.total_payment-client.pre_paid)
     try:
-        msg_html = render_to_string('emails/email_success.html', {'trip_date':client.trip.trip_date, 
-                                                                  'trip_time':client.trip.trip_time, 
-                                                                  'trip_type':ourTours.title, 
+        msg_html = render_to_string('emails/email_success.html', {'trip_type':ourTours.title, 
                                                                   'client':client, 
                                                                   'print_children':children, 
                                                                   'more_to_pay':more_to_pay,
