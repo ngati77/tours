@@ -104,6 +104,7 @@
       <td>דואל</td>
       <td  class="more_text">הודעה</td>
       <td>אישור</td>
+      <td>מחק</td>
     </tr>
     
     {% for entry in check_contact_spam %}
@@ -115,6 +116,7 @@
      <td>{{  entry.email }}</td>
      <td  class="more_text">{{  entry.text }}</td>
      <td><a href="{% url  'tour:contact_not_spam' entry.id %}" class="btn btn-tour reg-btn">לא ספאם</a></td>
+     <td><a href="{% url  'tour:contact_spam' entry.id %}" class="btn btn-tour reg-btn">ספאם</a></td>
      
      </tr>
     {% endfor %}

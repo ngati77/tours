@@ -383,7 +383,7 @@ def contactUs(request ):
                 msg_html = render_to_string('emails/email_contact.html', {'first_name':first_name,'last_name':last_name, 'email':email, 'id': contact.id, 'text':text})
                 msg_plain = str(contact.id) + "מישהו יצר קשר פניה "#emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
                 emailTitle = "מישהו יצר קשר"
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.BCC_EMAIL], title=emailTitle, cc=[])
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=settings.BCC_EMAIL, title=emailTitle, cc=[])
             except:
                 print('Got an error...')
             # Save contact here
@@ -876,7 +876,7 @@ def contact_not_spam(request, pk):
         msg_html = render_to_string('emails/email_contact.html', {'first_name':contact.first_name,'last_name':contact.last_name, 'email':contact.email, 'id': contact.id, 'text':contact.text})
         msg_plain = str(contact.id) + "מישהו יצר קשר פניה "
         emailTitle = "מישהו יצר קשר"
-        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.CC_EMAIL], title=emailTitle, cc=[])
+        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=settings.CC_EMAIL, title=emailTitle, cc=[])
     except:
         print('Got an error...')
         # Save contact here
@@ -884,6 +884,12 @@ def contact_not_spam(request, pk):
 
     return  redirect('tour:tasks')
 
+def contact_spam(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    #if (len(contact_query)>0):
+    contact.delete()
+    # Now send email to adminstrator            
+    return  redirect('tour:tasks')
 
 def contact_confirm(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
@@ -899,3 +905,41 @@ def review_confirm(request, pk):
         review.confirm = True
         review.save()
     return  redirect('tour:tasks')
+
+
+def CanMakeIt(request, pk ):
+    return CanMakeItFuncion(request, pk, True )
+def CantMakeIt(request, pk ):    
+    return CanMakeItFuncion(request, pk, False )
+
+def CanMakeItFuncion(request, pk, canMakeit ):
+    clients = get_object_or_404(Clients, pk=pk)
+    title = 'שגיאה'
+    try:
+        msg_html = render_to_string('emails/email_free_tour_confirmation.html', {'first_name':clients.first_name,'last_name':clients.last_name, 'email':clients.email, 'id': clients.id, 'canMakeit':canMakeit})
+        if (canMakeit):
+            msg_plain = str(clients.id) + "בטח מגיע לסיור "
+            emailTitle = clients.first_name + " בטח מגיע לסיור"
+            title = " בטח מגיע לסיור"
+        else:
+            msg_plain = str(clients.id) + "לא מגיע לסיור "
+            emailTitle = clients.first_name + " לא מגיע לסיור"
+            title = "  לא מגיע לסיור"
+        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=settings.CC_EMAIL, title=emailTitle, cc=[])
+    except:
+        print('Got an error...')
+        # Save contact here
+    meta_des_heb = "קיימברידג בעברית אישור הגעה  "
+    meta_des_en  = "confirmation Cambridge in Hebrew"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "אישור הגעה קיימברידג' "
+    meta_key_en  = "confirmaion cambridge hebrew "
+    meta_key     = meta_key_heb + meta_key_en
+    
+    return render(request, 'tour/free_tour_confirmation.html', {'title':title, 
+                                                               'meta_des':meta_des,
+                                                               'meta_key':meta_key,
+                                                               'page_title':title,
+                                                               'canMakeit':canMakeit
+                                                               
+                                                               })

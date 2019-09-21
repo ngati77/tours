@@ -276,7 +276,7 @@ class ContactAdmin(admin.ModelAdmin):
         (None,               {'fields': ['text']}),
         (None,               {'fields': ['confirm']}),
     ]
-    list_display    = ('create_date','first_name','last_name','email','text','confirm')
+    list_display    = ('id','create_date','first_name','last_name','email','text','confirm')
     list_filter     = ['create_date']
 
 

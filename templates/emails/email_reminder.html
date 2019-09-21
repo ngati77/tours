@@ -2,7 +2,36 @@
 <html lang="he"
     dir = "rtl">
 <head>
+ <style type="text/css">
+ .btn-tour {
+    
+    background-color: Transparent;
+    border: 2px solid #124789!important;
+    color:     #124789;
+    text-align: right;
+    margin-bottom: 0.2rem!important;
+    margin-right: 0rem!important;
+    margin-top: 0.2rem!important;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+}
 
+.btn-tour:hover {
+
+    background-color: #124789;
+    border: 1px solid #124789;
+    color:     white;
+    text-align: right;
+    
+}
+
+.space {
+    margin:2rem;
+}
+
+ 
+ </style>
 </head>
 <body>
 
@@ -15,7 +44,14 @@
       {% if NotFree %}
       <p></p>
       {% else %}
-      <p>חשוב - אנא השיבו לכל המכותבים למייל ואשרו הגעה. ניתן גם באמצעות האתר או מספר הטלפון של המדריכה.</p>
+      <p>אנא ליחצו על הכפתור המתאים לאישור הסיור, לאחר מכן תוכלו לחזור לדוא"ל</p>
+      <div class="row space" align="right">
+      <a href="https://www.cambridgeinhebrew.com/can_make_it/{{client.id}}" class="btn btn-tour ">בטח שאנחנו מגיעים</a>
+     </div>
+      
+     <div class="row space" align="right">
+      <a href="https://www.cambridgeinhebrew.com/cant_make_it/{{client.id}}" class="btn btn-tour ">לצערנו לא נוכל להגיע</a>
+     </div>
       {% endif %}
       <p >אנו מזכירים לך להגיע בשעה {{trip_time|date:"H:i"}} למוזיאון הפיצווילאמס בקיימברידג׳</p>
       <p><font color="blue">המדריכה ממתינה בכניסה הימנית של המוזיאון, מתחת לעמודי האבן הגבוהים</font></p>
