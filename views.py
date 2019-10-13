@@ -874,9 +874,9 @@ def contact_not_spam(request, pk):
     # Now send email to adminstrator            
     try:
         msg_html = render_to_string('emails/email_contact.html', {'first_name':contact.first_name,'last_name':contact.last_name, 'email':contact.email, 'id': contact.id, 'text':contact.text})
-        msg_plain = str(contact.id) + "מישהו יצר קשר פניה "
-        emailTitle = "מישהו יצר קשר"
-        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=settings.CC_EMAIL, title=emailTitle, cc=[])
+        msg_plain = str(contact.id) + "תודה שיצרתם קשר "
+        emailTitle = "סיור בקיימברידג' - צור קשר"
+        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[contact.email], title=emailTitle, cc=settings.EMAIL_GMAIL_YAEL)
     except:
         print('Got an error...')
         # Save contact here
