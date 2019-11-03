@@ -284,6 +284,7 @@ def bookTour(request,pYear=1977, pMonth=1, tripType='Classic' ):
             meta_key_en  = "payment "
             meta_key     = meta_key_heb + meta_key_en
 
+
             form = PaymentForm(initial={       'title':title,
                                                'trip_date':trip_date,
                                                'trip_time':trip_time,
