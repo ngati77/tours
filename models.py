@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 TRIP_DAYS = (
-    ('Non', 'None'),    
+    ('Non', 'None'),   
     ('Sun', 'ראשון'),  
     ('Mon', 'שני'),  
     ('Tue', 'שלישי'),  
@@ -45,47 +45,37 @@ STATUS_TRIP = (
 hebmonthdic = {'Jan': 'ינואר', 'Feb' : 'פברואר' , 'Mar' : 'מרץ', 'Apr': 'אפריל' , 'May' : 'מאי' , 'Jun' : 'יוני' , 'Jul' : 'יולי' , 'Aug' : 'אוגוסט' , 'Sep' : 'ספטמבר' , 'Oct' : 'אוקטובר' , 'Nov' : 'נובמבר' , 'Dec' : 'דצמבר' }
 
 class Guide(models.Model):
-    first_name         = models.CharField(max_length=20)
-    last_name          = models.CharField(max_length=20)
+    first_name         = models.CharField(max_length=20, default="")
+    last_name_en       = models.CharField(max_length=20, default="")
+    first_name_en      = models.CharField(max_length=20, default="")
+    last_name          = models.CharField(max_length=20, default="")
+    user_name          = models.CharField(max_length=20, default="")
+    phone              = models.CharField(max_length=20, default="")
+    email              = models.EmailField(blank=True, default="")
     image              = models.ImageField(blank = True, null = True, upload_to = 'Guide/%Y/%m/')
     order              = models.IntegerField(default=0)
     general_info       = models.TextField(max_length=600)
     confirm            = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.user_name
 
 class Guide_Background(models.Model):
     question       = models.TextField(max_length=600)
     answer         = models.TextField(max_length=600)
     trip           = models.ForeignKey(Guide, on_delete=models.CASCADE)
     
-    
-
-class TripAvailabilty(models.Model):
-    ava_trip_type   = models.CharField(
-        max_length=1,
-        choices=TRIP_TYPE,
-        default='C',
-    )
-    ava_select_day   = models.CharField(
-        max_length=3,
-        choices=TRIP_DAYS,
-        default='Non',
-    )
-    ava_time = models.TimeField('If every day trip enter time')
-
-
-    ava_trip_day  = models.DateField('Eiher limit trip data, Or set trip on a specific day',blank=True, null=True)
-    
-              
+  
         
 class GuideVacation(models.Model):
-    
+    guide               = models.ForeignKey(Guide,    on_delete=models.CASCADE)
     guide_vacation = models.CharField(
         max_length=2,
         choices=TRIP_GUIDE,
         default='YR',
     )
-    vac_start_date    = models.DateField('First day guide on holiday') 
-    vac_end_date      = models.DateField('Last day guide on holiday') 
+    vac_start_date    = models.DateField('First day guide on holiday',default=datetime.date.today) 
+    vac_end_date      = models.DateField('Last day guide on holiday', default=datetime.date.today) 
     vac_cancel_classy = models.BooleanField(default=False)
     vac_cancel_family = models.BooleanField(default=False)
     vac_cancel_all    = models.BooleanField(default=False)
@@ -122,8 +112,36 @@ class OurTours(models.Model):
                                         choices=TRIP_TYPE,
                                         default='C',
                                         )
+    trip_abc_name     = models.CharField(max_length=20,default='Classic')
+
     order              = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.trip_abc_name
     
+    
+   
+
+class TripAvailabilty(models.Model):
+    
+    ourTour         = models.ForeignKey(OurTours, on_delete=models.SET_NULL,  blank=True, null=True)
+
+    ava_trip_type   = models.CharField(
+        max_length=1,
+        choices=TRIP_TYPE,
+        default='C',
+    )
+    ava_select_day   = models.CharField(
+        max_length=3,
+        choices=TRIP_DAYS,
+        default='Non',
+    )
+    ava_time = models.TimeField('If every day trip enter time')
+
+
+    ava_trip_day  = models.DateField('Either limit trip date, Or set trip on a specific day',blank=True, null=True)
+    
+                 
    
     
 class Gallery(models.Model):
@@ -143,7 +161,8 @@ class Trip(models.Model):
     trip_time   = models.TimeField('Tour time')
     create_date = models.DateTimeField(default=timezone.now)
     
-    
+    guide              = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
+    ourTour            = models.ForeignKey(OurTours, on_delete=models.SET_NULL, blank=True, null=True)
     
     trip_type   = models.CharField(
         max_length=1,
@@ -181,7 +200,7 @@ class Trip(models.Model):
         This function summerise the total incomne of a trip
         
         '''
-        reportEntry = ReportEntry(self.get_trip_type_display(), self.trip_date.strftime("%d.%m.%y"), self.get_trip_guide_display())
+        reportEntry = ReportEntry(self.ourTour.title, self.trip_date.strftime("%d.%m.%y"), self.guide.name())
         # Get all cilents from a trip hopefully more than one
         clientQuerey = self.clients_set.all()
         # Scan all clients, in the futrue need to scan the invoice

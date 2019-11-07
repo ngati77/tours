@@ -31,14 +31,6 @@ class TransactionInline(admin.TabularInline):
     model = Transaction
     extra = 3
 
-
-    
-    
-    
-    
-
-
-
 class ClientAdmin(admin.ModelAdmin):
    
     fieldsets = [
@@ -153,7 +145,9 @@ class TripAdmin(admin.ModelAdmin):
         ('Date information', {'fields': ['trip_date']}),
         (None,               {'fields': ['trip_time']}),
         ('Details',          {'fields': ['trip_guide']}),
+        ('Details',          {'fields': ['guide']}),
         (None,               {'fields': ['trip_type']}),
+        ('Details',          {'fields': ['ourTour']}),
         (None,               {'fields': ['status']}),
        
         ('Date information', {'fields': ['create_date'],'classes': ['collapse']}),
@@ -163,7 +157,7 @@ class TripAdmin(admin.ModelAdmin):
         
     ]
     inlines         = [ClientsInline]
-    list_display    = ('id','trip_type', 'trip_date', 'trip_time' ,'trip_guide' ,'status','create_date','total_payment')
+    list_display    = ('id','trip_type', 'trip_date', 'trip_time' ,'trip_guide' ,'status','create_date','total_payment','ourTour','guide')
     list_filter     = ['trip_date']
     search_fields   = ['trip_text']
     actions         = ['track_trip']
@@ -175,23 +169,28 @@ class TripAvailabiltyAdmin(admin.ModelAdmin):
         ('Date information', {'fields': ['ava_time']}),
         (None,               {'fields': ['ava_select_day']}),
         ('Date information', {'fields': ['ava_trip_day']}),
+        (None,               {'fields': ['ourTour']}),
+        
        
     ]
-    list_display    = ('ava_trip_type', 'ava_time','ava_select_day','ava_trip_day')
+    list_display    = ('ava_trip_type', 'ava_time','ava_select_day','ava_trip_day','ourTour')
     list_filter     = ['ava_trip_day']
     search_fields   = ['ava_select_day']
 
 class GuideVacationAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['guide_vacation']}),
+        #(None,               {'fields': ['guide_vacation']}),
         ('Date information', {'fields': ['vac_start_date']}),
         ('Date information', {'fields': ['vac_end_date']}),
         (None,               {'fields': ['vac_cancel_classy']}),
         (None,               {'fields': ['vac_cancel_family']}),
         (None,               {'fields': ['vac_cancel_all']}),
+        (None,               {'fields': ['guide']}),
+
+        
        
     ]
-    list_display    = ('guide_vacation', 'vac_start_date','vac_end_date','vac_cancel_classy','vac_cancel_family','vac_cancel_all')
+    list_display    = ('guide_vacation', 'vac_start_date','vac_end_date','vac_cancel_classy','vac_cancel_family','vac_cancel_all','guide')
     list_filter     = ['vac_start_date']
     search_fields   = ['guide_vacation']
     
@@ -239,11 +238,12 @@ class OurTourAdmin(admin.ModelAdmin):
         (None,               {'fields': ['priceChild']}),
         (None,               {'fields': ['deposit']}),
         (None,               {'fields': ['trip_type']}),
+        (None,               {'fields': ['trip_abc_name']}),      
         (None,               {'fields': ['img']}),
         (None,               {'fields': ['confirm']}),
         (None,               {'fields': ['order']}),
     ]
-    list_display    = ('title','price','trip_type','img','confirm','order','priceChild','deposit')
+    list_display    = ('title','price','trip_type','img','confirm','order','priceChild','deposit','trip_abc_name')
 
 class GuideBackgroundInline(admin.TabularInline):
     model = Guide_Background
@@ -256,14 +256,19 @@ class GuideAdmin(admin.ModelAdmin):
         
         (None,               {'fields': ['first_name']}),
         (None,               {'fields': ['last_name']}),
+        (None,               {'fields': ['first_name_en']}),
+        (None,               {'fields': ['last_name_en']}),
+        (None,               {'fields': ['user_name']}),
         (None,               {'fields': ['order']}),
         (None,               {'fields': ['image']}),
+        (None,               {'fields': ['phone']}),
+        (None,               {'fields': ['email']}),
         (None,               {'fields': ['general_info']}),
         (None,               {'fields': ['confirm']}),
        
     ]
     inlines         = [GuideBackgroundInline]
-    list_display    = ('first_name','last_name', 'image','confirm')
+    list_display    = ('first_name', 'last_name', 'first_name_en', 'last_name_en', 'user_name', 'order', 'image', 'phone' , 'email', 'confirm')
     search_fields   = ['first_name']
     
     

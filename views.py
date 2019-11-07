@@ -142,12 +142,15 @@ def create_new_trip_client(*args):
     ''' This function create trip if needed and create a client 
     '''
     title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, found_us ,text = args
-    date = [int(x) for x in trip_date.split("-")]
-    dateClass = datetime.date(date[0],date[1],date[2])
+    date         = [int(x) for x in trip_date.split("-")]
+    dateClass    = datetime.date(date[0],date[1],date[2])
     tripQuerySet = Trip.get_event(dateClass, trip_type)
+    guide        = get_object_or_404(Guide, user_name='yaelr')
+    ourTour      = get_object_or_404(OurTours, trip_abc_name = 'Classic')
+
     # If need a new trip
     if (len(tripQuerySet)==0):
-        trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time ,trip_type=trip_type)
+        trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time ,trip_type=trip_type, guide=guide,ourTour=ourTour)
         trip.save()
     # Repeat to solve the time format in the email    
     tripQuerySet = Trip.get_event(dateClass, trip_type)    
@@ -162,12 +165,11 @@ def create_new_trip_client(*args):
 def send_succes_email(request,client):
     ''' This function send email confirmation to a new client
     '''
-    #OurToursQuery = OurTours.objects.filter(trip_type=tripType)
-    ourTours = get_object_or_404(OurTours, trip_type=client.trip.trip_type)
-    NotFree = (ourTours.price != 0)
-    msg_plain= 'DUMMY ONE'
-    children = (client.number_of_children > 0)
-    more_to_pay=(client.total_payment-client.pre_paid)
+    ourTours    = get_object_or_404(OurTours, trip_type=client.trip.trip_type)
+    NotFree     = (ourTours.price != 0)
+    msg_plain   = 'DUMMY ONE'
+    children    = (client.number_of_children > 0)
+    more_to_pay = (client.total_payment-client.pre_paid)
     try:
         msg_html = render_to_string('emails/email_success.html', {'trip_type':ourTours.title, 
                                                                   'client':client, 
@@ -283,7 +285,6 @@ def bookTour(request,pYear=1977, pMonth=1, tripType='Classic' ):
             meta_key_heb = "תשלום "
             meta_key_en  = "payment "
             meta_key     = meta_key_heb + meta_key_en
-
 
             form = PaymentForm(initial={       'title':title,
                                                'trip_date':trip_date,

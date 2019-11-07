@@ -18,11 +18,10 @@
           הסיורים
                 </a>
                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Free ">סיור חינמי</a>
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Classic ">סיור קלאסי</a>
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Family ">סיור משפחות</a>
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Winter ">סיור חורפי</a>
-                   <a class="dropdown-item" href="{% url  'tour:tour_details' %}/Punting ">שייט</a>
+                   {% for title, trip_type in tour_titles %}
+                      <a class="dropdown-item" href="{% url  'tour:tour_details' %}/{{trip_type}} ">{{ title }}</a>
+
+                   {% endfor %}
                  </div>
             </li>
            
