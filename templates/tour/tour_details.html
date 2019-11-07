@@ -26,16 +26,16 @@
             </div>
             <div class="col-sm-12 col-md-5 col-lg-5 d-flex order-1 order-md-0">
                 <div class="card-body">
-                    <p class="card-text"><b>{{ourTour.headerShort1}}</b></p>
-                    <p class="card-text">{{ourTour.descriptionShort1}}</p>
-                    <p class="card-text">{{ourTour.description1}}</p>
-                    <p class="card-text">{{ourTour.description2}}</p>
-                    <p class="card-text">{{ourTour.description3}}</p>
+                    <p class="card-text"><b>{{ourTour.headerShort1 |linebreaks |urlize }}</b></p>
+                    <p class="card-text">{{ourTour.descriptionShort1 |linebreaks |urlize }}</p>
+                    <p class="card-text">{{ourTour.description1 |linebreaks |urlize }}</p>
+                    <p class="card-text">{{ourTour.description2 |linebreaks |urlize }}</p>
+                    <p class="card-text">{{ourTour.description3 |linebreaks |urlize }}</p>
                     <p><u>למי הסיור מתאים?</u></p>
-                    <p>{{ourTour.whoCanDoIt}}</p>
+                    <p>{{ourTour.whoCanDoIt |linebreaks }}</p>
                     
                     <p><u>משך הסיור</u></p>
-                    <p>{{ourTour.duration}}</p>
+                    <p>{{ourTour.duration |linebreaks}}</p>
                     <div class="meeting_point">
                         <p><u> עלות הסיור </u></p>
                         {% if NotFree %}
