@@ -68,7 +68,7 @@ class Guide_Background(models.Model):
   
         
 class GuideVacation(models.Model):
-    guide               = models.ForeignKey(Guide,    on_delete=models.CASCADE)
+    guide              = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
     guide_vacation = models.CharField(
         max_length=2,
         choices=TRIP_GUIDE,
