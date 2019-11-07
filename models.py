@@ -200,7 +200,8 @@ class Trip(models.Model):
         This function summerise the total incomne of a trip
         
         '''
-        reportEntry = ReportEntry(self.ourTour.title, self.trip_date.strftime("%d.%m.%y"), self.guide.name())
+        #reportEntry = ReportEntry(self.ourTour.title, self.trip_date.strftime("%d.%m.%y"), self.guide.name())
+        reportEntry = ReportEntry(self.get_trip_type_display(), self.trip_date.strftime("%d.%m.%y"), self.get_trip_guide_display())
         # Get all cilents from a trip hopefully more than one
         clientQuerey = self.clients_set.all()
         # Scan all clients, in the futrue need to scan the invoice

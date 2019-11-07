@@ -531,7 +531,6 @@ def reportView(request):
             if (len(tripQuerey)>0):
                 reportsum = ReportEntry("sum", "sum", "sum")
                 for trip in tripQuerey:
-                    
                     # Gather the sum here
                     reportEntry = trip.get_trip_sum()
                     reportsum   += reportEntry
