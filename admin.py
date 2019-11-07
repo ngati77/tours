@@ -179,7 +179,7 @@ class TripAvailabiltyAdmin(admin.ModelAdmin):
 
 class GuideVacationAdmin(admin.ModelAdmin):
     fieldsets = [
-        #(None,               {'fields': ['guide_vacation']}),
+        (None,               {'fields': ['guide_vacation']}),
         ('Date information', {'fields': ['vac_start_date']}),
         ('Date information', {'fields': ['vac_end_date']}),
         (None,               {'fields': ['vac_cancel_classy']}),
