@@ -12,8 +12,8 @@ import datetime
 # could be solved with a relative path like 
 #os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..') which corresponds to the parent folder of the actual file.
 # Used locally
-#sys.path.append('c:/first_web/mysite')
-#os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+#sys.path.append('/Users/owner/cambridge')
+#os.environ['DJANGO_SETTINGS_MODULE'] = 'cambridge.settings'
 
 # This is needed
 sys.path.append('/home/ngati/cambridge')
@@ -41,8 +41,7 @@ def main():
     
     # Now find the clients and send an email 
     for trip in tripQuery:
-        ourTours = get_object_or_404(OurTours, trip_type=trip.trip_type)
-        NotFree = (ourTours.price != 0)
+        NotFree = (trip.ourTour.price != 0)
         clientQuerey = trip.clients_set.filter(status = 'a')
         for client in clientQuerey:
             msg_plain= 'תזכורת לסיור מחר'
