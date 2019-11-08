@@ -36,8 +36,8 @@
       <p>{{client.text}}</p>
       {% endif %}
       <hr>
-      <p>(**שם המדריכה  שלכם יעל רימון (מכותבת למייל</p>
-       <p>מספר הטלפון של יעל: 07305317171</p>
+      <p>(** שם המדריכה  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותבת למייל</p>
+      <p>מספר הטלפון של {{ client.trip.guide.first_name }} : {{ client.trip.guide.phone }} </p>
       <hr>
       <h3><font color="blue">נקודת המפגש</font></h3>
       <p>מוזיאון הפיצוויליאמס</p>

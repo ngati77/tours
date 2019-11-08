@@ -5,7 +5,6 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 TRIP_DAYS = (
-    ('Non', 'None'),   
     ('Sun', 'ראשון'),  
     ('Mon', 'שני'),  
     ('Tue', 'שלישי'),  
@@ -67,18 +66,7 @@ class Guide_Background(models.Model):
     
   
         
-class GuideVacation(models.Model):
-    guide              = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
-    guide_vacation = models.CharField(
-        max_length=2,
-        choices=TRIP_GUIDE,
-        default='YR',
-    )
-    vac_start_date    = models.DateField('First day guide on holiday',default=datetime.date.today) 
-    vac_end_date      = models.DateField('Last day guide on holiday', default=datetime.date.today) 
-    vac_cancel_classy = models.BooleanField(default=False)
-    vac_cancel_family = models.BooleanField(default=False)
-    vac_cancel_all    = models.BooleanField(default=False)
+
 
 
 class Review(models.Model):
@@ -119,7 +107,19 @@ class OurTours(models.Model):
     def __str__(self):
         return self.trip_abc_name
     
-    
+class GuideVacation(models.Model):
+    guide           = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
+    ourTour         = models.ForeignKey(OurTours, on_delete=models.SET_NULL,  blank=True, null=True)
+    guide_vacation = models.CharField(
+        max_length=2,
+        choices=TRIP_GUIDE,
+        default='YR',
+    )
+    vac_start_date    = models.DateField('First day guide on holiday',default=datetime.date.today) 
+    vac_end_date      = models.DateField('Last day guide on holiday', default=datetime.date.today) 
+    #vac_cancel_classy = models.BooleanField(default=False)
+    #vac_cancel_family = models.BooleanField(default=False)
+    vac_cancel_all    = models.BooleanField(default=False)    
    
 
 class TripAvailabilty(models.Model):
@@ -134,13 +134,14 @@ class TripAvailabilty(models.Model):
     ava_select_day   = models.CharField(
         max_length=3,
         choices=TRIP_DAYS,
-        default='Non',
+        default='All',
     )
     ava_time = models.TimeField('If every day trip enter time')
 
 
-    ava_trip_day  = models.DateField('Either limit trip date, Or set trip on a specific day',blank=True, null=True)
-    
+    ava_trip_start_day  = models.DateField('Start day',blank=True, null=True)
+    ava_trip_end_day  = models.DateField('End day',blank=True, null=True)
+
                  
    
     
@@ -201,7 +202,7 @@ class Trip(models.Model):
         
         '''
         #reportEntry = ReportEntry(self.ourTour.title, self.trip_date.strftime("%d.%m.%y"), self.guide.name())
-        reportEntry = ReportEntry(self.get_trip_type_display(), self.trip_date.strftime("%d.%m.%y"), self.get_trip_guide_display())
+        reportEntry = ReportEntry(self.ourTour.trip_abc_name, self.trip_date.strftime("%d.%m.%y"), self.guide.user_name)
         # Get all cilents from a trip hopefully more than one
         clientQuerey = self.clients_set.all()
         # Scan all clients, in the futrue need to scan the invoice
@@ -225,9 +226,10 @@ class Trip(models.Model):
         else:
             
             # How much the guide earn from this tour
-            reportEntry.total_guide_exp = reportEntry.calc_guide_payment(trip_type = self.trip_type,
-                                                              adult     = reportEntry.total_people,
-                                                              children  = reportEntry.total_children)
+            reportEntry.total_guide_exp = reportEntry.calc_guide_payment(
+                                                                    adult     = reportEntry.total_people,
+                                                                    children  = reportEntry.total_children,
+                                                                    ourTour   = self.ourTour)
             # how much we earend
             reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
             # Now that we know how much the guide earn we can calculate home amount he needs to return
@@ -240,11 +242,14 @@ class Trip(models.Model):
         
         
     @staticmethod
-    def get_event(date,trip_type):
+    def get_event(date,trip_abc_name):
+        trip_abc_name
+        ourTour = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
+
         return Trip.objects.filter(
                                 ~Q(status='b'),
                                 trip_date=date,
-                                trip_type=trip_type)
+                                ourTour=ourTour)
      
     #was_published_recently.admin_order_field = 'pub_date'
     #was_published_recently.boolean = True
@@ -341,10 +346,10 @@ class Contact(models.Model):
 
 # This class is used in the report.html
 class ReportEntry: 
-    def __init__(self, trip_text, trip_date, trip_guide):
-        self.trip_text       = trip_text
-        self.trip_date       = trip_date
-        self.trip_guide      = trip_guide
+    def __init__(self, trip_abc_name, trip_date, guide):
+        self.trip_text   = trip_abc_name
+        self.trip_date   = trip_date
+        self.trip_guide  = guide
 
         self.trip_time       = ''
         self.trip_id         = 0
@@ -362,9 +367,9 @@ class ReportEntry:
     Return report between range of guides and according to the guide
     """
     # This function calculate how much money the guide owe the company
-    def calc_guide_payment(self, trip_type ,adult, children):
+    def calc_guide_payment(self ,adult, children, ourTour):
         # Before calculating Guide salary check if children are paying
-        ourTour = get_object_or_404(OurTours, trip_type=trip_type)
+
         # If it is a payed our then
         if ourTour.price > 0:
             ChildAccount    = ourTour.priceChild > 0
@@ -541,25 +546,36 @@ class DayInCalendar:
         elif (dateInCalendar > today):
             
             # Check specific day in the week (Sun/Mon/Tue/...)
-            availableDateQuery0     = TripAvailabilty.objects.filter(ava_select_day = dateInCalendar.strftime('%a'))
+            #availableDateQuery0     = TripAvailabilty.objects.filter(ava_select_day = dateInCalendar.strftime('%a'))
             # Check for all days
-            availableDateQuery1     = TripAvailabilty.objects.filter(ava_select_day    =   'All')
-            availableDateQuery2     = TripAvailabilty.objects.filter(ava_trip_day__lte =   dateInCalendar)
-            availableDateQuery      = availableDateQuery2 | availableDateQuery1 | availableDateQuery0
+            #availableDateQuery1     = TripAvailabilty.objects.filter(ava_select_day    =   'All')
+            #availableDateQuery2     = TripAvailabilty.objects.filter(ava_trip_day__lte =   dateInCalendar)
+            #availableDateQuery      = availableDateQuery2 | availableDateQuery1 | availableDateQuery0
             
+            # Bring all relevant tours
+            availableDateQuery       = TripAvailabilty.objects.filter(ourTour__trip_abc_name = view)
             #print("view: " + view)       
             for tripAvailabilty in availableDateQuery:
                 # Check if on the day we have either all tours or the specific tour that we need
-                if (tripAvailabilty.get_ava_trip_type_display() != 'All' and tripAvailabilty.get_ava_trip_type_display() != view):
-                    #print("Skip this tour")
+                #if (tripAvailabilty.ourTour.trip_abc_name != view):
+                #    #print("Skip this tour")
+                #    continue
+
+                # Check if start day is bigger than the day in the calendar
+                if (tripAvailabilty.ava_trip_start_day != None and tripAvailabilty.ava_trip_start_day > dateInCalendar ):
                     continue
-                # Now we check if the time has passed or we have a tour on this specific day
-                if (tripAvailabilty.ava_trip_day != None and tripAvailabilty.ava_trip_day < dateInCalendar ):
+                # Check if end day is smaller than the day in the calendar
+                if (tripAvailabilty.ava_trip_end_day != None and tripAvailabilty.ava_trip_end_day < dateInCalendar ):
                     continue
+                # Now that we know trip is in the right dates, check if it run every day or on a prticular day
+                if (tripAvailabilty.ava_select_day != 'All' and tripAvailabilty.ava_select_day != dateInCalendar.strftime('%a') ):
+                    continue
+
                 canceled = False
                 
-                for vac in guideVacationQuery:
-                    if (vac.vac_cancel_all) or (vac.vac_cancel_family and view=='Family') or (vac.vac_cancel_classy and view=='Classic'):
+
+                for vac in guideVacationQuery:                     
+                    if ((vac.vac_cancel_all) or (vac.ourTour != None and vac.ourTour.trip_abc_name == view)):
                         canceled = True
                         break
                 # Guide on holiday there is no tour on this day
@@ -580,7 +596,7 @@ class DayInCalendar:
                 for trip in tripQuery:
                     #print("trip type: "+ trip.get_trip_type_display())
                     #print("view2 : "+ view)
-                    if (trip.status  != 'b' and trip.get_trip_type_display() != view):
+                    if (trip.status  != 'b' and trip.ourTour.trip_abc_name != view):
                         canceled = True
                         break
                 if (canceled):

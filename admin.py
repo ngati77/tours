@@ -168,29 +168,28 @@ class TripAvailabiltyAdmin(admin.ModelAdmin):
         (None,               {'fields': ['ava_trip_type']}),
         ('Date information', {'fields': ['ava_time']}),
         (None,               {'fields': ['ava_select_day']}),
-        ('Date information', {'fields': ['ava_trip_day']}),
+        ('Date information', {'fields': ['ava_trip_start_day']}),
+        ('Date information', {'fields': ['ava_trip_end_day']}),
         (None,               {'fields': ['ourTour']}),
         
        
     ]
-    list_display    = ('ava_trip_type', 'ava_time','ava_select_day','ava_trip_day','ourTour')
-    list_filter     = ['ava_trip_day']
+    list_display    = ('ava_trip_type', 'ava_time','ava_select_day','ava_trip_start_day','ava_trip_end_day','ourTour')
+    list_filter     = ['ava_trip_start_day']
     search_fields   = ['ava_select_day']
 
 class GuideVacationAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['guide_vacation']}),
+        (None,               {'fields': ['guide']}),
         ('Date information', {'fields': ['vac_start_date']}),
         ('Date information', {'fields': ['vac_end_date']}),
-        (None,               {'fields': ['vac_cancel_classy']}),
-        (None,               {'fields': ['vac_cancel_family']}),
+        (None,               {'fields': ['ourTour']}),
         (None,               {'fields': ['vac_cancel_all']}),
-        (None,               {'fields': ['guide']}),
 
         
        
     ]
-    list_display    = ('guide_vacation', 'vac_start_date','vac_end_date','vac_cancel_classy','vac_cancel_family','vac_cancel_all','guide')
+    list_display    = ('guide_vacation', 'vac_start_date','vac_end_date','vac_cancel_all','guide')
     list_filter     = ['vac_start_date']
     search_fields   = ['guide_vacation']
     

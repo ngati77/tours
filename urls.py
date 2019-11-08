@@ -11,13 +11,13 @@ from . import views
 app_name = 'tour'
 urlpatterns = [
     path('',               views.home, name='home'),
-    path('book-tour/<int:pYear>/<int:pMonth>/<str:tripType>', views.bookTour, name='book-tour'),
+    path('book-tour/<int:pYear>/<int:pMonth>/<str:trip_abc_name>', views.bookTour, name='book-tour'),
     path('book-tour', views.bookTour, name='book-tour'),
     
-    path('book_tour_today/<str:tripType>', views.bookTourToday, name='book_tour_today'),
+    path('book_tour_today/<str:trip_abc_name>', views.bookTourToday, name='book_tour_today'),
     path('book_tour_today', views.bookTourToday, name='book_tour_today'),
     
-    path('tour_details/<str:tripType>', views.tour_details, name='tour_details'),
+    path('tour_details/<str:trip_abc_name>', views.tour_details, name='tour_details'),
     path('tour_details', views.tour_details, name='tour_details'),
 
     

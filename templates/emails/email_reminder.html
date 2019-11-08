@@ -70,13 +70,9 @@
        <p>מידע נוסף</p>  
        <p>{{client.text}}</p>
       <hr>
-      {% if client.trip.trip_guide == 'YR' %}
-      <p>(**שם המדריכה  שלכם יעל רימון (מכותבת למייל</p>
-      <p>מספר הטלפון של יעל: 00447305317171</p>
-      {% else %}
-      <p>(**שם המדריכה  שלכם יעל גתי (מכותבת למייל</p>
-      <p>מספר הטלפון של יעל: 00447578560505</p>
-      {% endif %}
+      <p>(** שם המדריכה  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותבת למייל</p>
+      <p>מספר הטלפון של {{ client.trip.guide.first_name }} : {{ client.trip.guide.phone }} </p>
+      
       <hr>
       <p>      
       לעידכונים והודעות ניתן לשלוח מייל<br>     

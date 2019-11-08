@@ -18,8 +18,8 @@
           הסיורים
                 </a>
                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
-                   {% for title, trip_type in tour_titles %}
-                      <a class="dropdown-item" href="{% url  'tour:tour_details' %}/{{trip_type}} ">{{ title }}</a>
+                   {% for title, trip_abc_name in tour_titles %}
+                      <a class="dropdown-item" href="{% url  'tour:tour_details' %}/{{trip_abc_name}} ">{{ title }}</a>
 
                    {% endfor %}
                  </div>

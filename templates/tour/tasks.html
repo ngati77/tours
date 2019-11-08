@@ -35,8 +35,8 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
      <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{  entry.trip_time|date:'H:i'  }}</td>
-     <td>{{  entry.get_trip_guide_display }}</td>
-     <td>{{  entry.get_trip_type_display }}</td>
+     <td>{{  entry.guide.user_name }}</td>
+     <td>{{  entry.ourTour.trip_abc_name }}</td>
      <td>{{  entry.create_date|date:'d.m.Y' }}</td>
      <td><a href="{% url  'tour:tour_confirm' entry.id %}" class="btn btn-tour reg-btn"> אישור סיור</a></td>
      </tr>
@@ -75,8 +75,8 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
      <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{  entry.trip_time|date:'H:i' }}</td>
-     <td>{{  entry.get_trip_guide_display }}</td>
-     <td>{{  entry.get_trip_type_display }}</td>
+     <td>{{  entry.guide.user_name }}</td>
+     <td>{{  entry.ourTour.trip_abc_name }}</td>
      <td><a href="{% url  'tour:tour_complete' entry.id %}" class="btn btn-tour reg-btn"> סיום סיור</a></li>
      </tr>
     {% endfor %}
@@ -222,8 +222,8 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{ entry.id }}</a></td>
      <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{ entry.trip_time|date:'H:i'  }}</td>
-     <td>{{ entry.get_trip_guide_display }}</td>
-     <td>{{ entry.get_trip_type_display }}</td>
+     <td>{{  entry.guide.user_name }}</td>
+     <td>{{  entry.ourTour.trip_abc_name }}</td>
      <td>{{ entry.create_date|date:'d.m.Y' }}</td>
      </tr>
      </table>
