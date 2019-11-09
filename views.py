@@ -177,7 +177,6 @@ def send_succes_email(request,client):
                                                                   'NotFree':NotFree})
 
         emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-        #cc =['yael.gati@cambridgeinhebrew.com']
         emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
     except:
         print('Got an error... sending email...')
@@ -593,10 +592,7 @@ def tripView(request):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']
            # Get all infortamtion from form
-            month, year, check_guide, user_name, order, output  = form.get_data()
-           # contact = Contact(first_name=first_name, last_name = last_name, email = email, text = text)
-           # contact.save()
-            guide = get_object_or_404(OurTours, user_name=user_name)
+            month, year, check_guide, guide, order, output  = form.get_data()
 
             if (check_guide):
                 tripQuerey = Trip.objects.filter(
@@ -610,22 +606,7 @@ def tripView(request):
                          trip_date__month  = month,
                          trip_date__year   = year,
                         ).order_by(order)
-            # Scan all trips
-            # if (len(tripQuerey)>0):
-                # for trip in tripQuerey:
-                    # Create new entry in the report
-                    # reportEntry = ReportEntry(trip.get_trip_type_display(), trip.trip_date.strftime("%d.%m.%y"), trip.get_trip_guide_display())
-                    # Get all cilents from a trip hopefully more than one
-                    # reportEntry.trip_time = trip.trip_time.strftime("%H:%M")
-                    # reportEntry.trip_id   = trip.id
-                    # clientQuerey = trip.clients_set.all()
-                    # Scan all clients, in the futrue need to scan the invoice
-                    #for client in clientQuerey:
-                        
-                    #    reportEntry.total_people    += client.number_of_people
-                    #    reportEntry.total_children  += client.number_of_children
-                    
-                    # report.append(reportEntry)
+            
             # If requested view is html  
             if (output=='html'):
                 return render(request, 'tour/trip_view.html', {'title':'טיולים לחודש',
@@ -857,7 +838,6 @@ def tour_complete(request, pk):
             else:
                 try:
                     
-                    #cc =['yael.gati@cambridgeinhebrew.com']
                     emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=title, cc=[settings.EMAIL_YAEL])
                 except:
                     print('Got an error... sending email...')

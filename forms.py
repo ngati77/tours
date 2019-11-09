@@ -13,6 +13,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from datetime import date, datetime, time
 from captcha.fields import CaptchaField
+
+from .models import Guide
  
 FOUND_US = (
     ('a', 'גוגל'),
@@ -154,13 +156,15 @@ class ReportForm(forms.Form):
     month              = forms.ChoiceField(choices=MONTH)
     year               = forms.IntegerField(initial=2019)
     check_guide        = forms.BooleanField(required=False)
-    TRIP_GUIDE = (
-    ('PE', 'Pending'),
-    ('YR', 'YaelR'),
-    ('GS', 'Gui'),
-    ('YG', 'YaelG'),
-    )
-    guide = forms.ChoiceField(choices=TRIP_GUIDE)
+    #TRIP_GUIDE = (
+    #('PE', 'Pending'),
+    #('YR', 'YaelR'),
+    #('GS', 'Gui'),
+    #('YG', 'YaelG'),
+    #)
+    #guide = forms.ChoiceField(choices=TRIP_GUIDE)
+    guide = forms.ModelChoiceField(queryset=Guide.objects.all())
+
     ORDER = (
     ('trip_date', 'Date'),
     ('trip_guide', 'Guide'),
@@ -179,7 +183,6 @@ class ReportForm(forms.Form):
         guide           = self.cleaned_data['guide']
         order           = self.cleaned_data['order']
         output          = self.cleaned_data['output']
-    
         return month, year, check_guide, guide, order, output 
     
 

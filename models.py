@@ -15,22 +15,22 @@ TRIP_DAYS = (
     ('All', 'כל יום'), 
 )
 
-TRIP_GUIDE = (
-    ('PE', 'Pending'),
-    ('YR', 'YaelR'),
-    ('GS', 'Gui'),
-    ('YG', 'YaelG'),
-)
+#TRIP_GUIDE = (
+#    ('PE', 'Pending'),
+#    ('YR', 'YaelR'),
+#    ('GS', 'Gui'),
+#    ('YG', 'YaelG'),
+#)
 
-TRIP_TYPE = (
-        ('C', 'Classic'),
-        ('F', 'Family'),
-        ('W', 'Winter'),
-        ('B', 'Bus'),
-        ('P', 'Punting'),
-        ('A', 'All'),
-        ('E','Free'),
-        )
+#TRIP_TYPE = (
+#        ('C', 'Classic'),
+#        ('F', 'Family'),
+#        ('W', 'Winter'),
+#        ('B', 'Bus'),
+#        ('P', 'Punting'),
+#        ('A', 'All'),
+#        ('E','Free'),
+#        )
 #TRIP_TYPE_HEB = {'C': 'סיור קלאסי','F': 'סיור משפחות','B': 'אוטובוס מלונדון','P': 'סיור פרטי'} 
 
 STATUS_TRIP = (
@@ -95,11 +95,11 @@ class OurTours(models.Model):
     deposit            = models.IntegerField(default=0)
     img                = models.ImageField(blank = True, null = True, upload_to = 'Tours/%Y/%m/')
     confirm            = models.BooleanField(default=False)
-    trip_type          = models.CharField(
-                                        max_length=1,
-                                        choices=TRIP_TYPE,
-                                        default='C',
-                                        )
+    #trip_type          = models.CharField(
+    #                                    max_length=1,
+    #                                    choices=TRIP_TYPE,
+    #                                    default='C',
+    #                                    )
     trip_abc_name     = models.CharField(max_length=20,default='Classic')
 
     order              = models.IntegerField(default=0)
@@ -110,11 +110,11 @@ class OurTours(models.Model):
 class GuideVacation(models.Model):
     guide           = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
     ourTour         = models.ForeignKey(OurTours, on_delete=models.SET_NULL,  blank=True, null=True)
-    guide_vacation = models.CharField(
-        max_length=2,
-        choices=TRIP_GUIDE,
-        default='YR',
-    )
+    #guide_vacation = models.CharField(
+    #    max_length=2,
+    #    choices=TRIP_GUIDE,
+    #    default='YR',
+    #)
     vac_start_date    = models.DateField('First day guide on holiday',default=datetime.date.today) 
     vac_end_date      = models.DateField('Last day guide on holiday', default=datetime.date.today) 
     #vac_cancel_classy = models.BooleanField(default=False)
@@ -126,11 +126,11 @@ class TripAvailabilty(models.Model):
     
     ourTour         = models.ForeignKey(OurTours, on_delete=models.SET_NULL,  blank=True, null=True)
 
-    ava_trip_type   = models.CharField(
-        max_length=1,
-        choices=TRIP_TYPE,
-        default='C',
-    )
+    #ava_trip_type   = models.CharField(
+    #    choices=TRIP_TYPE,
+    ##    max_length=1,
+    #    default='C',
+    #)
     ava_select_day   = models.CharField(
         max_length=3,
         choices=TRIP_DAYS,
@@ -165,17 +165,17 @@ class Trip(models.Model):
     guide              = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
     ourTour            = models.ForeignKey(OurTours, on_delete=models.SET_NULL, blank=True, null=True)
     
-    trip_type   = models.CharField(
-        max_length=1,
-        choices=TRIP_TYPE,
-        default='C',
-    )
+    #trip_type   = models.CharField(
+    #    max_length=1,
+    #    choices=TRIP_TYPE,
+    #    default='C',
+    #)
     
-    trip_guide = models.CharField(
-        max_length=2,
-        choices=TRIP_GUIDE,
-        default='YR',
-    )
+    #trip_guide = models.CharField(
+    #    max_length=2,
+    #    choices=TRIP_GUIDE,
+    #    default='YR',
+    #)
     
     status = models.CharField(
             max_length=1, 
@@ -219,7 +219,7 @@ class Trip(models.Model):
         if (reportEntry.total_gross == 0):
             reportEntry.total_gross = self.total_payment
         # If Yael Gati is the guide for this tour. then we don't need to pay her!!!
-        if (self.trip_guide=='YG'):
+        if (self.guide.user_name == 'yaelg'):
             reportEntry.total_guide_exp = 0
             reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense
             reportEntry.guide_payback = 0

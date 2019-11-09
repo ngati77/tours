@@ -144,9 +144,7 @@ class TripAdmin(admin.ModelAdmin):
         
         ('Date information', {'fields': ['trip_date']}),
         (None,               {'fields': ['trip_time']}),
-        ('Details',          {'fields': ['trip_guide']}),
         ('Details',          {'fields': ['guide']}),
-        (None,               {'fields': ['trip_type']}),
         ('Details',          {'fields': ['ourTour']}),
         (None,               {'fields': ['status']}),
        
@@ -157,7 +155,7 @@ class TripAdmin(admin.ModelAdmin):
         
     ]
     inlines         = [ClientsInline]
-    list_display    = ('id','trip_type', 'trip_date', 'trip_time' ,'trip_guide' ,'status','create_date','total_payment','ourTour','guide')
+    list_display    = ('id','trip_date', 'trip_time'  ,'status','create_date','total_payment','ourTour','guide')
     list_filter     = ['trip_date']
     search_fields   = ['trip_text']
     actions         = ['track_trip']
@@ -165,16 +163,15 @@ class TripAdmin(admin.ModelAdmin):
 
 class TripAvailabiltyAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['ava_trip_type']}),
+        (None,               {'fields': ['ourTour']}),
         ('Date information', {'fields': ['ava_time']}),
         (None,               {'fields': ['ava_select_day']}),
         ('Date information', {'fields': ['ava_trip_start_day']}),
         ('Date information', {'fields': ['ava_trip_end_day']}),
-        (None,               {'fields': ['ourTour']}),
         
        
     ]
-    list_display    = ('ava_trip_type', 'ava_time','ava_select_day','ava_trip_start_day','ava_trip_end_day','ourTour')
+    list_display    = ('ourTour', 'ava_time','ava_select_day','ava_trip_start_day','ava_trip_end_day')
     list_filter     = ['ava_trip_start_day']
     search_fields   = ['ava_select_day']
 
@@ -189,9 +186,9 @@ class GuideVacationAdmin(admin.ModelAdmin):
         
        
     ]
-    list_display    = ('guide_vacation', 'vac_start_date','vac_end_date','vac_cancel_all','guide')
+    list_display    = ('guide', 'vac_start_date','vac_end_date','vac_cancel_all')
     list_filter     = ['vac_start_date']
-    search_fields   = ['guide_vacation']
+    search_fields   = ['guide']
     
 
 class ReviewAdmin(admin.ModelAdmin):
@@ -236,13 +233,12 @@ class OurTourAdmin(admin.ModelAdmin):
         (None,               {'fields': ['price']}),
         (None,               {'fields': ['priceChild']}),
         (None,               {'fields': ['deposit']}),
-        (None,               {'fields': ['trip_type']}),
         (None,               {'fields': ['trip_abc_name']}),      
         (None,               {'fields': ['img']}),
         (None,               {'fields': ['confirm']}),
         (None,               {'fields': ['order']}),
     ]
-    list_display    = ('title','price','trip_type','img','confirm','order','priceChild','deposit','trip_abc_name')
+    list_display    = ('title','price','img','confirm','order','priceChild','deposit','trip_abc_name')
 
 class GuideBackgroundInline(admin.TabularInline):
     model = Guide_Background

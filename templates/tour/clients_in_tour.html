@@ -37,8 +37,8 @@
      <td>{{ trip.id }}</td>
      <td>{{ trip.trip_date|date:'d.m.Y' }}</td>
      <td>{{ trip.trip_time|date:'H:i'  }}</td>
-     <td>{{ trip.trip_guide }}</td>
-     <td>{{ trip.trip_type }}</td>
+     <td>{{ trip.guide.user_name }}</td>
+     <td>{{ trip.ourTour.trip_abc_name }}</td>
      <td>{{ trip.create_date|date:'d.m.Y' }}</td>
      </tr>
      </table>
