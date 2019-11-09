@@ -291,7 +291,7 @@
     {% for entry in next_vacations %}
      <tr class="data">
      <td>{{ entry.id }}</td>
-     <td>{{ entry.get_guide_vacation_display }}</td>
+     <td>{{ entry.guide.user_name }}</td>
      <td>{{ entry.vac_start_date|date:'d.m.Y' }}</td>
      <td>{{ entry.vac_end_date|date:'d.m.Y' }}</td>
      
