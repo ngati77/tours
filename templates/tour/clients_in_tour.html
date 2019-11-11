@@ -32,9 +32,9 @@
       <td>נוצר בתאריך</td>
     </tr>
     
-   
      <tr class="data">
-     <td>{{ trip.id }}</td>
+     <td><a href="{% url 'admin:tours_trip_change' trip.id %}">{{ trip.id }}</a></td>
+
      <td>{{ trip.trip_date|date:'d.m.Y' }}</td>
      <td>{{ trip.trip_time|date:'H:i'  }}</td>
      <td>{{ trip.guide.user_name }}</td>
