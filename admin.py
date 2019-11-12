@@ -78,9 +78,7 @@ class ClientAdmin(admin.ModelAdmin):
             
     def send_email_again(self, request, emailTitle, client, emailType):
         trip = client.trip
-        #OurToursQuery = OurTours.objects.filter(trip_type=trip.trip_type)
-        ourTours = get_object_or_404(OurTours, trip_type=trip.trip_type)
-        NotFree = (ourTours.price != 0)
+        NotFree = (trip.ourTour.price != 0)
         #if len(OurToursQuery)!=1:
         #    print('Raise exception')
         #title = OurToursQuery[0].title
@@ -90,7 +88,7 @@ class ClientAdmin(admin.ModelAdmin):
         try:
             msg_html = render_to_string(emailType, {'trip_date':trip.trip_date, 
                                                                       'trip_time':trip.trip_time, 
-                                                                      'trip_type':ourTours.title, 
+                                                                      'trip_type':trip.ourTour.title, 
                                                                       'client':client, 
                                                                       'print_children':children, 
                                                                       'more_to_pay':more_to_pay,
