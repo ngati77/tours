@@ -76,36 +76,21 @@ table {
         <div class="card-header">
 <!--            <h3>Sales Report - {{ today | date:"d/m/Y" }}</h3>-->
       <h2>Cambridge In Hebrew monthly trip report</h2>
-      <h3>Date: {{ month }} {{ year }}</h3>
+      <h3>Date: 1-{{ start_month }}-{{ start_year }} to {{ end_day }}-{{ end_month }}-{{ end_year }} </h3>
         </div>
 
     {% for entry in report %}
       {% if entry.status != 'b' %}
-    <table>
-    <thead>
-    <tr class="title">
-      <td>סטטוס</td>
-      <td>נוצר בתאריך</td>
-      <td>סוג סיור</td>
-      <td>מדריך</td>
-       <td>שעה</td>
-       <td>תאריך סיור</td>
-       <td>מספר סיור</td>
-    </tr>
-    </thead>
+      <p> {{ entry.get_status_display }} סטטוס<br>
+      נוצר בתאריך {{ entry.create_date|date:'d.m.Y' }}<br>
+      {{ entry.ourTour }} סוג סיור <br>
+      {{ entry.guide }} מדריך <br>
+      {{ entry.trip_time|date:'H:i'  }} שעה<br>
+      {{ entry.trip_date|date:'d.m.Y' }} תאריך סיור<br>
+       מספר סיור {{ entry.id }}</p>
+   
+     
     
-     <tbody>
-     <tr class="data">
-     <td>{{ entry.get_status_display }}</td>
-     <td>{{ entry.create_date|date:'d.m.Y' }}</td>
-     <td>{{ entry.get_trip_type_display }}</td>
-     <td>{{ entry.get_trip_guide_display }}</td>
-     <td>{{ entry.trip_time|date:'H:i'  }}</td>
-     <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
-     <td>{{ entry.id }}</td>
-     </tr>
-      </tbody>
-     </table>
      <div class="row content"></div>
      
       <table>
@@ -129,7 +114,7 @@ table {
        {% if client.status == 'a' %}
           <tr class="data">
       
-     <td>{{ client.get_found_us_display }}</td>
+     <td>{{ client.foundUs.title }}</td>
      <td>{{ client.text }}</td>
      <td width="33">{{ client.total_payment }}</td>
       <td width="33">{{ client.pre_paid }}</td>

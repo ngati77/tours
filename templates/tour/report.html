@@ -24,53 +24,97 @@
                        </div>
        </form>
   
-   </div>
+     </div>
 {% if report %}
 
-    <ul class="title">
-      <li>trip id</li>
-      <li>תאריך</li>
-      <li>מדריך</li>
-      <li>סוג סיור</li>
-      <li>מבוגרים</li>
-      <li>ילדים</li>
-      <li>מקדמה</li>
-      <li>הכנסה</li>
-       <li>הוצאה מדריך</li>
-      <li>הוצאה נוספת</li>
-      <li>נטו</li>
-      {% if filter_check_guide %}
-      <li>סכום להעביר ליעל</li>
-       {% endif%}
-    </ul>
-    
-    {% for entry in report %}
-     <ul class="data">
-      <li><a href="{% url 'tour:clientview' entry.trip_id %}">{{  entry.trip_id }}</a></li>
-     <li>{{  entry.trip_date }}</li>
-     <li>{{  entry.trip_guide }}</li>
-     <li>{{  entry.trip_text }}</li>
-     <li>{{  entry.total_people }}</li>
-     <li>{{  entry.total_children }}</li>
-     <li>{{  entry.total_deposit }}</li>
-     <li>{{  entry.total_gross }}</li>
-     <li>{{  entry.total_guide_exp }}</li>
-     <li>{{  entry.other_expense }}</li>
-     <li>{{  entry.total_neto }}</li>
+  <!-- Client summery per found us -->
+  {% if found_us %}
+  <table>
+    <tr class="title">
+      <td>client id</td>
+      <td>שם פרטי</td>
+      <td>שם משפחה</td>
+      <td>ספר טלפון</td>
+      <td>דואר אלקטרוני</td>
+      <td>מבוגרים</td>
+      <td>ילדים</td>
+      <td>מקדמה</td>
+      <td>סה"כ</td>
+      <td>הודעה</td>
+      <td>מצא אותנו</td>
+      <td> עמלה</td>
+    </tr>
+    {% for rep in report %}
+    {% if rep.client.status == 'a' %}
+        <tr class="data">
+    {% else %}
+     <tr class="data_cancel">
+     {% endif %}
+ 
+   <td> <button class="collapsible" id="n{{ client.id }}">{{ rep.client.id }}</button></td>
+   <td>{{ rep.client.first_name }}</td>
+   <td>{{ rep.client.last_name }}</td>
+   <td>{{ rep.client.phone_number }}</td>
+   <td>{{ rep.client.email }}</td>
+   <td>{{ rep.client.number_of_people }}</td>
+   <td>{{ rep.client.number_of_children }}</td>
+   <td>{{ rep.client.pre_paid }}</td>
+   <td>{{ rep.client.total_payment }}</td>
+   <td>{{ rep.client.text }}</td>
+   <td>{{ rep.client.foundUs.title }}</td>
+   <td>{{ rep.comission }}</td>
+   </tr>
      
-    
-    {% if filter_check_guide %}
-   
-    <li>{{  entry.guide_payback }}</li>
-    {% endif %}
-     </ul>
-    {% endfor %}
-   
-{% else %}
-    <div class="row p-1 bg-dark text-white">
-    <p>סליחה אבל אין סיורים....</p>
-     </div>
-{% endif %}
- </div>
-{% endif %}
+   {% endfor%}
+  </table>
+
+
+
+  <!-- Trip summary -->
+  {% else %}
+      <ul class="title">
+        <li>trip id</li>
+        <li>תאריך</li>
+        <li>מדריך</li>
+        <li>סוג סיור</li>
+        <li>מבוגרים</li>
+        <li>ילדים</li>
+        <li>מקדמה</li>
+        <li>הכנסה</li>
+         <li>הוצאה מדריך</li>
+        <li>הוצאה נוספת</li>
+        <li>נטו</li>
+        {% if filter_check_guide %}
+        <li>סכום להעביר ליעל</li>
+         {% endif%}
+      </ul>
+
+      {% for entry in report %}
+        <ul class="data">
+        <li><a href="{% url 'tour:clientview' entry.trip_id %}">{{ entry.trip_id }}</a></li>
+        <li>{{  entry.trip_date }}</li>
+        <li>{{  entry.trip_guide }}</li>
+        <li>{{  entry.trip_text }}</li>
+        <li>{{  entry.total_people }}</li>
+        <li>{{  entry.total_children }}</li>
+        <li>{{  entry.total_deposit }}</li>
+        <li>{{  entry.total_gross }}</li>
+        <li>{{  entry.total_guide_exp }}</li>
+        <li>{{  entry.other_expense }}</li>
+        <li>{{  entry.total_neto }}</li>
+        
+        
+        {% if filter_check_guide %}
+          <li>{{  entry.guide_payback }}</li>
+        {% endif %}
+        </ul>
+      {% endfor %}
+    {% endif %}    
+  {% else %}
+      <div class="row p-1 bg-dark text-white">
+      <p>סליחה אבל אין סיורים....</p>
+       </div>
+  {% endif %}
+   </div>
+  {% endif %}
 {% endblock %}

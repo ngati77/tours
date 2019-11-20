@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Cambridge in Hebrew monthly report</title>
+    <title>Cambridge in Hebrew report</title>
     
    
     <style type="text/css">
@@ -85,66 +85,49 @@
     <div class="card">
         <div class="card-header">
 <!--            <h3>Sales Report - {{ today | date:"d/m/Y" }}</h3>-->
-      <h2>Cambridge In Hebrew monthly report</h2>
+      <h2>Cambridge In Hebrew report</h2>
       <h3>Date: 1-{{ start_month }}-{{ start_year }} to {{ end_day }}-{{ end_month }}-{{ end_year }} </h3>
         </div>
 
        
 
-        <table class="table">
+        <table>
             <thead>
-            <tr>
-                <th>Date</th>
-                <th>Guide</th>
-                <th>Tour</th>
-                <th>Adults</th>
-                <th>Child</th>
-                <th>Deposit</th>
-                <th>Income</th>
-                <th>Guide Exp</th>
-                <th>Other Exp</th>
-                <th>Neto</th>
-                 {% if filter_check_guide %}
-                <th>To Yael</th>
-                 {% endif%}
-            </tr>
+           <tr class="title">
+           <td> עמלה</td>
+           <td>מצא אותנו</td>
+           <td>הודעה</td>
+           <td width="33">סהכ</td>
+           <td width="33">שלם</td>
+           <td width="33">ילד</td>
+           <td width="33">מבגר</td>
+           <td>דואר אלקטרוני</td>
+           <td>מספר טלפון</td>
+           <td  width="120">שם משפחה</td>
+           <td  width="120">שם פרטי</td>
+           <td width="33">id</td>
+           </tr>
             </thead>
             <tbody>
-            {%  for entry in report %}
-                <tr>
-<!--                    <td>{{ sale.created_at | date:"d/m/Y" }}</td>  -->
-                    <td>{{  entry.trip_date }}</td>
-                    <td>{{  entry.trip_guide  }}</td>
-                    <td>{{ entry.trip_text }}</td>
-                    <td>{{ entry.total_people }}</td>
-                     <td>{{  entry.total_children }}</td>
-                    <td>{{  entry.total_deposit  }}</td>
-                    <td>{{ entry.total_gross }}</td>
-                    <td>{{ entry.total_guide_exp }}</td>
-                    <td>{{ entry.other_expense }}</td>
-                    <td>{{ entry.total_neto }}</td>
-                    {% if filter_check_guide %}
-                     <td>{{ entry.guide_payback }}</td>
-                     {% endif %}
-                </tr>
+            {% for rep in report %}
+                {% if rep.client.status == 'a' %}
+                    <tr class="data">
            
+                    <td>{{ rep.client.comission }}</td>
+                    <td>{{ rep.client.foundUs.title }}</td>
+                    <td>{{ rep.client.text }}</td>
+                    <td width="33">{{ rep.client.total_payment }}</td>
+                    <td width="33">{{ rep.client.pre_paid }}</td>
+                    <td width="33">{{ rep.client.number_of_children }}</td>
+                    <td width="33">{{ rep.client.number_of_people }}</td>
+                    <td >{{ rep.client.email }}</td>
+                    <td>{{ rep.client.phone_number }}</td>
+                    <td  width="120">{{ rep.client.last_name }}</td>
+                    <td  width="120">{{ rep.client.first_name }}</td>
+                    <td width="33">{{ rep.client.id }}</td>
+                    </tr>
+                {% endif %}
             {% endfor %}
-                <tr class="sum">
-<!--                    <td>{{ sale.created_at | date:"d/m/Y" }}</td>  -->
-                    <td>{{  sum.trip_date }}</td>
-                    <td>{{  sum.trip_guide  }}</td>
-                    <td>{{ sum.trip_text }}</td>
-                    <td>{{ sum.total_people }}</td>
-                     <td>{{  sum.total_children }}</td>
-                    <td>{{  sum.total_deposit  }}</td>
-                    <td>{{ sum.total_gross }}</td>
-                    <td>{{ sum.total_guide_exp }}</td>
-                    <td>{{ sum.other_expense }}</td>
-                    <td>{{ sum.total_neto }}</td>
-                    {% if filter_check_guide %}
-                     <td>{{ sum.guide_payback }}</td>
-                     {% endif %}
-                </tr>
             </tbody>
         </table>
     </div>

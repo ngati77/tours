@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Trip, Clients, TripAvailabilty, GuideVacation
+from .models import Trip, Clients, TripAvailabilty, GuideVacation, FoundUs
 from .models import Review, Gallery, OurTours, Guide, Guide_Background, Transaction
 from .models import Contact
 
@@ -41,6 +41,7 @@ class ClientAdmin(admin.ModelAdmin):
         (None,               {'fields': ['number_of_people']}),
         (None,               {'fields': ['number_of_children']}),
         (None,               {'fields': ['found_us']}),
+        (None,               {'fields': ['foundUs']}),
         
         ('Payments',         {'fields': ['pre_paid']}),
         (None,               {'fields': ['total_payment']}),
@@ -52,7 +53,7 @@ class ClientAdmin(admin.ModelAdmin):
         
     ]
     inlines         = [TransactionInline]
-    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','found_us','text','status','admin_comment')
+    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','found_us','foundUs','text','status','admin_comment')
     list_filter     = ['first_name']
     search_fields   = ['first_name','last_name']
     
@@ -107,7 +108,20 @@ class ClientAdmin(admin.ModelAdmin):
     send_cancelaion_trip_email.short_description    = "Cancel trip email"
     actions = [send_success_email, send_update_trip_email, send_cancelaion_trip_email]
     
+
+
+class FoundUsAdmin(admin.ModelAdmin):
+    fieldsets = [
+        
+        (None,            {'fields': ['title']}),
+        (None,            {'fields': ['precentage']}),
+        (None,            {'fields': ['old_letter']}),
     
+        
+    ]
+    list_display    = ('id','title','precentage', 'old_letter')
+
+
 class TransactionAdmin(admin.ModelAdmin):
    
     fieldsets = [
@@ -290,6 +304,7 @@ admin.site.register(Guide, GuideAdmin)
 admin.site.register(Clients, ClientAdmin)
 admin.site.register(Contact,ContactAdmin)
 admin.site.register(Transaction,TransactionAdmin)
+admin.site.register(FoundUs,FoundUsAdmin)
 
 
 

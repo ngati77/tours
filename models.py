@@ -15,24 +15,6 @@ TRIP_DAYS = (
     ('All', 'כל יום'), 
 )
 
-#TRIP_GUIDE = (
-#    ('PE', 'Pending'),
-#    ('YR', 'YaelR'),
-#    ('GS', 'Gui'),
-#    ('YG', 'YaelG'),
-#)
-
-#TRIP_TYPE = (
-#        ('C', 'Classic'),
-#        ('F', 'Family'),
-#        ('W', 'Winter'),
-#        ('B', 'Bus'),
-#        ('P', 'Punting'),
-#        ('A', 'All'),
-#        ('E','Free'),
-#        )
-#TRIP_TYPE_HEB = {'C': 'סיור קלאסי','F': 'סיור משפחות','B': 'אוטובוס מלונדון','P': 'סיור פרטי'} 
-
 STATUS_TRIP = (
     ('n', 'New'),
     ('a', 'Confirmed'),
@@ -64,10 +46,6 @@ class Guide_Background(models.Model):
     answer         = models.TextField(max_length=600)
     trip           = models.ForeignKey(Guide, on_delete=models.CASCADE)
     
-  
-        
-
-
 
 class Review(models.Model):
    
@@ -95,11 +73,7 @@ class OurTours(models.Model):
     deposit            = models.IntegerField(default=0)
     img                = models.ImageField(blank = True, null = True, upload_to = 'Tours/%Y/%m/')
     confirm            = models.BooleanField(default=False)
-    #trip_type          = models.CharField(
-    #                                    max_length=1,
-    #                                    choices=TRIP_TYPE,
-    #                                    default='C',
-    #                                    )
+
     trip_abc_name     = models.CharField(max_length=20,default='Classic')
 
     order              = models.IntegerField(default=0)
@@ -110,27 +84,15 @@ class OurTours(models.Model):
 class GuideVacation(models.Model):
     guide           = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
     ourTour         = models.ForeignKey(OurTours, on_delete=models.SET_NULL,  blank=True, null=True)
-    #guide_vacation = models.CharField(
-    #    max_length=2,
-    #    choices=TRIP_GUIDE,
-    #    default='YR',
-    #)
+    
     vac_start_date    = models.DateField('First day guide on holiday',default=datetime.date.today) 
     vac_end_date      = models.DateField('Last day guide on holiday', default=datetime.date.today) 
-    #vac_cancel_classy = models.BooleanField(default=False)
-    #vac_cancel_family = models.BooleanField(default=False)
     vac_cancel_all    = models.BooleanField(default=False)    
    
 
 class TripAvailabilty(models.Model):
     
     ourTour         = models.ForeignKey(OurTours, on_delete=models.SET_NULL,  blank=True, null=True)
-
-    #ava_trip_type   = models.CharField(
-    #    choices=TRIP_TYPE,
-    ##    max_length=1,
-    #    default='C',
-    #)
     ava_select_day   = models.CharField(
         max_length=3,
         choices=TRIP_DAYS,
@@ -142,15 +104,20 @@ class TripAvailabilty(models.Model):
     ava_trip_start_day  = models.DateField('Start day',blank=True, null=True)
     ava_trip_end_day  = models.DateField('End day',blank=True, null=True)
 
-                 
-   
     
 class Gallery(models.Model):
     img                = models.ImageField(blank = True, null = True, upload_to = 'Gallery/%Y/%m/')
     title              = models.CharField(max_length=200)
     text               = models.TextField(max_length=600)
     confirm            = models.BooleanField(default=True)
-    
+
+class FoundUs(models.Model):
+    title                   = models.CharField(max_length=200)
+    precentage              = models.IntegerField(default=0, blank=True, null=True)
+    old_letter              = models.CharField(max_length=200)   
+
+    def __str__(self):
+        return self.title 
 
 class Trip(models.Model):
     '''
@@ -164,18 +131,6 @@ class Trip(models.Model):
     
     guide              = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
     ourTour            = models.ForeignKey(OurTours, on_delete=models.SET_NULL, blank=True, null=True)
-    
-    #trip_type   = models.CharField(
-    #    max_length=1,
-    #    choices=TRIP_TYPE,
-    #    default='C',
-    #)
-    
-    #trip_guide = models.CharField(
-    #    max_length=2,
-    #    choices=TRIP_GUIDE,
-    #    default='YR',
-    #)
     
     status = models.CharField(
             max_length=1, 
@@ -297,7 +252,7 @@ class Clients(models.Model):
                                         choices=FOUND_US,
                                         default='f',
                                         )
-    
+    foundUs             = models.ForeignKey(FoundUs,    on_delete=models.SET_NULL, blank=True, null=True)
     text                = models.TextField(max_length=600, blank=True)
     admin_comment       = models.TextField(max_length=120, blank=True)
     
@@ -343,7 +298,14 @@ class Contact(models.Model):
     
     #create_date      = models.DateTimeField('date create')
 
-
+# This class is used in the report.html
+class ClientReportEntry: 
+    def __init__(self, client, precentage):
+        self.client   = client
+        self.comission   = client.total_payment * precentage / 100.0
+        
+    def __str__(self):
+        return (str(self.client.first_name) +'_'+ str(self.client.last_name)+'_'+ str(self.comission)) 
 # This class is used in the report.html
 class ReportEntry: 
     def __init__(self, trip_abc_name, trip_date, guide):
@@ -363,6 +325,9 @@ class ReportEntry:
         self.guide_payback   = 0
         self.total_neto      = 0
         
+    def __str__(self):
+        return (str(self.trip_id) +'_'+ str(self.total_people)+'_'+ str(self.total_neto)) 
+
     """
     Return report between range of guides and according to the guide
     """
@@ -607,13 +572,6 @@ class DayInCalendar:
                 self.attr = True
                 self.id   = dateInCalendar.strftime('%d_%m_%Y')
                 self.id   += "-"+ tripAvailabilty.ava_time.strftime('%H_%M')
-                
-            
-                
-                
-
-
-
     
     def __str__(self):
         return self.first_name
