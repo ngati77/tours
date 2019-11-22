@@ -16,15 +16,15 @@ from captcha.fields import CaptchaField
 
 from .models import Guide, FoundUs
  
-FOUND_US = (
-    ('a', 'גוגל'),
-    ('b', 'פייסבוק'),
-    ('c', 'שאל לונדוני'),
-    ('g', 'ארטנטיבי'),
-    ('d', 'כתבה'),
-    ('e', 'המלצה מחבר/ה'),
-    ('f', 'אחר'),
-)
+# FOUND_US = (
+#     ('a', 'גוגל'),
+#     ('b', 'פייסבוק'),
+#     ('c', 'שאל לונדוני'),
+#     ('g', 'ארטנטיבי'),
+#     ('d', 'כתבה'),
+#     ('e', 'המלצה מחבר/ה'),
+#     ('f', 'אחר'),
+# )
     
     
 class BookingForm(forms.Form):

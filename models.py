@@ -114,7 +114,6 @@ class Gallery(models.Model):
 class FoundUs(models.Model):
     title                   = models.CharField(max_length=200)
     precentage              = models.IntegerField(default=0, blank=True, null=True)
-    old_letter              = models.CharField(max_length=200)   
 
     def __str__(self):
         return self.title 
@@ -219,17 +218,17 @@ class Clients(models.Model):
     ('a', 'Confirmed'),
     ('b', 'Canceled'),
     ('c', 'Canceled and refund'),
-)
+    )
     
-    FOUND_US = (
-    ('a', 'גוגל'),
-    ('b', 'פייסבוק'),
-    ('c', 'שאל לונדוני'),
-    ('g', 'ארטנטיבי'),
-    ('d', 'כתבה'),
-    ('e', 'המלצה מחבר/ה'),
-    ('f', 'אחר'),
-)
+    # FOUND_US = (
+    # ('a', 'גוגל'),
+    # ('b', 'פייסבוק'),
+    # ('c', 'שאל לונדוני'),
+    # ('g', 'ארטנטיבי'),
+    # ('d', 'כתבה'),
+    # ('e', 'המלצה מחבר/ה'),
+    # ('f', 'אחר'),
+    # )
     trip             = models.ForeignKey(Trip, on_delete=models.CASCADE)
     first_name       = models.CharField(max_length=200)
     last_name        = models.CharField(max_length=200)
@@ -247,11 +246,11 @@ class Clients(models.Model):
                                         choices=STATUS_CLIENT,
                                         default='a',
                                         )
-    found_us             = models.CharField(
-                                        max_length=1,
-                                        choices=FOUND_US,
-                                        default='f',
-                                        )
+    # found_us             = models.CharField(
+    #                                     max_length=1,
+    #                                     choices=FOUND_US,
+    #                                     default='f',
+    #                                     )
     foundUs             = models.ForeignKey(FoundUs,    on_delete=models.SET_NULL, blank=True, null=True)
     text                = models.TextField(max_length=600, blank=True)
     admin_comment       = models.TextField(max_length=120, blank=True)
@@ -298,7 +297,7 @@ class Contact(models.Model):
     
     #create_date      = models.DateTimeField('date create')
 
-# This class is used in the report.html
+ # This class is used in the report.html
 class ClientReportEntry: 
     def __init__(self, client, precentage):
         self.client   = client
@@ -452,7 +451,6 @@ class DayInCalendar:
     
     def __init__(self, request, dateInCalendar, today, view):
         self.events=[]
-        hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
         
         self.year  = dateInCalendar.year
         self.month = dateInCalendar.month
@@ -468,9 +466,7 @@ class DayInCalendar:
         else:
            self.fill =    ""
         
-#        if (dateInCalendar.day==1):
-#            self.dayNumStr     =  str(dateInCalendar.day) + '    .....   ' + hebmonthdic[dateInCalendar.strftime("%b")]
-#        else:
+
         if self.year == 1977:
             self.dayNumStr     =  ""
         else:
@@ -483,7 +479,6 @@ class DayInCalendar:
         self.vac = False
         # Only gor Managment
         if (request.user.is_authenticated and view == 'All'):
-#        if (False):
             # If user then bring relevant data of:
             # Planned trips for user
             # Days off for user
@@ -501,25 +496,11 @@ class DayInCalendar:
             if len(guideVacationQuery)>0:
                 self.vac = True
             # Now print day off    
-#            for vac in guideVacationQuery:
-#                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small bg-info text-white"
-#                text  = 'Vaction ' + vac.guide_vacation
-#                link  = None  
-#                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=11, trip_type='C', trip_id =1))
             
-        
         elif (dateInCalendar > today):
             
-            # Check specific day in the week (Sun/Mon/Tue/...)
-            #availableDateQuery0     = TripAvailabilty.objects.filter(ava_select_day = dateInCalendar.strftime('%a'))
-            # Check for all days
-            #availableDateQuery1     = TripAvailabilty.objects.filter(ava_select_day    =   'All')
-            #availableDateQuery2     = TripAvailabilty.objects.filter(ava_trip_day__lte =   dateInCalendar)
-            #availableDateQuery      = availableDateQuery2 | availableDateQuery1 | availableDateQuery0
-            
             # Bring all relevant tours
-            availableDateQuery       = TripAvailabilty.objects.filter(ourTour__trip_abc_name = view)
-            #print("view: " + view)       
+            availableDateQuery       = TripAvailabilty.objects.filter(ourTour__trip_abc_name = view)     
             for tripAvailabilty in availableDateQuery:
                 # Check if on the day we have either all tours or the specific tour that we need
                 #if (tripAvailabilty.ourTour.trip_abc_name != view):

@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 
 # Create your models here.
+hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
 
 
 class MyAdminSite(AdminSite):
@@ -40,9 +41,7 @@ class ClientAdmin(admin.ModelAdmin):
         (None,               {'fields': ['email']}),
         (None,               {'fields': ['number_of_people']}),
         (None,               {'fields': ['number_of_children']}),
-        (None,               {'fields': ['found_us']}),
         (None,               {'fields': ['foundUs']}),
-        
         ('Payments',         {'fields': ['pre_paid']}),
         (None,               {'fields': ['total_payment']}),
         (None,               {'fields': ['text']}),
@@ -53,7 +52,7 @@ class ClientAdmin(admin.ModelAdmin):
         
     ]
     inlines         = [TransactionInline]
-    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','found_us','foundUs','text','status','admin_comment')
+    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','foundUs','text','status','admin_comment')
     list_filter     = ['first_name']
     search_fields   = ['first_name','last_name']
     
@@ -83,17 +82,17 @@ class ClientAdmin(admin.ModelAdmin):
         #if len(OurToursQuery)!=1:
         #    print('Raise exception')
         #title = OurToursQuery[0].title
-        msg_plain= 'DUMMY ONE'
-        children = (client.number_of_children > 0)
-        more_to_pay=(client.total_payment-client.pre_paid)
+        msg_plain   = 'DUMMY ONE'
+        children    = (client.number_of_children > 0)
+        more_to_pay =(client.total_payment-client.pre_paid)
+        dayHeb      = hebdict[client.trip.trip_date.strftime('%a')]
         try:
-            msg_html = render_to_string(emailType, {'trip_date':trip.trip_date, 
-                                                                      'trip_time':trip.trip_time, 
-                                                                      'trip_type':trip.ourTour.title, 
-                                                                      'client':client, 
-                                                                      'print_children':children, 
-                                                                      'more_to_pay':more_to_pay,
-                                                                      'NotFree':NotFree})
+            msg_html = render_to_string(emailType, {
+                                                  'client':client, 
+                                                  'print_children':children, 
+                                                  'more_to_pay':more_to_pay,
+                                                  'day_in_hebrew':dayHeb,
+                                                  'NotFree':NotFree})
             #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
             #emailTitle = "סיור בקיימברידג' - אישור הזמנה"
             #cc =['yael.gati@cambridgeinhebrew.com']
@@ -102,7 +101,7 @@ class ClientAdmin(admin.ModelAdmin):
             print('Got an error... sending email...')
 
         self.message_user(request, "%s successfully send email to ." % client.email)
-# 
+ 
     send_success_email.short_description        = "Resending confirmation email to a specific client"   
     send_update_trip_email.short_description    = "Update client details"   
     send_cancelaion_trip_email.short_description    = "Cancel trip email"
@@ -114,12 +113,10 @@ class FoundUsAdmin(admin.ModelAdmin):
     fieldsets = [
         
         (None,            {'fields': ['title']}),
-        (None,            {'fields': ['precentage']}),
-        (None,            {'fields': ['old_letter']}),
-    
+        (None,            {'fields': ['precentage']}),    
         
     ]
-    list_display    = ('id','title','precentage', 'old_letter')
+    list_display    = ('id','title','precentage')
 
 
 class TransactionAdmin(admin.ModelAdmin):

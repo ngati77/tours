@@ -16,9 +16,9 @@
       
       
       <p class="lead"><strong>שם: {{client.first_name}} {{client.last_name}}</strong></p>
-      <p class="lead">סוג הסיור: {{trip_type}}</p>
-      <p> בתאריך {{trip_date|date:'d.m.Y' }}</p>
-      <p>  בשעה {{trip_time|date:'H:i'  }}</p>
+      <p class="lead">סוג הסיור: {{client.trip.ourTour.title}}</p>
+      <p> בתאריך {{client.trip.trip_date|date:'d.m.Y' }}</p>
+      <p>  בשעה {{client.trip.trip_time|date:'H:i'  }}</p>
       
       <p>במידה ושילמתם מקדמה כספכם יוחזר לכם בזמן הקרוב</p>
      

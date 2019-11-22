@@ -11,7 +11,7 @@
             src: url("tours/static/tour/fonts/david.ttf");
         }
         @page {
-            size: A4;
+            size: A4 landscape;
             margin: 1cm;
         }
 
@@ -84,11 +84,15 @@
 <div class="container">
     <div class="card">
         <div class="card-header">
-<!--            <h3>Sales Report - {{ today | date:"d/m/Y" }}</h3>-->
-      <h2>Cambridge In Hebrew monthly report</h2>
-      <h3>Date: 1-{{ start_month }}-{{ start_year }} to {{ end_day }}-{{ end_month }}-{{ end_year }} </h3>
-        </div>
-
+                <h2>Cambridge In Hebrew report</h2>
+                <h3>Date: 1-{{ start_month }}-{{ start_year }} to {{ end_day }}-{{ end_month }}-{{ end_year }} </h3>
+                      <h3 style="text-align:left">Address:</h3> 
+                      <p style="text-align:left">27 Marshall Road</p>
+                      <p style="text-align:left">Cambridge, Cambrdigeshire</p>
+                      <p style="text-align:left">CB1 7TY</p>
+                      <h3 style="text-align:left">Phone:</h3>
+                      <p style="text-align:left">+447578560505</p>
+            </div>
        
 
         <table class="table">

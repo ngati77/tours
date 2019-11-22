@@ -13,10 +13,12 @@
         <h3><font color="blue"> תודה {{client.first_name}} שהזמנת איתנו סיור בקיימברידג'</font></h3>
           <h3><font color="blue">אפשר להתחיל להתרגש </font></h3>
           <hr>
-         <h3>ההרשמה ל{{trip_type}} הסתיימה בהצלחה</h3>
+         <h3>ההרשמה ל{{client.trip.ourTour.title}} הסתיימה בהצלחה</h3>
              <p>אישור הזמנה {{client.id}}</p>
           <hr>
           <p>נשמח לראותכם בתאריך {{client.trip.trip_date|date:'d.m.Y' }}</p>
+          <p> ביום {{day_in_hebrew }}</p>
+          <p> בתאריך {{client.trip.trip_date|date:'d.m.Y' }}</p>
           <p>בשעה {{client.trip.trip_time|date:'H:i' }}</p>
            {% if NotFree %}
           <div class="space">

@@ -11,7 +11,7 @@
             src: url("tours/static/tour/fonts/david.ttf");
         }
         @page {
-            size: A4;
+            size: A4 landscape;
             margin: 1cm;
         }
 
@@ -25,14 +25,20 @@
             max-width: 100%;
             margin-bottom: 5px;
             background-color: #fff;
+            text-align: center;
+
         }
         .table th,
-        .table td {
+        .table td, {
             padding: 5px;
             vertical-align: top;
             border-top: 1px solid #000;
             text-align: center;
+            vertical-align: bottom;
+            margin-bottom:3px;
+
         }
+       
         .table thead th {
             vertical-align: bottom;
             border-bottom: 2px solid #000;
@@ -57,25 +63,34 @@
             list-style: none;
             font-size: 1.1em;
         }
-         .card  h2{
+        .card-header {
+
+            text-align:left;
+
+        }
+        .card  h2{
             padding: 5px;
             vertical-align: top;
             text-align: center;
         }
-        .sum {
-            width: 100%;
-            max-width: 100%;
-            margin-bottom: 5px;
-            background-color: #fff;
-            padding: 5px;
-            vertical-align: top;
-            text-align: center;
-            vertical-align: bottom;
-            border-bottom: 2px solid #0000ff;
-            padding: 5px;
-            vertical-align: top;
+        .card  h3{
+         
+            text-align: left;
+        }
+       
+        .data{
+           padding-bottom:3px;
+           padding-top:3px;
+        }
+        .data_canceled {
+            color: red;
+        }
+        .sum{
+            border-bottom: 2px solid #0000ff;           
             border-top: 3px solid #0000ff;
-            text-align: center;
+        }
+        .title {
+          border-bottom: 2px solid #0000ff;
         }
     </style>
 </head>
@@ -83,51 +98,56 @@
 
 <div class="container">
     <div class="card">
-        <div class="card-header">
-<!--            <h3>Sales Report - {{ today | date:"d/m/Y" }}</h3>-->
-      <h2>Cambridge In Hebrew report</h2>
-      <h3>Date: 1-{{ start_month }}-{{ start_year }} to {{ end_day }}-{{ end_month }}-{{ end_year }} </h3>
-        </div>
-
-       
-
+            <div class="card-header">
+                    <h2>Cambridge In Hebrew report</h2>
+                    <h2>Report period: 1-{{ start_month }}-{{ start_year }} to {{ end_day }}-{{ end_month }}-{{ end_year }} </h2>
+                    Address:<b>27 Marshall Road, Cambridge<br>CB1 7TY</b><br>
+                    Phone:<b>+447578560505</b>
+                </div>
         <table>
             <thead>
-           <tr class="title">
-           <td> עמלה</td>
+           <tr class="data title">
+            <td>סטטוס</td>
+           <td>עמלה בפאונד</td>
            <td>מצא אותנו</td>
-           <td>הודעה</td>
-           <td width="33">סהכ</td>
-           <td width="33">שלם</td>
-           <td width="33">ילד</td>
-           <td width="33">מבגר</td>
-           <td>דואר אלקטרוני</td>
-           <td>מספר טלפון</td>
-           <td  width="120">שם משפחה</td>
-           <td  width="120">שם פרטי</td>
-           <td width="33">id</td>
+           <td>סה"כ בפאונד</td>
+           <td>שם משפחה</td>
+           <td>שם פרטי</td>
+           <td>מס לקוח</td>
            </tr>
             </thead>
             <tbody>
             {% for rep in report %}
+                <!-- If canceled print in red -->
                 {% if rep.client.status == 'a' %}
-                    <tr class="data">
-           
-                    <td>{{ rep.client.comission }}</td>
-                    <td>{{ rep.client.foundUs.title }}</td>
-                    <td>{{ rep.client.text }}</td>
-                    <td width="33">{{ rep.client.total_payment }}</td>
-                    <td width="33">{{ rep.client.pre_paid }}</td>
-                    <td width="33">{{ rep.client.number_of_children }}</td>
-                    <td width="33">{{ rep.client.number_of_people }}</td>
-                    <td >{{ rep.client.email }}</td>
-                    <td>{{ rep.client.phone_number }}</td>
-                    <td  width="120">{{ rep.client.last_name }}</td>
-                    <td  width="120">{{ rep.client.first_name }}</td>
-                    <td width="33">{{ rep.client.id }}</td>
-                    </tr>
+                    <tr class="data ">
+                    <td>בוצע</td>
+
+                {% else %}
+                    <!-- If canceled print in red -->
+                    <tr class="data data_canceled">
+                    <td>בוטל</td>
+
                 {% endif %}
+                    <td>{{ rep.comission }}</td>
+                    <td>{{ rep.client.foundUs.title }}</td>
+                    <td>{{ rep.client.total_payment }}</td>
+                    <td>{{ rep.client.last_name }}</td>
+                    <td>{{ rep.client.first_name }}</td>
+                    <td>{{ rep.client.id }}</td>
+                    </tr>
             {% endfor %}
+            <tr class="data sum">
+                <td>סיכום</td>
+
+                <td>{{ sum }}</td>
+                <td>סיכום</td>
+                <td>סיכום</td>
+                <td>סיכום</td>
+                <td>סיכום</td>
+                <td>סיכום</td>
+                </tr>
+
             </tbody>
         </table>
     </div>

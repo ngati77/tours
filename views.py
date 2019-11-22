@@ -53,15 +53,8 @@ logger = logging.getLogger(__name__)
 
 monthStr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul' , 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-trip_type_dic_rev = {
-        'Classic':'C',
-        'Family':'F',
-        'Winter':'W',
-        'Bus':'B',
-        'Punting':'P',
-        'All':'A',
-        'Free':'E',
-        }
+hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
+
 
 #hebdaydic   = {'Sun': 'ראשון','Mon': 'שני','Tue': 'שלישי','Wed': 'רביעי','Thu': 'חמישי','Fri': 'שישי','Sat': 'שבת'}
         
@@ -158,7 +151,7 @@ def create_new_trip_client(*args):
     trip = tripQuerySet[0]
     # Create new client           
     client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
-                     number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails, found_us = 'f' ,text = text, foundUs = foundUsPointer)
+                     number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails, text = text, foundUs = foundUsPointer)
 #            
     client.save()
     return client
@@ -170,11 +163,13 @@ def send_succes_email(request,client):
     msg_plain   = 'DUMMY ONE'
     children    = (client.number_of_children > 0)
     more_to_pay = (client.total_payment-client.pre_paid)
+    dayHeb      = hebdict[client.trip.trip_date.strftime('%a')]
     try:
-        msg_html = render_to_string('emails/email_success.html', {'trip_type':client.trip.ourTour.title, 
+        msg_html = render_to_string('emails/email_success.html', { 
                                                                   'client':client, 
                                                                   'print_children':children, 
                                                                   'more_to_pay':more_to_pay,
+                                                                  'day_in_hebrew':dayHeb,
                                                                   'NotFree':NotFree})
 
         emailTitle = "סיור בקיימברידג' - אישור הזמנה"
@@ -194,7 +189,7 @@ def send_succes_email(request,client):
                                                       'meta_key':  meta_key,
                                                       'client':    client,
                                                       'more_to_pay':more_to_pay, 
-                                                      'trip_type': client.trip.ourTour.title 
+                                                      'day_in_hebrew':dayHeb
                                                       })
             
 def payment(request):
@@ -217,7 +212,6 @@ def payment(request):
             return render(request, 'tour/failure.html', {'title':'failure', 'page_title':'failure'})
         
         # We made a payment, greaty lat's create trip and client
-        #trip_type_letter = trip_type_dic_rev[trip_type]
         client = create_new_trip_client(title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text)
                
         transaction = Transaction(client=client,
@@ -234,8 +228,6 @@ def payment(request):
 
 def tour_details(request, trip_abc_name='Classic'):
     
-    #trip_type_letter = trip_type_dic_rev[trip_abc_name]
-    #OurToursQuery = OurTours.objects.filter(trip_type=tripType)
     ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
 
     meta_des_heb = "סיורים בקיימברידג' אנגליה"
@@ -269,7 +261,6 @@ def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
             title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text  = form.get_data()
            
             # If it is  a free tour, no need to go to payment
-            #trip_type_letter = trip_type_dic_rev[trip_type]
             ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
             if (ourTours.price==0):
                 client = create_new_trip_client(title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text)
@@ -312,12 +303,8 @@ def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
            
     newCalendar= Calendar(request=request, year=pYear,  month=pMonth , view=trip_abc_name)
     # If this is a POST request then process the Form data
-    #TyprDict = {'F': 'הרשמה לסיור משפחות', 'C': 'הרשמה לסיור קלאסי', 'B': 'הרשמה לאוטובוס'}
-    # Britng the trip name in hebrew from db
-    #trip_type_letter = trip_type_dic_rev[tripType]
+    # Bring the trip name in hebrew from db
     TripTypeQuery = OurTours.objects.filter(trip_abc_name=trip_abc_name)
-   
-   
     
     if (len(TripTypeQuery)>0):
         ourTours    = TripTypeQuery[0]
@@ -511,12 +498,15 @@ def reportView(request):
             # They give different report as 'found us' is per client.... while the guide is per trip
             # Check if need a specific guide
             # If we need a specific guide and it is not this one...
-            
+            sum_commision = 0
             if (foundUs != None):
                 for trip in tripQuerey: 
                     for client in trip.clients_set.all():
                         if client.foundUs == foundUs:
                             report.append(ClientReportEntry(client,foundUs.precentage))
+                            # If the client didn't cancel then we add it to the final sum
+                            if (report[-1].client.status == 'a'):
+                                sum_commision += report[-1].comission
             
             else:
                 reportsum = ReportEntry("sum", "sum", "sum")
@@ -552,15 +542,23 @@ def reportView(request):
             else:
                 firstDayOfNextMonth = datetime.date(end_year, int(end_month) +1, 1);
             lastDayInMonth = firstDayOfNextMonth - datetime.timedelta(days=1)
+            if (foundUs == None):
+                report_pdf=  report[:-1]
+                sum_pdf   =   report[-1]
+            else:
+                report_pdf=  report
+                sum_pdf   =  sum_commision
+
             params = {
-                'report': report,
+                'report': report_pdf,
+                'sum':   sum_pdf,
                 'filter_check_guide'    : check_guide,
                 'start_month'           : monthStr[int(start_month)-1],
                 'end_month'             : monthStr[int(end_month)-1],
                 'start_year'            : start_year,
                 'end_year'              : end_year,
                 'end_day'               : lastDayInMonth.day,
-                'request': request
+                'request'               : request
             }
             # Check if need to send the pdf    
             if (output=='send_pdf'):
@@ -571,8 +569,10 @@ def reportView(request):
                     file = Render.render_to_file('pdf/found_us.html', file_name, params)
                 tour_emails.send_email_pdf(to=['noam.gati@gmail.com'],file=file, file_name=file_name)
                 
-            
-            return Render.render('pdf/report.html', params)    
+            if (foundUs == None):
+                return Render.render('pdf/report.html', params)    
+            else:    
+                return Render.render('pdf/found_us.html', params)    
     else:
         today   = datetime.date.today()
         form    = ReportForm(initial={'start_year' : today.year, 'start_month' : today.month, 'end_year' : today.year, 'end_month' : today.month})
@@ -603,7 +603,7 @@ def tripView(request):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             # Get all infortamtion from form
             #month, year, check_guide, guide, order, output  = form.get_data()
-            start_month, end_month, start_year, end_year, guide, found_us,order, output= form.get_data()
+            start_month, end_month, start_year, end_year, guide, foundUs, order, output= form.get_data()
                     
             tripQuerey = Trip.objects.filter(
                 trip_date__month__gte  = start_month,

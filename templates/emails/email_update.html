@@ -15,9 +15,10 @@
       
       <p>{{client.admin_comment}}</p>
        <p class="lead"><strong>שם: {{client.first_name}} {{client.last_name}}</strong></p>
-      <p class="lead">סוג הסיור: {{trip_type}}</p>
-      <p> נשמח לראותכם בתאריך {{trip_date|date:'d.m.Y' }}</p>
-      <p>  בשעה {{trip_time|date:'H:i'  }}</p>
+      <p class="lead">סוג הסיור: {{client.trip.ourTour.title}}</p>
+      <p> נשמח לראותכם ביום {{day_in_hebrew }}</p>
+      <p> בתאריך {{client.trip.trip_date|date:'d.m.Y' }}</p>
+      <p>  בשעה {{client.trip.trip_time|date:'H:i'  }}</p>
       
       <p>מספר מטיילים: {{client.number_of_people}}</p>
        {% if print_children %}
