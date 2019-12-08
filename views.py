@@ -231,7 +231,7 @@ def tour_details(request, trip_abc_name='Classic'):
     ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
 
     meta_des_heb = "סיורים בקיימברידג' אנגליה"
-    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
+    meta_des_en  = "סיורים בעברית בקיימברידג'- סיור מחוץ ללונדון"
     meta_des = meta_des_heb + meta_des_en
     meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
     meta_key_en  = " cambridge college old market"
