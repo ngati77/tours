@@ -466,6 +466,10 @@ class DayInCalendar:
         self.attr = False
         self.vac = False
         # Only gor Managment
+        today_full      = datetime.datetime.now()
+        
+
+
         if (request.user.is_authenticated and view == 'All'):
             # If user then bring relevant data of:
             # Planned trips for user
@@ -484,16 +488,14 @@ class DayInCalendar:
             if len(guideVacationQuery)>0:
                 self.vac = True
             # Now print day off    
-            
+
         elif (dateInCalendar > today):
-            
+            # After 16:00 allow book a trip to the next day, if there is already one. Build the date here
+            days_add = 1 if today_full.hour > 14 else 0
+            today_check = today + datetime.timedelta(days=days_add)
             # Bring all relevant tours
             availableDateQuery       = TripAvailabilty.objects.filter(ourTour__trip_abc_name = view)     
             for tripAvailabilty in availableDateQuery:
-                # Check if on the day we have either all tours or the specific tour that we need
-                #if (tripAvailabilty.ourTour.trip_abc_name != view):
-                #    #print("Skip this tour")
-                #    continue
 
                 # Check if start day is bigger than the day in the calendar
                 if (tripAvailabilty.ava_trip_start_day != None and tripAvailabilty.ava_trip_start_day > dateInCalendar ):
@@ -508,16 +510,16 @@ class DayInCalendar:
                 canceled = False
                 
 
+                # Guide on holiday there is no tour on this day
                 for vac in guideVacationQuery:                     
                     if ((vac.vac_cancel_all) or (vac.ourTour != None and vac.ourTour.trip_abc_name == view)):
                         canceled = True
                         break
-                # Guide on holiday there is no tour on this day
                 if (canceled):
                     #print("Skip this tour no guides")
                     continue
                     
-                # Check if their is already a different trip on this day, we don't want two trips on the same day
+                # Check if there is already a different trip on this day, we don't want two trips on the same day
                 tripQuery = Trip.objects.filter(trip_date__year  = dateInCalendar.year,
                                                 trip_date__month = dateInCalendar.month,
                                                 trip_date__day   = dateInCalendar.day,
@@ -526,13 +528,21 @@ class DayInCalendar:
                                                 trip_time__second  = tripAvailabilty.ava_time.second
                                                 
                                                 )
-                # We found a trip let's check if it is a different one.
+                # Set the default value, if looking on tommorow allow only if it before 16:00, or there is a trip exit
+                canceled = True if dateInCalendar == today_check else False
+
                 for trip in tripQuery:
-                    #print("trip type: "+ trip.get_trip_type_display())
-                    #print("view2 : "+ view)
+
+                    # We found a trip let's check if it is a different one.
                     if (trip.status  != 'b' and trip.ourTour.trip_abc_name != view):
                         canceled = True
                         break
+                    
+                    # If it is after 16:00 - if trip exist then allow to book it
+                    if (trip.status  != 'b' and trip.ourTour.trip_abc_name == view):
+                        canceled = False
+                        break
+
                 if (canceled):
                     continue
                     
