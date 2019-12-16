@@ -49,7 +49,7 @@
 -->
 <a name="calendar"></a>
 <p><font color="blue"><strong>בחר/י את היום המתאים בלוח השנה </strong></font> </p>
-<a href="{% url  'tour:contact'  %}">אם ברצונך לטייל בגפך, אנא צור קשר כדי לוודא שמתקיים סיור ביום המבוקש</a>
+<!--<a href="{% url  'tour:contact'  %}">אם ברצונך לטייל בגפך, אנא צור קשר כדי לוודא שמתקיים סיור ביום המבוקש</a>-->
 <div class="month">      
   <ul>
     <li><a class="prev" href="{% url  'tour:book-tour'  newCalendar.nextMonthYear  newCalendar.nextMonth newCalendar.view %}#calendar">&#10095;</a></li>
@@ -89,7 +89,8 @@
 
 
    <p class="timetime" id="date"> תאריך:   </p>
-   <p class="timetime" id="time"> שעה:     </p>          
+   <p class="timetime" id="time"> שעה:     </p>  
+   <p class="min_adults" id="min_adults">     </p>         
             <form action="{% url 'tour:book-tour' %}" method="post" >
                     {% csrf_token %}
                      
@@ -204,6 +205,14 @@
             
             document.getElementById("date").innerHTML = "תאריך: " + res[0].replace(/_/g,".");
             document.getElementById("time").innerHTML = "שעה: " + res[1].replace(/_/g,":");
+            if (res[2]=='2'){
+              document.getElementById("min_adults").innerHTML = "שימו לב - מספר מטיילים מינימלי ליום זה הוא : 2";
+            }
+            else{
+              document.getElementById("min_adults").innerHTML = "";
+
+
+            }
             
             
             var date = res[0].split("_");

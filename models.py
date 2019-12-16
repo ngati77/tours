@@ -443,6 +443,7 @@ class DayInCalendar:
         self.year  = dateInCalendar.year
         self.month = dateInCalendar.month
         self.day   = dateInCalendar.day 
+        min_adults = '2'
         
         # If client then bring the relevant day of avliable tours
         # Remove days were guide is on vacation and tour isn't possible
@@ -534,12 +535,13 @@ class DayInCalendar:
                 for trip in tripQuery:
 
                     # We found a trip let's check if it is a different one.
-                    if (trip.status  != 'b' and trip.ourTour.trip_abc_name != view):
+                    if (trip.get_status_display  != 'Canceled' and trip.ourTour.trip_abc_name != view):
                         canceled = True
                         break
                     
                     # If it is after 16:00 - if trip exist then allow to book it
-                    if (trip.status  != 'b' and trip.ourTour.trip_abc_name == view):
+                    if (trip.get_status_display  != 'Canceled' and trip.ourTour.trip_abc_name == view):
+                        min_adults = '1'
                         canceled = False
                         break
 
@@ -551,6 +553,7 @@ class DayInCalendar:
                 self.attr = True
                 self.id   = dateInCalendar.strftime('%d_%m_%Y')
                 self.id   += "-"+ tripAvailabilty.ava_time.strftime('%H_%M')
+                self.id   += "-"+ min_adults
     
     def __str__(self):
         return self.first_name
