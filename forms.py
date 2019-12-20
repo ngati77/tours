@@ -15,18 +15,7 @@ from datetime import date, datetime, time
 from captcha.fields import CaptchaField
 
 from .models import Guide, FoundUs
- 
-# FOUND_US = (
-#     ('a', 'גוגל'),
-#     ('b', 'פייסבוק'),
-#     ('c', 'שאל לונדוני'),
-#     ('g', 'ארטנטיבי'),
-#     ('d', 'כתבה'),
-#     ('e', 'המלצה מחבר/ה'),
-#     ('f', 'אחר'),
-# )
-    
-    
+       
 class BookingForm(forms.Form):
     title          = forms.CharField(widget = forms.HiddenInput())
     trip_date      = forms.CharField(widget = forms.HiddenInput())

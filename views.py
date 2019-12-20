@@ -514,7 +514,8 @@ def reportView(request):
                 check_guide = (guide != None)
 
                 for trip in tripQuerey:
-                    if (check_guide == False or trip.guide==guide):
+                    if ((check_guide == False or trip.guide==guide) and trip.get_status_display()=='Completed'):
+
                     # Gather the sum here
                         reportEntry = trip.get_trip_sum()
                         reportsum   += reportEntry
@@ -781,7 +782,7 @@ def tour_complete(request, pk):
     #tours_query =  Trip.objects.filter(id  = pk)
     #if (len(tours_query)>0):
     #    trip = tours_query[0]
-    if trip.status == 'a':
+    if trip.get_status_display() == 'Confirmed':
         # First thing to avoid races -  Change trip status to complete    
         trip.status = 'e'
         trip.save()
