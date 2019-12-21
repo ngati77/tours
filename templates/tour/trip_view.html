@@ -45,7 +45,7 @@
     
    
      <tr class="data">
-     <td>{{ entry.id }}</td>
+     <td><a href="{% url 'admin:tours_trip_change' entry.id %}">{{ entry.id }}</a></td>
      <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{ entry.trip_time|date:'H:i'  }}</td>
      <td>{{ entry.guide.user_name }}</td>
@@ -69,14 +69,14 @@
      <td>הודעה</td>
      <td>מצא אותנו</td>
       </tr>
-      {% if client.status == 'a' %}
+      {% if client.get_status_display == 'Confirmed' %}
           <tr class="data">
       {% else %}
        <tr class="data_cancel">
        {% endif %}
    
      <td> <button class="collapsible" id="n{{ client.id }}">{{ client.id }}</button></td>
-     <td>{{ client.first_name }}</td>
+     <td><a href="{% url 'admin:tours_clients_change' client.id %}">{{ client.first_name }}</a></td>
      <td>{{ client.last_name }}</td>
      <td>{{ client.phone_number }}</td>
      <td>{{ client.email }}</td>
