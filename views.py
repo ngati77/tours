@@ -538,7 +538,7 @@ def reportView(request):
             
             # The view is pdf, therefore Create param dictionary for the pdf
             #print(list(hebmonthdic.keys())[int(month)-1])
-            if (end_month == 12):
+            if (int(end_month) == 12):
                 firstDayOfNextMonth = datetime.date(int(end_year)+1, 1, 1);
             else:
                 firstDayOfNextMonth = datetime.date(end_year, int(end_month) +1, 1);
