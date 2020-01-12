@@ -37,26 +37,18 @@
              <li class="nav-item">
                 <a class="nav-link" href="{% url  'tour:contact'  %}">צור קשר</a>
             </li>
-               <li  class="nav-item dropdown">
+            <li  class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          מידע נוסף
+                    מידע נוסף
                 </a>
-                 <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
-                   <a class="dropdown-item" href="{% url  'tour:privacy' %}">מדיניות פרטיות</a>
-                 </div>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right">
+                    <a class="dropdown-item" href="{% url  'tour:privacy' %}">מדיניות פרטיות</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url  'blog:post_list'  %}">בלוג טיולים</a>
             </li>
             {% if request.user.is_authenticated %}
-            
-          <!---  <li class="nav-item"> --->
-          <!---       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> --->
-        <!---  Guide --->
-        <!---        </a> --->
-        <!---          <div class="dropdown-menu" aria-labelledby="navbarDropdown" text-align="right"> --->
-                <!-- <a class="nav-link" href="{% url  'tour:trip_view'  %}">הטיולים הבאים</a> -->
-              <!--   <a class="dropdown-item" href="{% url  'tour:book_tour_today' %}/A ">לוח שנה</a>-->
-              <!--    <a class="dropdown-item" href="{% url  'logout' %}">logout</a> -->
-        <!---         </div> --->
-       <!---     </li> --->
            
             {% endif %}
            
