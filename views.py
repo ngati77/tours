@@ -851,28 +851,24 @@ def tour_complete(request, pk):
                     'request'  : request
                 }
                 # Check if need to send the pdf    
-                try:
-                    file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
-                    file = Render.render_to_file('pdf/client.html', file_name, params)
-                except:
-                    print("Can't create pdf")
-                try:
+                file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
+                file = Render.render_to_file('pdf/client.html', file_name, params)
+
+
                 
-                    tour_emails.send_email_msg_pdf( to=[client.email],
-                                                   msg_html=msg_html, 
-                                                   msg_plain=msg_plain, 
-                                                   file=file, 
-                                                   file_name=file_name, 
-                                                   cc=[settings.EMAIL_YAEL], 
-                                                   title=title)
-                except:
-                    print("Can't send email")
+                tour_emails.send_email_msg_pdf( to=[client.email, settings.EMAIL_GMAIL_YAEL],
+                                                msg_html=msg_html, 
+                                                msg_plain=msg_plain, 
+                                                file=file, 
+                                                file_name=file_name, 
+                                                cc=[], 
+                                                title=title)
+
             else:
-                try:
+                
                     
-                    emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=title, cc=[settings.EMAIL_YAEL])
-                except:
-                    print('Got an error... sending email...')
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email, settings.EMAIL_GMAIL_YAEL], title=title, cc=[])
+
         
     
     # Bring back the tasks        
@@ -888,7 +884,7 @@ def contact_not_spam(request, pk):
         msg_html = render_to_string('emails/email_contact.html', {'first_name':contact.first_name,'last_name':contact.last_name, 'email':contact.email, 'id': contact.id, 'text':contact.text})
         msg_plain = str(contact.id) + "תודה שיצרתם קשר "
         emailTitle = "סיור בקיימברידג' - צור קשר"
-        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[contact.email], title=emailTitle, cc=settings.EMAIL_GMAIL_YAEL)
+        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[contact.email,settings.EMAIL_GMAIL_YAEL], title=emailTitle, cc=[])
     except:
         print('Got an error...')
         # Save contact here
