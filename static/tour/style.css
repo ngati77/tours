@@ -51,6 +51,9 @@ html, body {
 .space{
     margin-top: .3rem;
     margin-bottom: .3rem;
+    margin-right: 3rem;
+    padding-right: 3rem;
+    margin-left: .5rem;
 }
 .navbar-en-line{
     height: 30%;

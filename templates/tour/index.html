@@ -127,64 +127,63 @@
           </div>
            <hr class="short">
                  
+           <!--- Our tours row -->
            <div class="display-4">הסיורים שלנו</div>
-                    
-          
-<!--- Our tours row -->
-
-            {% for card in ourTours %}
-                <div class="row ">
-                    <div class="col-sm-4 ">
-                         <h4 class="card-title">{{card.title}}</h4>
-                         <img class="card-img-top" src="{{card.img.url}}">
-                    </div>
-                    <div class="col-sm-6 ">
-                        <div class="card-body">
-                            <p><b>{{card.headerShort1 |linebreaks }}</b></p>
-                            <p>{{card.descriptionShort1 |linebreaks }}</p>
-                            <p><u>למי הסיור מתאים?</u></p>
-                            <p>{{card.whoCanDoIt}}</p>
-                        </div>
-                    </div>
-                    <div class="col-xs-4 col-sm-1 align-self-end ">
-                    <a href="{% url  'tour:tour_details' card.trip_abc_name %}" class="btn btn-tour reg-btn"> לפרטים והרשמה</a>
+           {% for card in ourTours %}
+           <div class="row ">
+               <div class="col-sm-4 ">
+                   <h4 class="card-title">{{card.title}}</h4>
+                   <img class="card-img-top" src="{{card.img.url}}">
+                </div>
+                <div class="col-sm-6 ">
+                    <div class="card-body">
+                        <p><b>{{card.headerShort1 |linebreaks }}</b></p>
+                        <p>{{card.descriptionShort1 |linebreaks }}</p>
+                        <p><u>למי הסיור מתאים?</u></p>
+                        <p>{{card.whoCanDoIt}}</p>
                     </div>
                 </div>
+                <div class="col-xs-4 col-sm-1 align-self-end ">
+                    <a href="{% url  'tour:tour_details' card.trip_abc_name %}" class="btn btn-tour reg-btn"> לפרטים והרשמה</a>
+                </div>
+            </div>
             {% endfor %}
             
             <div class="row">
-             <hr class="light">
-             </div>
-            <div class="row  d-flex justify-content-center">
-            
-            <video width="80%" controls>
-            <source src="{% static 'tour/videos/cambridge_in_hebrew_in_a_brief.mp4' type='video/mp4' %}">
-            Your browser does not support the video tag.
-            </video>
+                <hr class="light">
             </div>
-            
-
+            <div class="row  d-flex justify-content-center">
+                
+                <video width="80%" controls>
+                    <source src="{% static 'tour/videos/cambridge_in_hebrew_in_a_brief.mp4' type='video/mp4' %}">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+            </div><!-- col-sm-12 col-md-12 col-lg-8 order-0 order-lg-1 -->
+        </div><!-- jumbotron row  text-center .d-none .d-sm-block -->
+        
+        <!--- Posts-->
+        <div class=" row d-flex justify-content-center text-right">
             <div class="row">
                 <hr class="light">
             </div>
-            <div class="row d-flex justify-content-center nav_blog_index">
-                <div class="row title2">
-                    מתוך בלוג הטיולים שלנו
-                </div>
+            <div class="blog_name">
+                <h2> מתוך בלוג הטיולים שלנו</h2>
+            </div>
+        </div><!--  row d-flex justify-content-center order-2 -->
+        <div class=" row d-flex justify-content-center text-right">
                 <div class="row space">
-                </div>
-                <div class="row space">
-
                     {% for post in latest_posts %}
-                        <div class="col-sm-12 col-md-6 col-lg-4">
-                             <a href="{% url  'blog:post_detail' pk=post.pk %}"><img class="card-img-post" src="{{post.image.url}}">{{post.title |linebreaks }}</a>
-                        </div>
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <a href="{% url  'blog:post_detail' pk=post.pk %}"><img class="card-img-post" src="{{post.image.url}}">{{post.title |linebreaks }}</a>
+                    </div>
                     {% endfor %}
-            </div>
-            </div>
+                </div>
+                
+            </div><!--  row d-flex justify-content-center order-2 -->
             
 <!--- Close previous div -->
-        </div><!-- jumbotron row  text-center .d-none .d-sm-block -->
     </div><!-- container-fluid -->
 <!--- Welcome Section -->
 
