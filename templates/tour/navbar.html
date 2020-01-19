@@ -46,11 +46,8 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url  'blog:post_list'  %}">בלוג</a>
+                <a class="nav-link nav-index-blog" href="{% url  'blog:post_list'  %}">בלוג</a>
             </li>
-            {% if request.user.is_authenticated %}
-           
-            {% endif %}
            
             {% if request.user.is_superuser %}
             <li class="nav-item">

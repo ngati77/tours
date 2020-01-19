@@ -48,6 +48,10 @@ html, body {
     text-align:right;
     margin-right: .6rem;
 }
+.space{
+    margin-top: .3rem;
+    margin-bottom: .3rem;
+}
 .navbar-en-line{
     height: 30%;
     width:   40%;
@@ -372,7 +376,11 @@ hr.short{
 
 }
 
-
+.card-img-post{
+    width:70%;
+    border-radius:8%;
+    text-align:right;
+}
 
 .tips p{
    font-size:16px;
@@ -449,7 +457,10 @@ hr.light-100 {
 
 }
 
-
+.nav-index-blog{
+    color: #124789!important;
+    
+}
 
 /*---Media Queries --*/
 @media (max-width: 992px) {
