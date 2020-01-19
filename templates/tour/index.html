@@ -168,26 +168,19 @@
                 <hr class="light">
             </div>
             <div class="row d-flex justify-content-center nav_blog_index">
-                <div class="title2">
+                <div class="row title2">
                     מתוך בלוג הטיולים שלנו
                 </div>
-                <ul class="nav  flex-column flex-nowrap">
+                <div class="row space">
+                </div>
+                <div class="row space">
+
                     {% for post in latest_posts %}
-                    <div class="row space">
-                        <div class="col-sm-4">
-                             <img class="card-img-post" src="{{post.image.url}}">
+                        <div class="col-sm-12 col-md-6 col-lg-4">
+                             <a href="{% url  'blog:post_detail' pk=post.pk %}"><img class="card-img-post" src="{{post.image.url}}">{{post.title |linebreaks }}</a>
                         </div>
-                        <div class="col-sm-6 ">
-                            <div class="card-body">
-                                <p><b>{{post.title |linebreaks }}</b></p>
-                            </div>
-                        </div>
-                        <div class="col-xs-4 col-sm-1 align-self-end ">
-                        <a href="{% url  'blog:post_detail' pk=post.pk %}" class="btn btn-tour reg-btn"> להמשך קריאה</a>
-                        </div>
-                    </div>
                     {% endfor %}
-                </ul>
+            </div>
             </div>
             
 <!--- Close previous div -->

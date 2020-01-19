@@ -377,9 +377,8 @@ hr.short{
 }
 
 .card-img-post{
-    width:70%;
-    border-radius:8%;
-    text-align:right;
+    width:60%;
+    border-radius:2%;
 }
 
 .tips p{
@@ -459,6 +458,7 @@ hr.light-100 {
 
 .nav-index-blog{
     color: #124789!important;
+    font-weight: bold;
     
 }
 
