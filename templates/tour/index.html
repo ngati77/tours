@@ -179,8 +179,9 @@
                 <div class="row space">
                     {% for post in latest_posts %}
                     <div class="col-sm-12 col-md-6 col-lg-4">
-                        <a href="{% url  'blog:post_detail' pk=post.pk %}"><img class="card-img-post" src="{{post.image.url}}">{{post.title |linebreaks }}</a>
-                        {{post.title |linebreaks }}
+                        <a href="{% url  'blog:post_detail' pk=post.pk %}">{{post.title |linebreaks }}</a>
+                        <a href="{% url  'blog:post_detail' pk=post.pk %}"><img class="card-img-post" src="{{post.image.url}}"></a>
+                        {{post.text |linebreaks }}
                     </div>
                     {% endfor %}
                 </div>
