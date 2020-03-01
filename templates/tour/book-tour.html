@@ -1,6 +1,12 @@
 {% extends 'tour/base.html' %}
 {% load static %}
 
+
+{% block facebook_event %}
+        fbq('track', 'InitiateCheckout');
+{% endblock %}
+
+
 {% block head %}
 
   <!-- CSS for each example: -->

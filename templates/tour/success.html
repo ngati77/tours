@@ -1,9 +1,10 @@
 {% extends 'tour/base.html' %}
 {% load static %}
 
+{% block facebook_event %}
+        fbq('track', 'Purchase', {value: 30.00, currency: 'GBP'});
+{% endblock %}
    
-	
-
 {% block content %}
 <div class="container-fluid">
 

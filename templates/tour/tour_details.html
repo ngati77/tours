@@ -1,6 +1,10 @@
 {% extends 'tour/base.html' %}
 {% load static %}
 
+{% block facebook_event %}
+        fbq('track', 'ViewContent');
+{% endblock %}
+
 {% block head %}
 
   <!-- CSS for each example: -->
