@@ -30,7 +30,7 @@ class OurToursSitemap(Sitemap):
 class SiteSitemap(Sitemap):
         
     def items(self):
-        return ['tour:team','tour:reviewes','tour:home','tour:gallery', 'tour:contact']
+        return ['tour:team','tour:reviewes','tour:home','tour:gallery']
     
     def changefreq(self, obj):
         return 'weekly'

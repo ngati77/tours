@@ -342,7 +342,7 @@ def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
                                                  'newCalendar':newCalendar,
                                                  'NotFree':NotFree})
 
-
+'''
 def contactUs(request ):
     if request.method == 'POST':
         # Create a form instance and populate it with data from the request (binding):
@@ -392,7 +392,7 @@ def contactUs(request ):
                                                   'meta_des':meta_des,
                                                   'meta_key':meta_key,
                                                   'form': form})
-
+'''
 def GiveReview(request ):
 
     if request.method == 'POST':
