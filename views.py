@@ -486,12 +486,17 @@ def reportView(request):
             #book_inst.due_back = form.cleaned_data['renewal_date']
            # Get all infortamtion from form
             start_month, end_month, start_year, end_year, guide, foundUs,order, output= form.get_data()
-            check_guide = (guide != None)        
+            check_guide = (guide != None)  
+            
+            start_date = datetime.date(int(start_year), int(start_month), 1)
+            if int(end_month)==12:
+                end_date   = datetime.date(int(end_year)+1, 1, 1) - datetime.timedelta(days=1)
+            else:
+                end_date   = datetime.date(int(end_year), int(end_month)+1, 1) - datetime.timedelta(days=1)
+
             tripQuerey = Trip.objects.filter(
-                trip_date__month__gte  = start_month,
-                trip_date__month__lte  = end_month,
-                trip_date__year__gte   = start_year,
-                trip_date__year__lte   = end_year,
+                trip_date__gte   = start_date,
+                trip_date__lte   = end_date,
                 ).order_by(order)
 
             # At the moment there are two filters the guide and the 'found us'
@@ -501,6 +506,8 @@ def reportView(request):
             sum_commision = 0
             if (foundUs != None):
                 for trip in tripQuerey: 
+                    if trip.trip_date.month >= start_month and trip.trip_date.month <= end_month:
+                        continue
                     for client in trip.clients_set.all():
                         if client.foundUs == foundUs:
                             report.append(ClientReportEntry(client,foundUs.precentage))
