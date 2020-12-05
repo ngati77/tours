@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from datetime import date, datetime, time
-from captcha.fields import CaptchaField
+#from captcha.fields import CaptchaField
 
 from .models import Guide, FoundUs
        
@@ -104,7 +104,7 @@ class ContactForm(forms.Form):
     text           = forms.CharField(label  ='', widget=forms.Textarea(attrs={'cols':26,'placeholder': 'נושא הפנייה'}))
     
     #textdummy           = forms.CharField(hidden=True,required=False, label  ='')
-    captcha        = CaptchaField(label ='קצת חשבון',label_suffix="")
+    #captcha        = CaptchaField(label ='קצת חשבון',label_suffix="")
     
     def get_data(self):
         first_name      = self.cleaned_data['first_name']

@@ -1,7 +1,11 @@
 {% extends 'tour/base.html' %}
 {% load static %}
 
-
+{% block head %}
+        
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+        
+{% endblock %}
 {% block content %}
 
 <div class="container-fluid">
@@ -16,17 +20,12 @@
                     {{ form.as_p }}
                     </table>
                     <div class="row">    
-                        <p>
+                        
 
-                           <br> לצערנו לא ניתן ליצור קשר דרך עמוד זה 
-                           <br> בגלל ריבוי הודעות הספאם שקיבלנו.
-                           <br> ניתן כמובן להשיג אותנו בדרכים אחרות...
-                        </p>
-                        <!--
-
-                            <button id="contact_us" class="btn btn-runner1">צור קשר</button>
-                        -->      
+                            <button id="contact_us" class="btn btn-runner1">צור קשר</button>    
                    </div>
+                   <div class="g-recaptcha" data-sitekey="{{ public_captcha }}"></div>
+
                 </form>
             </div>
         </div>

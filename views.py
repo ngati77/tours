@@ -40,7 +40,7 @@ from threading import Thread, activeCount
 
 from django.db.models import Q
 
-
+from .decorators import check_recaptcha
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -194,7 +194,10 @@ def send_succes_email(request,client):
             
 def payment(request):
     form = PaymentForm(request.POST)
+    print('Debug')
     if request.method == 'POST':
+        print('Debug1')
+
         title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs, text = form.get_data() 
         stripe.api_key = settings.STRIPE_SECRET_KEY
         deposit = int(deposit)
@@ -248,7 +251,72 @@ def tour_details(request, trip_abc_name='Classic'):
 def bookTourToday(request, trip_abc_name ):
      today = datetime.date.today()
      return bookTour(request,today.year, today.month, trip_abc_name )
+
+# def update_transaction(request):
+#     if request.method == 'POST':
+        
+#         client =  request.POST['client']
+#         create_date =  request.POST['create_date']
+#         token =  request.POST['token']
+#         amount =  request.POST['amount']
+#         charge_id =  request.POST['charge_id']
+#         success =  request.POST['success']
+#         print(client)
+#         print(create_date)
+#         print(charge_id)
+#         print(success)
             
+            
+#         message = 'update successful'
+#     return HttpResponse(message)    
+#     #return  redirect('tour:about')
+
+# def checkout(request):
+#     stripe.api_key = settings.STRIPE_SECRET_KEY
+#     session = stripe.checkout.Session.create(
+#         payment_method_types=['card'],
+#         line_items=[{
+#             'price': 'price_1HKiSf2eZvKYlo2CxjF9qwbr',
+#             'quantity': 1,
+#         }],
+#         mode='subscription',
+#         success_url='https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
+#         cancel_url='https://example.com/cancel',
+#     )
+#     meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
+#     meta_des_en  = "cambridge in hebrew payment"
+#     meta_des = meta_des_heb + meta_des_en
+#     meta_key_heb = "תשלום "
+#     meta_key_en  = "payment "
+#     meta_key     = meta_key_heb + meta_key_en
+
+
+#     # # stripe payment intent
+#     # stripe.api_key = settings.STRIPE_SECRET_KEY
+#     # customer = stripe.Customer.create()
+
+    
+#     # intent = stripe.PaymentIntent.create(
+#     #     amount=1099,
+#     #     currency='gbp',
+#     #     customer=customer['id'],
+#     #     metadata={
+#     #         'Name':'Noam',
+#     #         'Date':'23-01-1977',
+#     #         'email':'noam.gati@gmail.com',
+#     #     }
+#     #     )
+
+#     return render(request, 'tour/checkout.html', {'title':'payment', 'page_title' : 'תשלום עבור סיור',
+#                                                   'meta_des':meta_des,
+#                                                   'meta_key':meta_key,                         
+#                                                  'stripe_public_key':settings.STRIPE_PUBLISHABLE_KEY,
+#                                                   'session': session, 
+#                                                 #   'intentId': intent.id,
+                                                 
+#                                                  })
+
+
 def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
     if request.method == 'POST':
         # Create a form instance and populate it with data from the request (binding):
@@ -342,7 +410,7 @@ def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
                                                  'newCalendar':newCalendar,
                                                  'NotFree':NotFree})
 
-'''
+@check_recaptcha
 def contactUs(request ):
     if request.method == 'POST':
         # Create a form instance and populate it with data from the request (binding):
@@ -375,6 +443,7 @@ def contactUs(request ):
                                                                'meta_des':meta_des,
                                                                'meta_key':meta_key,
                                                                'page_title':'נחזור אלייך בהקדם', 
+                                                               
                                                                'id': contact.id})
 
     # If this is a GET (or any other method) create the default form.
@@ -391,8 +460,9 @@ def contactUs(request ):
                                                  'page_title' : 'צור קשר', 
                                                   'meta_des':meta_des,
                                                   'meta_key':meta_key,
+                                                  'public_captcha': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY,
                                                   'form': form})
-'''
+
 def GiveReview(request ):
 
     if request.method == 'POST':
