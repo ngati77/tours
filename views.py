@@ -416,7 +416,7 @@ def contactUs(request ):
         # Create a form instance and populate it with data from the request (binding):
         form = ContactForm(request.POST)
         # Check if the form is valid:
-        if form.is_valid():
+        if form.is_valid() and request.recaptcha_is_valid:
             
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']
@@ -448,8 +448,8 @@ def contactUs(request ):
 
     # If this is a GET (or any other method) create the default form.
     # TODO, Double check date as avialable one, or already has a trip on that day. 
-    
-    form = ContactForm()
+    else:
+        form = ContactForm()
     meta_des_heb = "קיימברידג בעברית צור קשר  "
     meta_des_en  = "contact Cambridge in Hebrew"
     meta_des = meta_des_heb + meta_des_en
