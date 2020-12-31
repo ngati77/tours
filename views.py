@@ -9,8 +9,8 @@ from django.views import generic
 
 from django.utils import timezone
 
-from .models import Trip, Clients, Review, Gallery, Calendar
-from .models import OurTours, Guide, Transaction, Contact, GuideVacation
+from .models import Trip, Clients, Review, Gallery, Calendar, ReportEntry,ClientReportEntry
+from .models import OurTours, Guide, Transaction, Contact, GuideVacation, FoundUs
 
 from .tour_emails import tour_emails 
 import datetime
@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 
 
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -40,7 +40,7 @@ from threading import Thread, activeCount
 
 from django.db.models import Q
 
-
+from .decorators import check_recaptcha
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -53,6 +53,7 @@ logger = logging.getLogger(__name__)
 
 monthStr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul' , 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
+hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
 
 
 #hebdaydic   = {'Sun': 'ראשון','Mon': 'שני','Tue': 'שלישי','Wed': 'רביעי','Thu': 'חמישי','Fri': 'שישי','Sat': 'שבת'}
@@ -130,10 +131,74 @@ def reviewes(request):
                                                   'reviewes':reviewesQuery})
 
     
-def payment(request ):
+def create_new_trip_client(*args):
+    ''' This function create trip if needed and create a client 
+    '''
+    title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text = args
+    date         = [int(x) for x in trip_date.split("-")]
+    dateClass    = datetime.date(date[0],date[1],date[2])
+    tripQuerySet = Trip.get_event(dateClass, trip_abc_name)
+    guide        = get_object_or_404(Guide, user_name='yaelr')
+    ourTour      = get_object_or_404(OurTours, trip_abc_name = trip_abc_name)
+    foundUsPointer      = get_object_or_404(FoundUs, pk = foundUs)
+
+    # If need a new trip
+    if (len(tripQuerySet)==0):
+        trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time, guide=guide, ourTour=ourTour)
+        trip.save()
+    # Repeat to solve the time format in the email    
+    tripQuerySet = Trip.get_event(dateClass, trip_abc_name)    
+    trip = tripQuerySet[0]
+    # Create new client           
+    client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
+                     number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails, text = text, foundUs = foundUsPointer)
+#            
+    client.save()
+    return client
+
+def send_succes_email(request,client):
+    ''' This function send email confirmation to a new client
+    '''
+    NotFree     = (client.trip.ourTour.price != 0)
+    msg_plain   = 'DUMMY ONE'
+    children    = (client.number_of_children > 0)
+    more_to_pay = (client.total_payment-client.pre_paid)
+    dayHeb      = hebdict[client.trip.trip_date.strftime('%a')]
+    try:
+        msg_html = render_to_string('emails/email_success.html', { 
+                                                                  'client':client, 
+                                                                  'print_children':children, 
+                                                                  'more_to_pay':more_to_pay,
+                                                                  'day_in_hebrew':dayHeb,
+                                                                  'NotFree':NotFree})
+
+        emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
+    except:
+        print('Got an error... sending email...')
+    #print(f'Debug {emailSuccess}')
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
+    meta_des_en  = ""
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "הרשמה הצלחה "
+    meta_key_en  = " "
+    meta_key     = meta_key_heb + meta_key_en
+    #print(trip)
+    return render(request,'tour/success.html', {'title':'תשלום הצליח', 'page_title':'ההרשמה הסתיימה בהצלחה', 
+                                                      'meta_des':  meta_des,
+                                                      'meta_key':  meta_key,
+                                                      'client':    client,
+                                                      'more_to_pay':more_to_pay, 
+                                                      'day_in_hebrew':dayHeb
+                                                      })
+            
+def payment(request):
     form = PaymentForm(request.POST)
+    print('Debug')
     if request.method == 'POST':
-        title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, text = form.get_data() 
+        print('Debug1')
+
+        title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs, text = form.get_data() 
         stripe.api_key = settings.STRIPE_SECRET_KEY
         deposit = int(deposit)
         try:
@@ -150,20 +215,8 @@ def payment(request ):
             return render(request, 'tour/failure.html', {'title':'failure', 'page_title':'failure'})
         
         # We made a payment, greaty lat's create trip and client
-        date = [int(x) for x in trip_date.split("-")]
-        dateClass = datetime.date(date[0],date[1],date[2])
-        tripQuerySet = Trip.get_event(dateClass)
-        # If need a new trip
-        if (len(tripQuerySet)==0):
-            trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time ,trip_type=trip_type)
-            trip.save()
-        else:
-            trip = tripQuerySet[0]
-        # Create new client           
-        client = Clients(trip=trip,first_name=first_name,last_name=last_name, phone_number=phone, email=email, number_of_people=int(number_adults), 
-                         number_of_children=int(number_child), pre_paid = deposit, total_payment = int(paymentSum), confirm_use = confirm_use, send_emails = send_emails, text = text)
-#            
-        client.save()
+        client = create_new_trip_client(title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text)
+               
         transaction = Transaction(client=client,
                             token=token, 
                             charge_id = charge.id,
@@ -171,79 +224,101 @@ def payment(request ):
                             success=True)
             # save the transcation (otherwise doesn't exist)
         transaction.save()
-        
-        msg_plain= 'DUMMY ONE'
-        children = (client.number_of_children > 0)
-        more_to_pay=(client.total_payment-client.pre_paid)
-        try:
-            msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
-                                                                      'trip_time':trip.trip_time, 
-                                                                      'id': transaction.id, 
-                                                                      'trip_type':title, 
-                                                                      'client':client, 
-                                                                      'print_children':children, 
-                                                                      'more_to_pay':more_to_pay})
-            #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
-            emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-            #cc =['yael.gati@cambridgeinhebrew.com']
-            emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[email], title=emailTitle, cc=settings.CC_EMAIL)
-        except:
-            print('Got an error... sending email...')
-        #print(f'Debug {emailSuccess}')
-        meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
-        meta_des_en  = ""
-        meta_des = meta_des_heb + meta_des_en
-        meta_key_heb = "הרשמה הצלחה "
-        meta_key_en  = " "
-        meta_key     = meta_key_heb + meta_key_en
-        #print(trip)
-        return render(request, 'tour/success.html', {'title':'תשלום הצליח', 'page_title':'ההרשמה הסתיימה בהצלחה', 
-                                                          'meta_des':meta_des,
-                                                          'meta_key':meta_key,
-                                                          'trip_date':trip.trip_date.strftime("%d-%m-%Y"),
-                                                          'trip_time':trip.trip_time, 
-                                                          'deposit':deposit, 
-                                                          'more_to_pay':more_to_pay, 
-                                                          'id': transaction.id, 
-                                                          'trip_type':title, 
-                                                          'first':first_name, 
-                                                          'last': last_name })
-    
-#    meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
-#    meta_des_en  = "cambridge in hebrew payment"
-#    meta_des = meta_des_heb + meta_des_en
-#    meta_key_heb = "תשלום "
-#    meta_key_en  = "payment "
-#    meta_key     = meta_key_heb + meta_key_en
+        return send_succes_email(request, client)
+
     return render(request, 'tour/failure.html', {'title':'failure payment end', 'page_title':'failure'})
     
 
-def tour_details(request, tripType='Ç'):
-    OurToursQuery = OurTours.objects.filter(trip_type=tripType)
-    if len(OurToursQuery)!=1:
-        print('Raise exception')
-    OurTour = OurToursQuery[0]
-#    print(newCalendar)
-    meta_des_heb = "סיורים בקיימברידג' אנגליה - נטייל בשוק, נכנס לעיר עם אווירה של 800 שנה, נכנס לקולג'ים המפוארים, נבלה בשוק העתיק ועוד  "
-    meta_des_en  = "Cambridge in hebrew - We will go back 800 years, visit in the magnificent colleges, and the old city market"
+def tour_details(request, trip_abc_name='Classic'):
+    
+    ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
+
+    meta_des_heb = "סיורים בקיימברידג' אנגליה"
+    meta_des_en  = "סיורים בעברית בקיימברידג'- סיור מחוץ ללונדון"
     meta_des = meta_des_heb + meta_des_en
     meta_key_heb = "קולג'ים קולג' קיימברידג' שוק "
     meta_key_en  = " cambridge college old market"
     meta_key     = meta_key_heb + meta_key_en
-    print_child = (OurTour.priceChild) > 0
-    return render(request, 'tour/tour_details.html', {'page_title':OurTour.title,
+    print_child = (ourTours.priceChild) > 0
+    NotFree = (ourTours.price != 0)
+    return render(request, 'tour/tour_details.html', {'page_title':ourTours.title,
                                                    'meta_des':meta_des,
                                                    'meta_key':meta_key,
                                                    'print_child':print_child,
-                                                   'ourTour':OurTour})
+                                                   'ourTour':ourTours,
+                                                   'NotFree':NotFree})
     
-def bookTourToday(request, tripType ):
+def bookTourToday(request, trip_abc_name ):
      today = datetime.date.today()
-     return bookTour(request,today.year, today.month, tripType )
+     return bookTour(request,today.year, today.month, trip_abc_name )
+
+# def update_transaction(request):
+#     if request.method == 'POST':
+        
+#         client =  request.POST['client']
+#         create_date =  request.POST['create_date']
+#         token =  request.POST['token']
+#         amount =  request.POST['amount']
+#         charge_id =  request.POST['charge_id']
+#         success =  request.POST['success']
+#         print(client)
+#         print(create_date)
+#         print(charge_id)
+#         print(success)
             
-def bookTour(request,pYear, pMonth, tripType ):
+            
+#         message = 'update successful'
+#     return HttpResponse(message)    
+#     #return  redirect('tour:about')
+
+# def checkout(request):
+#     stripe.api_key = settings.STRIPE_SECRET_KEY
+#     session = stripe.checkout.Session.create(
+#         payment_method_types=['card'],
+#         line_items=[{
+#             'price': 'price_1HKiSf2eZvKYlo2CxjF9qwbr',
+#             'quantity': 1,
+#         }],
+#         mode='subscription',
+#         success_url='https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
+#         cancel_url='https://example.com/cancel',
+#     )
+#     meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
+#     meta_des_en  = "cambridge in hebrew payment"
+#     meta_des = meta_des_heb + meta_des_en
+#     meta_key_heb = "תשלום "
+#     meta_key_en  = "payment "
+#     meta_key     = meta_key_heb + meta_key_en
+
+
+#     # # stripe payment intent
+#     # stripe.api_key = settings.STRIPE_SECRET_KEY
+#     # customer = stripe.Customer.create()
+
+    
+#     # intent = stripe.PaymentIntent.create(
+#     #     amount=1099,
+#     #     currency='gbp',
+#     #     customer=customer['id'],
+#     #     metadata={
+#     #         'Name':'Noam',
+#     #         'Date':'23-01-1977',
+#     #         'email':'noam.gati@gmail.com',
+#     #     }
+#     #     )
+
+#     return render(request, 'tour/checkout.html', {'title':'payment', 'page_title' : 'תשלום עבור סיור',
+#                                                   'meta_des':meta_des,
+#                                                   'meta_key':meta_key,                         
+#                                                  'stripe_public_key':settings.STRIPE_PUBLISHABLE_KEY,
+#                                                   'session': session, 
+#                                                 #   'intentId': intent.id,
+                                                 
+#                                                  })
+
+
+def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
     if request.method == 'POST':
-        stripe.api_key = settings.STRIPE_SECRET_KEY
         # Create a form instance and populate it with data from the request (binding):
         form = BookingForm(request.POST)
         # Check if the form is valid:
@@ -251,19 +326,13 @@ def bookTour(request,pYear, pMonth, tripType ):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']
            # Get all infortamtion from form
-            title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, text  = form.get_data()
-            #trip_date = datetime.datetime(pYear, pMonth, pDay, pHour)
-            # Check iftrip exists
-  
-            
-            date = [int(x) for x in trip_date.split("-")]
-            dateClass = datetime.date(date[0],date[1],date[2])
-            tripQuerySet = Trip.get_event(dateClass)
-            # Check if a trip already exist, if no let's make sure we have more than one person
-            if (len(tripQuerySet)==0 and (number_adults + number_child)==1):
-                print("Sorry we need more people TODO")
-                #trip.save()
-#            return payment(request, trip=trip, client=client )
+            title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text  = form.get_data()
+           
+            # If it is  a free tour, no need to go to payment
+            ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
+            if (ourTours.price==0):
+                client = create_new_trip_client(title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text)
+                return send_succes_email(request, client)
             meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
             meta_des_en  = "cambridge in hebrew payment"
             meta_des = meta_des_heb + meta_des_en
@@ -274,7 +343,7 @@ def bookTour(request,pYear, pMonth, tripType ):
             form = PaymentForm(initial={       'title':title,
                                                'trip_date':trip_date,
                                                'trip_time':trip_time,
-                                               'trip_type':trip_type,
+                                               'trip_type':trip_abc_name,
                                                'first_name':first_name,
                                                'last_name':last_name,
                                                'phone':phone,
@@ -284,6 +353,7 @@ def bookTour(request,pYear, pMonth, tripType ):
                                                
                                                'confirm_use': confirm_use, 
                                                'send_emails': send_emails,
+                                               'foundUs'   : foundUs,
                                                'text'       : text,
                                                'deposit':deposit,
                                                'paymentSum':paymentSum})
@@ -299,32 +369,28 @@ def bookTour(request,pYear, pMonth, tripType ):
                                                  'stripe_public_key':settings.STRIPE_PUBLISHABLE_KEY,
                                                  })
            
-    newCalendar= Calendar(request=request, year=pYear,  month=pMonth , view=tripType)
+    newCalendar= Calendar(request=request, year=pYear,  month=pMonth , view=trip_abc_name)
     # If this is a POST request then process the Form data
-    #TyprDict = {'F': 'הרשמה לסיור משפחות', 'C': 'הרשמה לסיור קלאסי', 'B': 'הרשמה לאוטובוס'}
-    # Britng the trip name in hebrew from db
-   
-    TripTypeQuery = OurTours.objects.filter(trip_type=tripType)
+    # Bring the trip name in hebrew from db
+    TripTypeQuery = OurTours.objects.filter(trip_abc_name=trip_abc_name)
+    
     if (len(TripTypeQuery)>0):
-        title   =  TripTypeQuery[0].title
-        deposit =  TripTypeQuery[0].deposit
-        price =  TripTypeQuery[0].price
-        priceChild =  TripTypeQuery[0].priceChild
-        print_child = (TripTypeQuery[0].priceChild) > 0
+        ourTours    = TripTypeQuery[0]
+        NotFree     = (ourTours.price != 0)
+        title       = ourTours.title
+        deposit     = ourTours.deposit
+        price       = ourTours.price
+        priceChild  = ourTours.priceChild
+        print_child = ourTours.priceChild > 0
     else:
         title   = ''
         deposit = 0
         price =  0
         priceChild =  0
         print_child = 0
-    # If this is a GET (or any other method) create the default form.
-   # TODO, Double check date as avialable one, or already has a trip on that day. 
-#    proposed_date = datetime.datetime(pYear, pMonth, 1, 11)
-#    form = BookingForm(initial={'title':title, 'trip_date': proposed_date.date, 'trip_time':  proposed_date.time, 'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
-        
-#    tripdate = proposed_date.strftime("%d.%m.%Y") + ' (' +  ' יום '  +  hebdaydic[proposed_date.strftime("%a")] + ')'     
-#    triptime = proposed_date.strftime("%H:%M") 
-    form = BookingForm(initial={'title':title, 'trip_type':tripType,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+        NotFree     = True
+
+    form = BookingForm(initial={'title':title, 'trip_type':trip_abc_name,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
 
     pageTitle=  'הזמנת ' +  title 
     meta_des_heb = "הזמנת סיור בקיימברידג בעברית  "
@@ -341,15 +407,16 @@ def bookTour(request,pYear, pMonth, tripType ):
                                                  'priceChild':priceChild, 
                                                  'deposit':deposit, 
                                                  'print_child': print_child,
-                                                 'newCalendar':newCalendar})
+                                                 'newCalendar':newCalendar,
+                                                 'NotFree':NotFree})
 
-
+@check_recaptcha
 def contactUs(request ):
     if request.method == 'POST':
         # Create a form instance and populate it with data from the request (binding):
         form = ContactForm(request.POST)
         # Check if the form is valid:
-        if form.is_valid():
+        if form.is_valid() and request.recaptcha_is_valid:
             
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']
@@ -360,9 +427,9 @@ def contactUs(request ):
             contact.save()
             try:
                 msg_html = render_to_string('emails/email_contact.html', {'first_name':first_name,'last_name':last_name, 'email':email, 'id': contact.id, 'text':text})
-                msg_plain = str(contact.id) + "מישהו יצר קשר פניה "#emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
+                msg_plain = str(contact.id) + "מישהו יצר קשר פניה "
                 emailTitle = "מישהו יצר קשר"
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.BCC_EMAIL], title=emailTitle, cc=[])
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=settings.BCC_EMAIL, title=emailTitle, cc=[])
             except:
                 print('Got an error...')
             # Save contact here
@@ -376,12 +443,13 @@ def contactUs(request ):
                                                                'meta_des':meta_des,
                                                                'meta_key':meta_key,
                                                                'page_title':'נחזור אלייך בהקדם', 
+                                                               
                                                                'id': contact.id})
 
     # If this is a GET (or any other method) create the default form.
-   # TODO, Double check date as avialable one, or already has a trip on that day. 
-    
-    form = ContactForm()
+    # TODO, Double check date as avialable one, or already has a trip on that day. 
+    else:
+        form = ContactForm()
     meta_des_heb = "קיימברידג בעברית צור קשר  "
     meta_des_en  = "contact Cambridge in Hebrew"
     meta_des = meta_des_heb + meta_des_en
@@ -392,6 +460,7 @@ def contactUs(request ):
                                                  'page_title' : 'צור קשר', 
                                                   'meta_des':meta_des,
                                                   'meta_key':meta_key,
+                                                  'public_captcha': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY,
                                                   'form': form})
 
 def GiveReview(request ):
@@ -424,7 +493,7 @@ def GiveReview(request ):
                                                                'page_title':'תודה על המשוב'})
 
     # If this is a GET (or any other method) create the default form.
-   # TODO, Double check date as avialable one, or already has a trip on that day. 
+    # TODO, Double check date as avialable one, or already has a trip on that day. 
     
     form = ReviewForm()
     meta_des_heb = "תן לנו משוב  "
@@ -472,41 +541,6 @@ class ClientView(generic.DetailView):
     template_name = 'tour/clients_in_tour.html'
     model = Trip
 
-# This class is used in the report.html
-class ReportEntry: 
-    def __init__(self, trip_text, trip_date, trip_guide):
-        self.trip_text       = trip_text
-        self.trip_date       = trip_date
-        self.trip_guide      = trip_guide
-
-        self.trip_time       = ''
-        self.trip_id         = 0
-        self.total_people    = 0
-        self.total_children  = 0
-
-        self.total_deposit   = 0
-        self.total_gross     = 0
-        self.total_guide_exp = 0
-        self.other_expense   = 0
-        self.guide_payback   = 0
-        self.total_neto      = 0
-        
-    """
-    Return report between range of guides and according to the guide
-    """
-    # This function calculate how much money the guide owe the company
-    def calc_guide_payment(self, trip_type ,adult, children):
-        # Before calculating Guide salary check if children are paying
-        ChildAccount    = OurTours.objects.filter(trip_type=trip_type)[0].priceChild>0
-        # If children are account take the number of them otherwise set it to zero
-        childNum        = children if ChildAccount else 0
-        # Just add chidren to people
-        totalPeople     = adult +  childNum
-        # if more than 2 peole than we have extra to add
-        extraPeople     = (totalPeople-2) if totalPeople > 2 else 0
-        # Base amount 40 + 5 Pound per person
-        return (40 + 5 * extraPeople)    
-
 
 #######################################################
 def reportView(request):
@@ -521,62 +555,52 @@ def reportView(request):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             #book_inst.due_back = form.cleaned_data['renewal_date']
            # Get all infortamtion from form
-            month, year, check_guide, guide, order, output  = form.get_data()
-           # contact = Contact(first_name=first_name, last_name = last_name, email = email, text = text)
-           # contact.save()
-           
-            if (check_guide):
-                tripQuerey = Trip.objects.filter(
-                    status            = 'e',
-                    trip_date__month  = month,
-                    trip_date__year   = year,
-                    trip_guide        = guide,
-                    ).order_by(order)
-            # If we want to see all guides    
+            start_month, end_month, start_year, end_year, guide, foundUs,order, output= form.get_data()
+            check_guide = (guide != None)  
+            
+            start_date = datetime.date(int(start_year), int(start_month), 1)
+            if int(end_month)==12:
+                end_date   = datetime.date(int(end_year)+1, 1, 1) - datetime.timedelta(days=1)
             else:
-                tripQuerey = Trip.objects.filter(
-                         status            = 'e',
-                         trip_date__month  = month,
-                         trip_date__year   = year,
-                        ).order_by(order)
-            # Scan all trips
-            if (len(tripQuerey)>0):
+                end_date   = datetime.date(int(end_year), int(end_month)+1, 1) - datetime.timedelta(days=1)
+
+            tripQuerey = Trip.objects.filter(
+                trip_date__gte   = start_date,
+                trip_date__lte   = end_date,
+                ).order_by(order)
+
+            # At the moment there are two filters the guide and the 'found us'
+            # They give different report as 'found us' is per client.... while the guide is per trip
+            # Check if need a specific guide
+            # If we need a specific guide and it is not this one...
+            sum_commision = 0
+            if (foundUs != None):
+                for trip in tripQuerey: 
+                    if trip.trip_date.month >= start_month and trip.trip_date.month <= end_month:
+                        continue
+                    for client in trip.clients_set.all():
+                        if client.foundUs == foundUs:
+                            report.append(ClientReportEntry(client,foundUs.precentage))
+                            # If the client didn't cancel then we add it to the final sum
+                            if (report[-1].client.status == 'a'):
+                                sum_commision += report[-1].comission
+            
+            else:
                 reportsum = ReportEntry("sum", "sum", "sum")
+                
+                check_guide = (guide != None)
+
                 for trip in tripQuerey:
-                    # Create new entry in the report
-                    reportEntry = ReportEntry(trip.get_trip_type_display(), trip.trip_date.strftime("%d.%m.%y"), trip.get_trip_guide_display())
-                    # Get all cilents from a trip hopefully more than one
-                    clientQuerey = trip.clients_set.all()
-                    # Scan all clients, in the futrue need to scan the invoice
-                    for client in clientQuerey:
-                        reportEntry.total_people    += client.number_of_people
-                        reportEntry.total_children  += client.number_of_children
-                        reportEntry.total_deposit   += client.pre_paid
-                        reportEntry.total_gross     += client.total_payment
-                    
-                    # How much the guide earn from this tour
-                    reportEntry.total_guide_exp = reportEntry.calc_guide_payment(trip_type = trip.trip_type,
-                                                                          adult     = reportEntry.total_people,
-                                                                          children  = reportEntry.total_children)
-                    # how much we earend
-                    reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
-                    # Now that we know how much the guide earn we can calculate home amount he needs to return
-                    reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
-                    
-                    reportEntry.trip_id         = trip.id
+                    if ((check_guide == False or trip.guide==guide) and trip.get_status_display()=='Completed'):
+
                     # Gather the sum here
-                    reportsum.total_people      += reportEntry.total_people
-                    reportsum.total_children    += reportEntry.total_children
-                    reportsum.total_deposit     += reportEntry.total_deposit
-                    reportsum.total_gross       += reportEntry.total_gross
-                    reportsum.guide_payback     += reportEntry.guide_payback   
-                    reportsum.total_guide_exp   += reportEntry.total_guide_exp
-                    reportsum.total_neto        += reportEntry.total_neto
+                        reportEntry = trip.get_trip_sum()
+                        reportsum   += reportEntry
                   
-                   
-                   
-                    report.append(reportEntry)
+                        report.append(reportEntry)
+                
                 report.append(reportsum)
+          
             # If requested view is html  
             if (output=='html'):
                 return render(request, 'tour/report.html', {'title':'Report view',
@@ -585,29 +609,51 @@ def reportView(request):
                                                      'meta_key':'',
                                                      'form': form,
                                                      'report': report,
+                                                     'found_us':(foundUs != None),
                                                      'filter_check_guide': check_guide
                                                      })
             
             # The view is pdf, therefore Create param dictionary for the pdf
             #print(list(hebmonthdic.keys())[int(month)-1])
+            if (int(end_month) == 12):
+                firstDayOfNextMonth = datetime.date(int(end_year)+1, 1, 1);
+            else:
+                firstDayOfNextMonth = datetime.date(end_year, int(end_month) +1, 1);
+            lastDayInMonth = firstDayOfNextMonth - datetime.timedelta(days=1)
+            if (foundUs == None):
+                report_pdf=  report[:-1]
+                sum_pdf   =   report[-1]
+            else:
+                report_pdf=  report
+                sum_pdf   =  sum_commision
+
             params = {
-                'report': report[:-1],
-                'sum':   report[-1],
-                'filter_check_guide': check_guide,
-                'month'             : monthStr[int(month)-1],
-                'year'              : year,
-                'request': request
+                'report': report_pdf,
+                'sum':   sum_pdf,
+                'filter_check_guide'    : check_guide,
+                'start_month'           : monthStr[int(start_month)-1],
+                'end_month'             : monthStr[int(end_month)-1],
+                'start_year'            : start_year,
+                'end_year'              : end_year,
+                'end_day'               : lastDayInMonth.day,
+                'request'               : request
             }
             # Check if need to send the pdf    
             if (output=='send_pdf'):
-                file_name='Report_' +  monthStr[int(month)-1] + '_' + str(year)  + '.pdf'
-                file = Render.render_to_file('pdf/report.html', file_name, params)
+                file_name='Report_' +  monthStr[int(start_month)-1] + '_' + str(start_year)  + '.pdf'
+                if (foundUs == None):
+                    file = Render.render_to_file('pdf/report.html', file_name, params)
+                else:
+                    file = Render.render_to_file('pdf/found_us.html', file_name, params)
                 tour_emails.send_email_pdf(to=['noam.gati@gmail.com'],file=file, file_name=file_name)
-            
-            return Render.render('pdf/report.html', params)    
+                
+            if (foundUs == None):
+                return Render.render('pdf/report.html', params)    
+            else:    
+                return Render.render('pdf/found_us.html', params)    
     else:
-        today    = datetime.date.today()
-        form    = ReportForm(initial={'year' : today.year, 'month' : today.month})
+        today   = datetime.date.today()
+        form    = ReportForm(initial={'start_year' : today.year, 'start_month' : today.month, 'end_year' : today.year, 'end_month' : today.month})
         report  = []
         check_guide = False
         return render(request, 'tour/report.html', {'title':'Report view',
@@ -626,47 +672,41 @@ def reportView(request):
 def tripView(request):
 
     if request.method == 'POST':
+        report = []
         # Create a form instance and populate it with data from the request (binding):
         form = ReportForm(request.POST)
         # We get field called 'rating' a number from 1 to 10
         # Check if the form is valid:
-        report = []
         if form.is_valid():
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
-            #book_inst.due_back = form.cleaned_data['renewal_date']
-           # Get all infortamtion from form
-            month, year, check_guide, guide, order, output  = form.get_data()
-           # contact = Contact(first_name=first_name, last_name = last_name, email = email, text = text)
-           # contact.save()
-           
-            if (check_guide):
-                tripQuerey = Trip.objects.filter(
-                    trip_date__month  = month,
-                    trip_date__year   = year,
-                    trip_guide        = guide,
-                    ).order_by(order)
-            # If we want to see all guides    
-            else:
-                tripQuerey = Trip.objects.filter(
-                         trip_date__month  = month,
-                         trip_date__year   = year,
-                        ).order_by(order)
-            # Scan all trips
-            # if (len(tripQuerey)>0):
-                # for trip in tripQuerey:
-                    # Create new entry in the report
-                    # reportEntry = ReportEntry(trip.get_trip_type_display(), trip.trip_date.strftime("%d.%m.%y"), trip.get_trip_guide_display())
-                    # Get all cilents from a trip hopefully more than one
-                    # reportEntry.trip_time = trip.trip_time.strftime("%H:%M")
-                    # reportEntry.trip_id   = trip.id
-                    # clientQuerey = trip.clients_set.all()
-                    # Scan all clients, in the futrue need to scan the invoice
-                    #for client in clientQuerey:
-                        
-                    #    reportEntry.total_people    += client.number_of_people
-                    #    reportEntry.total_children  += client.number_of_children
+            # Get all infortamtion from form
+            #month, year, check_guide, guide, order, output  = form.get_data()
+            start_month, end_month, start_year, end_year, guide, foundUs, order, output= form.get_data()
                     
-                    # report.append(reportEntry)
+            tripQuerey = Trip.objects.filter(
+                trip_date__month__gte  = start_month,
+                trip_date__month__lte  = end_month,
+                trip_date__year__gte   = start_year,
+                trip_date__year__lte   = end_year,
+                ).order_by(order)
+
+            # At the moment there are two filters the guide and the 'found us'
+            # They give different report as 'found us' is per client.... while the guide is per trip
+            # Check if need a specific guide
+            # If we need a specific guide and it is not this one...
+            
+            #if (found_us != 'f'):
+            #    trip in tripQuereyand 
+            #    report = [client for client in trip.clients_all.objects() if client.found_us == found_us]
+            # Bring the whole trip
+            #else:
+            
+            check_guide = (guide != None)
+
+            report = [trip for trip in tripQuerey if (check_guide == False or trip.guide==guide)]
+             
+            # If we need a specific 'Found us' then we need to bring the client and this report will be per client.
+
             # If requested view is html  
             if (output=='html'):
                 return render(request, 'tour/trip_view.html', {'title':'טיולים לחודש',
@@ -674,22 +714,31 @@ def tripView(request):
                                                      'meta_des':'',
                                                      'meta_key':'',
                                                      'form': form,
-                                                     'report': tripQuerey,
+                                                     'report': report,
                                                      'filter_check_guide': check_guide
                                                      })
             
             # The view is pdf, therefore Create param dictionary for the pdf
             #print(list(hebmonthdic.keys())[int(month)-1])
+            if (end_month == 12):
+                firstDayOfNextMonth = datetime.date(int(end_year)+1, 1, 1);
+            else:
+                firstDayOfNextMonth = datetime.date(end_year, int(end_month) +1, 1);
+            lastDayInMonth = firstDayOfNextMonth - datetime.timedelta(days=1)
             params = {
-                'report': report,
+                'report': tripQuerey,
                 'filter_check_guide': check_guide,
-                'month'             :  monthStr[int(month)-1],
-                'year'              : year,
+                'start_month'           : monthStr[int(start_month)-1],
+                'end_month'             : monthStr[int(end_month)-1],
+                'start_year'            : start_year,
+                'end_year'              : end_year,
+                'end_day'               : lastDayInMonth.day,
+
                 'request': request
             }
             # Check if need to send the pdf    
             if (output=='send_pdf'):
-                file_name='Trips_' +  monthStr[int(month)-1] + '_' + str(year) + '.pdf'
+                file_name='Trips_' +  monthStr[int(start_month)-1] + '_' + str(start_year) + '.pdf'
                 file = Render.render_to_file('pdf/trip.html', file_name, params)
                 tour_emails.send_email_pdf(to=['noam.gati@gmail.com'],file=file, file_name=file_name)
                 
@@ -697,7 +746,7 @@ def tripView(request):
             return Render.render('pdf/trip.html', params)    
     else:
         today           = datetime.date.today()
-        form = ReportForm(initial={'year' : today.year, 'month' : today.month})
+        form = ReportForm(initial={'start_year' : today.year, 'end_year' : today.year, 'start_month' : today.month, 'end_month' : today.month})
         tripQuerey = []
         check_guide = False
         return render(request, 'tour/trip_view.html', {'title':'טיולים לחודש',
@@ -722,8 +771,17 @@ def tripPdf(request, pk):
                 
             
     return Render.render('pdf/trip_details.html', params)    
-   
-    
+
+
+def links(request): 
+     return render(request, 'tour/links.html')
+
+def privacy(request): 
+     return render(request, 'tour/privacy.html', {'title':'מדיניות פרטיות',
+                                                     'page_title' : 'מדיניות פרטיות',
+                                                     'meta_des':'מדיניות פרטיות ',
+                                                     'meta_key':'מדיניות פרטיות'
+                                                     })
     
 def tasks(request):
     today           = datetime.date.today()
@@ -775,7 +833,7 @@ def tour_confirm(request, pk):
         tour = tours_query[0]
         tour.status = 'a'
         tour.save()
-    return tasks(request)
+    return  redirect('tour:tasks')
 
 # This class is used in the report.html
 class TransactionEntry: 
@@ -796,39 +854,59 @@ def tour_complete(request, pk):
         2. Create invice
         3. Send email with request for feedback
     '''
-    tours_query =  Trip.objects.filter(id  = pk)
-    if (len(tours_query)>0):
-        trip = tours_query[0]
-        if trip.status == 'a':
-            # Change trip status to complete    
-            trip.status = 'e'
-            trip.save()
-            clientQuerey = trip.clients_set.all()
-            
-            # Scan all clients
-            for client in clientQuerey:
-                transactionArray = []
-                if client.total_payment > client.pre_paid:
-                    # Create Cache transaction  
-                    try:
-                        transaction = Transaction(
-                                        client          =  client,
-                                        token           =  'Cash',
-                                        amount          =  (client.total_payment - client.pre_paid),
-                                        charge_id       =  'Cash',
-                                        success         =  True)
-                        transaction.save()
-                    except:
-                        print ('problem creating transaction')
-                            
-                #'Now create the invoice'
-                
+    trip = get_object_or_404(Trip, pk=pk)
+    
+    #tours_query =  Trip.objects.filter(id  = pk)
+    #if (len(tours_query)>0):
+    #    trip = tours_query[0]
+    if trip.get_status_display() == 'Confirmed':
+        # First thing to avoid races -  Change trip status to complete    
+        trip.status = 'e'
+        trip.save()
+        
+        CreateInvoice = (trip.ourTour.price != 0)
+        #Let's see if it is a free tour
+        
+        clientQuerey = trip.clients_set.all()
+        
+        # If it is a free tour, we don't need to send invoice to the clients
+        # We just need to send the email....
+        
+        
+        # This isn't  a free tour we are going to make invice and send email with attachment
+        # Scan all clients
+        for client in clientQuerey:
+            transactionArray = []
+            if client.status != 'a':
+                continue
+            # Free tour will skip this if statement 
+            if client.total_payment > client.pre_paid:
+                # Create Cache transaction  
+                try:
+                    transaction = Transaction(
+                                    client          =  client,
+                                    token           =  'Cash',
+                                    amount          =  (client.total_payment - client.pre_paid),
+                                    charge_id       =  'Cash',
+                                    success         =  True)
+                    transaction.save()
+                except:
+                    print ('problem creating transaction')
+                        
+            #'Now create the invoice'
+            # Prepare the email content
+            msg_plain = "תודה שטיילתם איתנו בקיימברדיג' היה לנו כייף"
+            msg_html = render_to_string('emails/email_feedback.html', {'first_name':client.first_name})
+            title = "קיימברידג' בעברית- תודה שטיילתם איתנו"
+            if (CreateInvoice):
                 transactionQuerey = client.transaction_set.all()
                 amount = 0
                 for tran in transactionQuerey:
-                    tType = 'אשראי'
+                    tType = 'Card / אשראי'
                     if tran.token == 'Cash':
-                        tType = 'מזומן'
+                        tType = 'Cash / מזומן'
+                    elif tran.token == 'bank':
+                        tType = 'Bank Payment / העברה בנקית'
                     amount += tran.amount
                     tranEntry = TransactionEntry(payment_type   = tType,
                                                  payment_date   = tran.create_date,
@@ -850,69 +928,59 @@ def tour_complete(request, pk):
                     'request'  : request
                 }
                 # Check if need to send the pdf    
-                try:
-                    file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
-                    file = Render.render_to_file('pdf/client.html', file_name, params)
-                except:
-                    print("Can't create pdf")
-                try:
-                    msg_plain = "תודה שטיילתם איתנו בקיימברדיג' היה לנו כייף"
-                    msg_html = render_to_string('emails/email_feedback.html', {'first_name':client.first_name})
-                    title = "קיימברידג' בעברית- תודה שטיילתם איתנו"
-                    tour_emails.send_email_msg_pdf( to=[client.email],
-                                                   msg_html=msg_html, 
-                                                   msg_plain=msg_plain, 
-                                                   file=file, 
-                                                   file_name=file_name, 
-                                                   cc=[settings.EMAIL_YAEL], 
-                                                   title=title)
-                except:
-                    print("Can't send email")
+                file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
+                file = Render.render_to_file('pdf/client.html', file_name, params)
+
+
+                
+                tour_emails.send_email_msg_pdf( to=[client.email, settings.EMAIL_GMAIL_YAEL],
+                                                msg_html=msg_html, 
+                                                msg_plain=msg_plain, 
+                                                file=file, 
+                                                file_name=file_name, 
+                                                cc=[], 
+                                                title=title)
+
+            else:
+                
+                    
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email, settings.EMAIL_GMAIL_YAEL], title=title, cc=[])
+
         
     
     # Bring back the tasks        
-    return tasks(request)
+    return  redirect('tour:tasks')
 
 def contact_not_spam(request, pk):
-    contact_query =  Contact.objects.filter(id  = pk)
-    if (len(contact_query)>0):
-        contact = contact_query[0]
-        contact.confirm = 'c'
-        contact.save()
-        # Now send email to adminstrator            
-        try:
-            msg_html = render_to_string('emails/email_contact.html', {'first_name':contact.first_name,'last_name':contact.last_name, 'email':contact.email, 'id': contact.id, 'text':contact.text})
-            msg_plain = str(contact.id) + "מישהו יצר קשר פניה "
-            emailTitle = "מישהו יצר קשר"
-            emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[settings.CC_EMAIL], title=emailTitle, cc=[])
-        except:
-            print('Got an error...')
-            # Save contact here
-            meta_des_heb = "קיימברידג בעברית צור קשר  "
-            meta_des_en  = "contact Cambridge in Hebrew"
-            meta_des = meta_des_heb + meta_des_en
-            meta_key_heb = "צור קשר קיימברידג' "
-            meta_key_en  = "contact cambridge hebrew "
-            meta_key     = meta_key_heb + meta_key_en
-            return render(request, 'tour/contact_saved.html', {'title':'contact', 
-                                                               'meta_des':meta_des,
-                                                               'meta_key':meta_key,
-                                                               'page_title':'נחזור אלייך בהקדם', 
-                                                               'id': contact.id})
+    contact = get_object_or_404(Contact, pk=pk)
+    #if (len(contact_query)>0):
+    contact.confirm = 'c'
+    contact.save()
+    # Now send email to adminstrator            
+    try:
+        msg_html = render_to_string('emails/email_contact.html', {'first_name':contact.first_name,'last_name':contact.last_name, 'email':contact.email, 'id': contact.id, 'text':contact.text})
+        msg_plain = str(contact.id) + "תודה שיצרתם קשר "
+        emailTitle = "סיור בקיימברידג' - צור קשר"
+        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[contact.email,settings.EMAIL_GMAIL_YAEL], title=emailTitle, cc=[])
+    except:
+        print('Got an error...')
+        # Save contact here
+        
 
-    return tasks(request)
+    return  redirect('tour:tasks')
+
+def contact_spam(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    #if (len(contact_query)>0):
+    contact.delete()
+    # Now send email to adminstrator            
+    return  redirect('tour:tasks')
 
 def contact_confirm(request, pk):
-    contact_query =  Contact.objects.filter(id  = pk)
-    if (len(contact_query)>0):
-        contact = contact_query[0]
-        contact.confirm = 'd'
-        contact.save()
-    return tasks(request)
-
-
-
-
+    contact = get_object_or_404(Contact, pk=pk)
+    contact.confirm = 'd'
+    contact.save()
+    return  redirect('tour:tasks')
 
 
 def review_confirm(request, pk):
@@ -921,4 +989,42 @@ def review_confirm(request, pk):
         review = review_query[0]
         review.confirm = True
         review.save()
-    return tasks(request)
+    return  redirect('tour:tasks')
+
+
+def CanMakeIt(request, pk ):
+    return CanMakeItFuncion(request, pk, True )
+def CantMakeIt(request, pk ):    
+    return CanMakeItFuncion(request, pk, False )
+
+def CanMakeItFuncion(request, pk, canMakeit ):
+    clients = get_object_or_404(Clients, pk=pk)
+    title = 'שגיאה'
+    try:
+        msg_html = render_to_string('emails/email_free_tour_confirmation.html', {'first_name':clients.first_name,'last_name':clients.last_name, 'email':clients.email, 'id': clients.id, 'canMakeit':canMakeit})
+        if (canMakeit):
+            msg_plain = str(clients.id) + "בטח מגיע לסיור "
+            emailTitle = clients.first_name + " בטח מגיע לסיור"
+            title = " בטח מגיע לסיור"
+        else:
+            msg_plain = str(clients.id) + "לא מגיע לסיור "
+            emailTitle = clients.first_name + " לא מגיע לסיור"
+            title = "  לא מגיע לסיור"
+        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=settings.CC_EMAIL, title=emailTitle, cc=[])
+    except:
+        print('Got an error...')
+        # Save contact here
+    meta_des_heb = "קיימברידג בעברית אישור הגעה  "
+    meta_des_en  = "confirmation Cambridge in Hebrew"
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "אישור הגעה קיימברידג' "
+    meta_key_en  = "confirmaion cambridge hebrew "
+    meta_key     = meta_key_heb + meta_key_en
+    
+    return render(request, 'tour/free_tour_confirmation.html', {'title':title, 
+                                                               'meta_des':meta_des,
+                                                               'meta_key':meta_key,
+                                                               'page_title':title,
+                                                               'canMakeit':canMakeit
+                                                               
+                                                               })

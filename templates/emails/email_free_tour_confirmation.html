@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="he"
+    dir = "rtl">
+<head>
+
+</head>
+<body>
+
+<div class="row" align="right">
+    
+    <div class="col-12 success">
+       <img width=50% src="https://cambridgeinhebrew.com/media/Gallery/2018/12/Cambridge_Kings_college.jpg">
+      <h3>שלום יעל</h3>
+      {% if canMakeit %}
+          <p>אישור הגעה של</p>
+      {% else %}
+          <p>ביטול סיור של</p>
+      {% endif %}
+      <p class="lead"><strong> שם:  {{first_name}} {{last_name}}</strong></p>
+     
+      <p> {{email}} דואל: </p>
+      <p>מספר לקוח :  {{id}}</p>
+       <hr>
+</div>
+
+</body>
+</html>

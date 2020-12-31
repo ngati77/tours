@@ -14,10 +14,6 @@ class tour_emails:
         msg  = EmailMultiAlternatives(subject = title, body= msg_plain, from_email=settings.EMAIL_YAEL, to=to,cc=cc ,bcc=settings.BCC_EMAIL)
         msg.attach_alternative(msg_html, "text/html")
         
-        #attachment = open(request.session['customer']+".txt.blowfish", 'rb')
-        #msg.attach('Name.txt.blowfish', attachment.read(), 'text/plain')
-        
-        
         try:
             success = msg.send()
         except: 

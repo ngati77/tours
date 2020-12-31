@@ -40,16 +40,18 @@
       <td>מדריך</td>
       <td>סוג סיור</td>
       <td>נוצר בתאריך</td>
+       <td>סטטוס</td>
     </tr>
     
    
      <tr class="data">
-     <td>{{ entry.id }}</td>
+     <td><a href="{% url 'admin:tours_trip_change' entry.id %}">{{ entry.id }}</a></td>
      <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{ entry.trip_time|date:'H:i'  }}</td>
-     <td>{{ entry.get_trip_guide_display }}</td>
-     <td>{{ entry.get_trip_type_display }}</td>
+     <td>{{ entry.guide.user_name }}</td>
+     <td>{{ entry.ourTour.trip_abc_name }}</td>
      <td>{{ entry.create_date|date:'d.m.Y' }}</td>
+      <td>{{ entry.get_status_display }}</td>
      </tr>
      </table>
      {% for client in entry.clients_set.all %}
@@ -65,11 +67,16 @@
      <td>מקדמה</td>
      <td>סה"כ</td>
      <td>הודעה</td>
+     <td>מצא אותנו</td>
       </tr>
-      
-     <tr class="data">
+      {% if client.get_status_display == 'Confirmed' %}
+          <tr class="data">
+      {% else %}
+       <tr class="data_cancel">
+       {% endif %}
+   
      <td> <button class="collapsible" id="n{{ client.id }}">{{ client.id }}</button></td>
-     <td>{{ client.first_name }}</td>
+     <td><a href="{% url 'admin:tours_clients_change' client.id %}">{{ client.first_name }}</a></td>
      <td>{{ client.last_name }}</td>
      <td>{{ client.phone_number }}</td>
      <td>{{ client.email }}</td>
@@ -78,6 +85,7 @@
      <td>{{ client.pre_paid }}</td>
      <td>{{ client.total_payment }}</td>
      <td>{{ client.text }}</td>
+     <td>{{ client.foundUs.title }}</td>
      </tr>
        
      </table>

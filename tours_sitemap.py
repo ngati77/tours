@@ -23,14 +23,14 @@ class OurToursSitemap(Sitemap):
         return datetime.now()
     
     def location(self, obj):
-        return '/tour_details/' + obj.trip_type
+        return '/tour_details/' + obj.trip_abc_name
 
 
 
 class SiteSitemap(Sitemap):
         
     def items(self):
-        return ['tour:team','tour:reviewes','tour:home','tour:gallery', 'tour:contact']
+        return ['tour:team','tour:reviewes','tour:home','tour:gallery']
     
     def changefreq(self, obj):
         return 'weekly'
@@ -40,6 +40,3 @@ class SiteSitemap(Sitemap):
     
     def location(self, obj):
         return reverse(obj)
-    
-    
-        

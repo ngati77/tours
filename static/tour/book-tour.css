@@ -49,6 +49,12 @@ ul {list-style-type: none;}
     font-size: 18px;
     color:     blue;
 }
+.min_adults{
+  margin-top: .5em;
+  margin-bottom: .5em;
+  font-size: 18px;
+  color:     red;
+}
 
 .weekdays li {
   display: inline-block;

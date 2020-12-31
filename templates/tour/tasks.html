@@ -35,8 +35,8 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
      <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{  entry.trip_time|date:'H:i'  }}</td>
-     <td>{{  entry.get_trip_guide_display }}</td>
-     <td>{{  entry.get_trip_type_display }}</td>
+     <td>{{  entry.guide.user_name }}</td>
+     <td>{{  entry.ourTour.trip_abc_name }}</td>
      <td>{{  entry.create_date|date:'d.m.Y' }}</td>
      <td><a href="{% url  'tour:tour_confirm' entry.id %}" class="btn btn-tour reg-btn"> אישור סיור</a></td>
      </tr>
@@ -75,8 +75,8 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
      <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{  entry.trip_time|date:'H:i' }}</td>
-     <td>{{  entry.get_trip_guide_display }}</td>
-     <td>{{  entry.get_trip_type_display }}</td>
+     <td>{{  entry.guide.user_name }}</td>
+     <td>{{  entry.ourTour.trip_abc_name }}</td>
      <td><a href="{% url  'tour:tour_complete' entry.id %}" class="btn btn-tour reg-btn"> סיום סיור</a></li>
      </tr>
     {% endfor %}
@@ -104,6 +104,7 @@
       <td>דואל</td>
       <td  class="more_text">הודעה</td>
       <td>אישור</td>
+      <td>מחק</td>
     </tr>
     
     {% for entry in check_contact_spam %}
@@ -115,6 +116,7 @@
      <td>{{  entry.email }}</td>
      <td  class="more_text">{{  entry.text }}</td>
      <td><a href="{% url  'tour:contact_not_spam' entry.id %}" class="btn btn-tour reg-btn">לא ספאם</a></td>
+     <td><a href="{% url  'tour:contact_spam' entry.id %}" class="btn btn-tour reg-btn">ספאם</a></td>
      
      </tr>
     {% endfor %}
@@ -220,8 +222,8 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{ entry.id }}</a></td>
      <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{ entry.trip_time|date:'H:i'  }}</td>
-     <td>{{ entry.get_trip_guide_display }}</td>
-     <td>{{ entry.get_trip_type_display }}</td>
+     <td>{{  entry.guide.user_name }}</td>
+     <td>{{  entry.ourTour.trip_abc_name }}</td>
      <td>{{ entry.create_date|date:'d.m.Y' }}</td>
      </tr>
      </table>
@@ -237,11 +239,16 @@
      <td>ילדים</td>
      <td>מקדמה</td>
      <td>סה"כ</td>
-      <td>הודעה</td>
+     <td>הודעה</td>
+     <td>מצא אותנו</td>
       </tr>
       {% for client in entry.clients_set.all %}
-      <tr class="data">
-       <td>{{ client.id }}</td>
+      {% if client.status == 'a' %}
+          <tr class="data">
+      {% else %}
+       <tr class="data_cancel">
+       {% endif %}
+     <td>{{ client.id }}</td>
      <td>{{ client.first_name }}</td>
      <td>{{ client.last_name }}</td>
      <td>{{ client.phone_number }}</td>
@@ -251,6 +258,7 @@
      <td>{{ client.pre_paid }}</td>
      <td>{{ client.total_payment }}</td>
      <td>{{ client.text }}</td>
+     <td>{{ client.foundUs.title }}</td>
       </tr>
        {% endfor %}
       </table>
@@ -283,7 +291,7 @@
     {% for entry in next_vacations %}
      <tr class="data">
      <td>{{ entry.id }}</td>
-     <td>{{ entry.get_guide_vacation_display }}</td>
+     <td>{{ entry.guide.user_name }}</td>
      <td>{{ entry.vac_start_date|date:'d.m.Y' }}</td>
      <td>{{ entry.vac_end_date|date:'d.m.Y' }}</td>
      

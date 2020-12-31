@@ -12,9 +12,10 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from datetime import date, datetime, time
-from captcha.fields import CaptchaField
- 
-    
+#from captcha.fields import CaptchaField
+
+from .models import Guide, FoundUs
+       
 class BookingForm(forms.Form):
     title          = forms.CharField(widget = forms.HiddenInput())
     trip_date      = forms.CharField(widget = forms.HiddenInput())
@@ -24,10 +25,12 @@ class BookingForm(forms.Form):
     last_name      = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
     phone          = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'מספר טלפון ביום הטיול'}))
     email          = forms.EmailField(label ='' ,widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
-    number_adults  = forms.IntegerField(max_value = 10, min_value =0, label ='מספר מבוגרים' ) 
-    number_child   = forms.IntegerField(max_value = 10, min_value =0, label ='מספר ילדים עד גיל 12')
+    number_adults  = forms.IntegerField(max_value = 20, min_value =0, initial=0, label ='מספר מבוגרים' ) 
+    number_child   = forms.IntegerField(max_value = 10, min_value =0, initial=0, label ='מספר ילדים עד גיל 12')
     confirm_use    = forms.BooleanField(label ='אני מסכים שפרטי ישמרו כדי ליצור קשר לגבי הסיור',label_suffix="")
     send_emails    = forms.BooleanField(required=False, label ='אני מעוניין להצטרף לרשימת התפוצה',label_suffix="")
+    #found_us       = forms.ChoiceField(choices=FOUND_US, label ='איך הגעתם אלינו',initial='f')
+    foundUs       = forms.ModelChoiceField(queryset=FoundUs.objects.all(), label='מצא אותנו')
     text           = forms.CharField(required=False, label  ='', widget=forms.Textarea(attrs={'placeholder': 'שדה לא חובה - אנא הוסיפו כמה פרטים על עצמכם כדי שנדע את מי אנו פוגשים. אם ובתה / משפחה / פנסיונריות . כאן זה גם המקום לכתוב אם ישנה איזה מגבלה או משהו אחר שאנו צריכים להיות מודעים אליו. תודה'}))
     deposit        = forms.IntegerField(widget = forms.HiddenInput())
     price          = forms.IntegerField(widget = forms.HiddenInput())
@@ -50,8 +53,9 @@ class BookingForm(forms.Form):
         paymentSum      = self.cleaned_data['paymentSum']
         confirm_use     = self.cleaned_data['confirm_use']
         send_emails     = self.cleaned_data['send_emails']
+        foundUs        = self.data['foundUs']
         text            = self.cleaned_data['text']
-        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, text  
+        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs, text  
        
 class PaymentForm(forms.Form):
     title          = forms.CharField(widget = forms.HiddenInput())
@@ -66,6 +70,7 @@ class PaymentForm(forms.Form):
     number_child   = forms.IntegerField(widget = forms.HiddenInput())
     confirm_use    = forms.BooleanField(widget = forms.HiddenInput())
     send_emails    = forms.BooleanField(required=False, widget = forms.HiddenInput())
+    foundUs        = forms.ModelChoiceField(queryset=FoundUs.objects.all(), widget = forms.HiddenInput())
     text           = forms.CharField(required=False, widget = forms.HiddenInput())
     deposit        = forms.IntegerField(widget = forms.HiddenInput())
     paymentSum     = forms.IntegerField(widget = forms.HiddenInput())
@@ -87,8 +92,9 @@ class PaymentForm(forms.Form):
         paymentSum      = self.data['paymentSum']
         confirm_use     = self.data['confirm_use']
         send_emails     = self.data['send_emails']
+        foundUs        = self.data['foundUs']
         text            =self.data['text']
-        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, text        
+        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs, text        
 
 
 class ContactForm(forms.Form):
@@ -98,7 +104,7 @@ class ContactForm(forms.Form):
     text           = forms.CharField(label  ='', widget=forms.Textarea(attrs={'cols':26,'placeholder': 'נושא הפנייה'}))
     
     #textdummy           = forms.CharField(hidden=True,required=False, label  ='')
-    captcha        = CaptchaField(label ='קצת חשבון',label_suffix="")
+    #captcha        = CaptchaField(label ='קצת חשבון',label_suffix="")
     
     def get_data(self):
         first_name      = self.cleaned_data['first_name']
@@ -137,16 +143,15 @@ class ReportForm(forms.Form):
     ('11', 'Nov'),
     ('12', 'Dec'),
     )
-    month              = forms.ChoiceField(choices=MONTH)
-    year               = forms.IntegerField(initial=2019)
-    check_guide        = forms.BooleanField(required=False)
-    TRIP_GUIDE = (
-    ('PE', 'Pending'),
-    ('YR', 'YaelR'),
-    ('GS', 'Gui'),
-    ('YG', 'YaelG'),
-    )
-    guide = forms.ChoiceField(choices=TRIP_GUIDE)
+    start_month      = forms.ChoiceField(choices=MONTH)
+    end_month        = forms.ChoiceField(choices=MONTH)
+    start_year       = forms.IntegerField(initial=2019)
+    end_year         = forms.IntegerField(initial=2019)
+   
+    guide = forms.ModelChoiceField(queryset=Guide.objects.all(),required=False)
+    foundUs       = forms.ModelChoiceField(queryset=FoundUs.objects.all(),required=False, label='מצא אותנו')
+    #found_us       = forms.ChoiceField(choices=FOUND_US, label ='מצא אותנו',initial='f')
+
     ORDER = (
     ('trip_date', 'Date'),
     ('trip_guide', 'Guide'),
@@ -159,15 +164,15 @@ class ReportForm(forms.Form):
     )
     output = forms.ChoiceField(choices=OUTPUT)
     def get_data(self):
-        month           = self.cleaned_data['month']
-        year            = self.cleaned_data['year']
-        check_guide     = self.cleaned_data['check_guide']
+        start_month     = self.cleaned_data['start_month']
+        end_month       = self.cleaned_data['end_month']
+        start_year      = self.cleaned_data['start_year']
+        end_year        = self.cleaned_data['end_year']
         guide           = self.cleaned_data['guide']
+        foundUs        = self.cleaned_data['foundUs']
         order           = self.cleaned_data['order']
         output          = self.cleaned_data['output']
-    
-        return month, year, check_guide, guide, order, output 
-    
+        return start_month, end_month, start_year, end_year, guide, foundUs,order, output  
 
     
 #    def clean_check_guide(self):

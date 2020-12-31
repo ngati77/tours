@@ -15,9 +15,11 @@
       
       <h2>אישור הזמנה</h2>
        <p class="lead"><strong>שם: {{client.first_name}} {{client.last_name}}</strong></p>
-      <p class="lead">סוג הסיור: {{trip_type}}</p>
-      <p> נשמח לראותכם בתאריך {{trip_date}}</p>
-      <p>  בשעה {{trip_time}}</p>
+       <p class="lead">סוג הסיור: {{client.trip.ourTour.title}}</p>
+       <p> נשמח לראותכם ביום {{day_in_hebrew }}</p>
+      <p> בתאריך {{client.trip.trip_date|date:'d.m.Y' }}</p>
+      <p>  בשעה {{client.trip.trip_time|date:'H:i'  }}</p>
+      
       <p>מספר מטיילים: {{client.number_of_people}}</p>
        {% if print_children %}
       <p>מספר ילדים: {{client.number_of_children}}</p>
@@ -28,13 +30,21 @@
        <p>הערות:</p>  
        <p>{{client.text}}</p>
       <hr>
+      {% if NotFree %}
+      <p>אל דאגה - אנחנו נשלח אליכם מייל תזכורת יום  לפני הסיור בשעה 11:00</p>
+      {% else %}
+      <p>שימו לב - כדי למנוע מצב שהמדריכה מחכה ללקוח שאינו מגיע אנחנו ניצור איתכם קשר יום לפני הסיור ונבקש אישור הגעה נוסף, במידה ולא נקבל אישור השתתפותכם בסיור תבוטל.</p>
+      <p>{{client.text}}</p>
+      {% endif %}
+      <hr>
       <p>(**שם המדריכה  שלכם יעל רימון (מכותבת למייל</p>
        <p>מספר הטלפון של יעל: 07305317171</p>
       <hr>
       <h3><font color="blue">נקודת המפגש</font></h3>
       <p>מוזיאון הפיצוויליאמס</p>
       <p"><strong>Fitzwilliam Museum</strong></p>
-      <p>:מוזיאון הפיצווילאם בכניסה הראשית, כתובת  </p>
+      <p><font color="blue">המדריכה ממתינה בכניסה הימנית של המוזיאון, מתחת לעמודי האבן הגבוהים</font></p>
+      <p>:כתובת</p>
       <p>Trumpington St, Cambridge CB2 1RB</p>
        <a href="https://www.google.co.uk/maps/place/The+Fitzwilliam+Museum/@52.1998685,0.1199856,15z/data=!4m5!3m4!1s0x0:0xb0140168bdc0b72c!8m2!3d52.1998685!4d0.1199856">מפה</a>
       <p>הכנסו לאווירת הטיול ותתחילו להתרגש בעזרת 
@@ -42,12 +52,16 @@
       </p>
       <hr>
       <div class="space"></div>
+      {% if NotFree %}
       <p>נתקבל תשלום של {{client.pre_paid}}
     פאונד
       </p>
       <p>יתרה לתשלום {{more_to_pay}}
        פאונד
       </p>
+      {% else %}
+      <p> הסיור מבוסס על טיפים לפי שביעות רצונכם</p>
+      {% endif %}
       </div>
        <hr>
       </p>
@@ -55,13 +69,20 @@
       <p>
       אם רוצים לשנות את יום הסיור אפשר להודיע 3 ימים לפני.<br>
 לעידכונים והודעות ניתן לשלוח מייל<br>
- yael.gati@cambridgeinhebrew.com
+ cambridgeinhebrew@gmail.com
+ </p>
+  
+ <p>
+     עקבו אחרנו בפייסבוק
+<br>         www.facebook.com/cambridgeinhebrew/ 
+ </p>
+ <p>
+     ובאינסטגרם
+<br>         https://www.instagram.com/cambridgeinhebrew 
  </p>
  <h3>נתראה בסיור </h3>
- <h3>יעל </h3>
+ <h3>יעל גתי</h3>
    <hr> 
-    <hr>     
-      
       
       
       <h2>הוראות הגעה ברכבת מלונדון</h2>

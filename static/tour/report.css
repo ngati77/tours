@@ -2,6 +2,18 @@
 * {box-sizing: border-box;}
 ul {list-style-type: none;}
 
+table {
+  table-layout: fixed;
+  white-space: normal!important;
+}
+
+table td 
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
+}
 table, th, td {
   border: 1px solid black;
   padding:10px; 
@@ -33,7 +45,15 @@ table, th, td {
   width: 100%;
 }
 
-.data li {
+.data_cancel {
+  background: #F56A6A;
+  margin: 0;
+  text-align: right !important;
+  padding-right:0;
+  width: 100%;
+}
+
+.data li, .data_cancel li {
   list-style-type: none;
   display: inline-block;
   width: 8%;
@@ -53,20 +73,21 @@ table, th, td {
 
 /* Add media queries for smaller screens */
 @media screen and (max-width:720px) {
-  .title li, .data li {
+  .title li, .data li, .data_cancel {
   width: 9%;
   font-size:10px;
   }
+}
 
 @media screen and (max-width: 420px) {
-  .title li, .data li {
+  .title li, .data li, .data_cancel {
   width: 8%;
   font-size:8px;
   }
 }
 
 @media screen and (max-width: 290px) {
-  .title li, .data li {
+  .title li, .data li, .data_cancel {
    width: 5%;
    font-size:8px;
   }

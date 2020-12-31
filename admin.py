@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Trip, Clients, TripAvailabilty, GuideVacation
+from .models import Trip, Clients, TripAvailabilty, GuideVacation, FoundUs
 from .models import Review, Gallery, OurTours, Guide, Guide_Background, Transaction
 from .models import Contact
 
@@ -8,8 +8,11 @@ from django.contrib.admin import AdminSite
 from django.http import HttpResponse
 from .tour_emails import tour_emails 
 from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404
 from django.conf import settings
+
 # Create your models here.
+hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
 
 
 class MyAdminSite(AdminSite):
@@ -29,14 +32,6 @@ class TransactionInline(admin.TabularInline):
     model = Transaction
     extra = 3
 
-
-    
-    
-    
-    
-
-
-
 class ClientAdmin(admin.ModelAdmin):
    
     fieldsets = [
@@ -46,52 +41,84 @@ class ClientAdmin(admin.ModelAdmin):
         (None,               {'fields': ['email']}),
         (None,               {'fields': ['number_of_people']}),
         (None,               {'fields': ['number_of_children']}),
-        
+        (None,               {'fields': ['foundUs']}),
         ('Payments',         {'fields': ['pre_paid']}),
         (None,               {'fields': ['total_payment']}),
         (None,               {'fields': ['text']}),
+        (None,               {'fields': ['status']}),
+        ('Admin',            {'fields': ['admin_comment']}),
         ('Trip',             {'fields': ['trip']}),
         
         
     ]
     inlines         = [TransactionInline]
-    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','text')
+    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','foundUs','text','status','admin_comment')
     list_filter     = ['first_name']
-    search_fields   = ['first_name']
+    search_fields   = ['first_name','last_name']
     
-    
-    def send_email_again(self, request, queryset):
+    def send_success_email(self, request, queryset):
+        emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+        emailType = 'emails/email_success.html'
         for client in queryset:
-            trip = client.trip
-            OurToursQuery = OurTours.objects.filter(trip_type=trip.trip_type)
-            transaction=client.transaction_set.all()[0]
-            if len(OurToursQuery)!=1:
-                print('Raise exception')
-            title = OurToursQuery[0].title
-            msg_plain= 'DUMMY ONE'
-            children = (client.number_of_children > 0)
-            more_to_pay=(client.total_payment-client.pre_paid)
-            try:
-                msg_html = render_to_string('emails/email_success.html', {'trip_date':trip.trip_date.strftime("%d-%m-%Y"), 
-                                                                          'trip_time':trip.trip_time.strftime('%H:%M'), 
-                                                                          'id': transaction.id, 
-                                                                          'trip_type':title, 
-                                                                          'client':client, 
-                                                                          'print_children':children, 
-                                                                          'more_to_pay':more_to_pay})
-                #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
-                emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-                #cc =['yael.gati@cambridgeinhebrew.com']
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
-            except:
-                print('Got an error... sending email...')
+            self.send_email_again(request, emailTitle, client, emailType)
+            
+    def send_update_trip_email(self, request, queryset):
+        emailTitle = "סיור בקיימברידג' - עידכון הזמנה "
+        emailType = 'emails/email_update.html'
+        for client in queryset:
+            emailTitle = emailTitle
+            self.send_email_again(request, emailTitle, client,emailType)
+            
+    def send_cancelaion_trip_email(self, request, queryset):
+        emailTitle = "סיור בקיימברידג' - ביטול סיור"
+        emailType = 'emails/email_cancelation.html'
+        for client in queryset:
+            emailTitle = emailTitle   
+            self.send_email_again(request, emailTitle, client,emailType)
+            
+    def send_email_again(self, request, emailTitle, client, emailType):
+        trip = client.trip
+        NotFree = (trip.ourTour.price != 0)
+        #if len(OurToursQuery)!=1:
+        #    print('Raise exception')
+        #title = OurToursQuery[0].title
+        msg_plain   = 'DUMMY ONE'
+        children    = (client.number_of_children > 0)
+        more_to_pay =(client.total_payment-client.pre_paid)
+        dayHeb      = hebdict[client.trip.trip_date.strftime('%a')]
+        try:
+            msg_html = render_to_string(emailType, {
+                                                  'client':client, 
+                                                  'print_children':children, 
+                                                  'more_to_pay':more_to_pay,
+                                                  'day_in_hebrew':dayHeb,
+                                                  'NotFree':NotFree})
+            #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
+            #emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+            #cc =['yael.gati@cambridgeinhebrew.com']
+            emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
+        except:
+            print('Got an error... sending email...')
+
+        self.message_user(request, "%s successfully send email to ." % client.email)
+ 
+    send_success_email.short_description        = "Resending confirmation email to a specific client"   
+    send_update_trip_email.short_description    = "Update client details"   
+    send_cancelaion_trip_email.short_description    = "Cancel trip email"
+    actions = [send_success_email, send_update_trip_email, send_cancelaion_trip_email]
     
-            self.message_user(request, "%s successfully send email to ." % client.email)
-    
-    send_email_again.short_description = "Resending the email to the specific client"
-    actions = [send_email_again]
-    
-    
+
+
+class FoundUsAdmin(admin.ModelAdmin):
+    fieldsets = [
+        
+        (None,            {'fields': ['title']}),
+        (None,            {'fields': ['precentage']}),    
+        
+    ]
+    list_display    = ('id','title','precentage')
+
+
 class TransactionAdmin(admin.ModelAdmin):
    
     fieldsets = [
@@ -126,17 +153,18 @@ class TripAdmin(admin.ModelAdmin):
         
         ('Date information', {'fields': ['trip_date']}),
         (None,               {'fields': ['trip_time']}),
-        ('Details',          {'fields': ['trip_guide']}),
-        (None,               {'fields': ['trip_type']}),
+        ('Details',          {'fields': ['guide']}),
+        ('Details',          {'fields': ['ourTour']}),
         (None,               {'fields': ['status']}),
        
         ('Date information', {'fields': ['create_date'],'classes': ['collapse']}),
         ('Comments',         {'fields': ['trip_text']}),
+        (None,               {'fields': ['total_payment']}),
        
         
     ]
     inlines         = [ClientsInline]
-    list_display    = ('id','trip_type', 'trip_date', 'trip_time' ,'trip_guide' ,'status','create_date')
+    list_display    = ('id','trip_date', 'trip_time'  ,'status','create_date','total_payment','ourTour','guide')
     list_filter     = ['trip_date']
     search_fields   = ['trip_text']
     actions         = ['track_trip']
@@ -144,29 +172,32 @@ class TripAdmin(admin.ModelAdmin):
 
 class TripAvailabiltyAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['ava_trip_type']}),
+        (None,               {'fields': ['ourTour']}),
         ('Date information', {'fields': ['ava_time']}),
         (None,               {'fields': ['ava_select_day']}),
-        ('Date information', {'fields': ['ava_no_trip_day']}),
+        ('Date information', {'fields': ['ava_trip_start_day']}),
+        ('Date information', {'fields': ['ava_trip_end_day']}),
+        
        
     ]
-    list_display    = ('ava_trip_type', 'ava_time','ava_select_day','ava_no_trip_day')
-    list_filter     = ['ava_no_trip_day']
+    list_display    = ('ourTour', 'ava_time','ava_select_day','ava_trip_start_day','ava_trip_end_day')
+    list_filter     = ['ava_trip_start_day']
     search_fields   = ['ava_select_day']
 
 class GuideVacationAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['guide_vacation']}),
+        (None,               {'fields': ['guide']}),
         ('Date information', {'fields': ['vac_start_date']}),
         ('Date information', {'fields': ['vac_end_date']}),
-        (None,               {'fields': ['vac_cancel_classy']}),
-        (None,               {'fields': ['vac_cancel_family']}),
+        (None,               {'fields': ['ourTour']}),
         (None,               {'fields': ['vac_cancel_all']}),
+
+        
        
     ]
-    list_display    = ('guide_vacation', 'vac_start_date','vac_end_date','vac_cancel_classy','vac_cancel_family','vac_cancel_all')
+    list_display    = ('guide', 'vac_start_date','vac_end_date','vac_cancel_all')
     list_filter     = ['vac_start_date']
-    search_fields   = ['guide_vacation']
+    search_fields   = ['guide']
     
 
 class ReviewAdmin(admin.ModelAdmin):
@@ -211,12 +242,12 @@ class OurTourAdmin(admin.ModelAdmin):
         (None,               {'fields': ['price']}),
         (None,               {'fields': ['priceChild']}),
         (None,               {'fields': ['deposit']}),
-        (None,               {'fields': ['trip_type']}),
+        (None,               {'fields': ['trip_abc_name']}),      
         (None,               {'fields': ['img']}),
         (None,               {'fields': ['confirm']}),
         (None,               {'fields': ['order']}),
     ]
-    list_display    = ('title','price','trip_type','img','confirm','order','priceChild','deposit')
+    list_display    = ('title','price','img','confirm','order','priceChild','deposit','trip_abc_name')
 
 class GuideBackgroundInline(admin.TabularInline):
     model = Guide_Background
@@ -229,14 +260,19 @@ class GuideAdmin(admin.ModelAdmin):
         
         (None,               {'fields': ['first_name']}),
         (None,               {'fields': ['last_name']}),
+        (None,               {'fields': ['first_name_en']}),
+        (None,               {'fields': ['last_name_en']}),
+        (None,               {'fields': ['user_name']}),
         (None,               {'fields': ['order']}),
         (None,               {'fields': ['image']}),
+        (None,               {'fields': ['phone']}),
+        (None,               {'fields': ['email']}),
         (None,               {'fields': ['general_info']}),
         (None,               {'fields': ['confirm']}),
        
     ]
     inlines         = [GuideBackgroundInline]
-    list_display    = ('first_name','last_name', 'image','confirm')
+    list_display    = ('first_name', 'last_name', 'first_name_en', 'last_name_en', 'user_name', 'order', 'image', 'phone' , 'email', 'confirm')
     search_fields   = ['first_name']
     
     
@@ -249,7 +285,7 @@ class ContactAdmin(admin.ModelAdmin):
         (None,               {'fields': ['text']}),
         (None,               {'fields': ['confirm']}),
     ]
-    list_display    = ('create_date','first_name','last_name','email','text','confirm')
+    list_display    = ('id','create_date','first_name','last_name','email','text','confirm')
     list_filter     = ['create_date']
 
 
@@ -265,6 +301,7 @@ admin.site.register(Guide, GuideAdmin)
 admin.site.register(Clients, ClientAdmin)
 admin.site.register(Contact,ContactAdmin)
 admin.site.register(Transaction,TransactionAdmin)
+admin.site.register(FoundUs,FoundUsAdmin)
 
 
 

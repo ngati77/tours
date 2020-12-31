@@ -3,15 +3,18 @@
 {% block content %}
 
 <!-- Navigation -->
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = 'https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v3.2';
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
+<!--
 
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v3.2';
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+-->
+    
 <!--- Image Slider -->
 <div class="container-fluid">
     <div id="slides" class="carousel slide" data-ride="carousel">
@@ -24,55 +27,56 @@
 <!--- Jumbotron -->
     <div class="jumbotron row d-flex  justify-content-center text-center ">
         <div class="col-sm-12 col-md-10 col-lg-3 runner order-1 order-lg-0">
-        <!--
+       
             <div class="row">
-                 <a href="#"  class="btn btn-runner">הבלוג יעלה בקרוב<i class="fa fa-chevron-circle-left arrow1 arrow"></i></button></a>
-            </div>
-         -->   
-            <div class="row">
-                <hr class="light">
-            </div>
-            <div class="row">
-                  <div class="title2">
-     המלצות
-                  </div>
-    
+                <div class="title2">
+                    המלצות
+                </div>
+                
             </div>
             
             {% for review in reviewes %}
             <div class="review">
-
+                
                 <div class="review_header">
-                <div class="text-left mb-2"><i><b>{{ review.create_date|date:"d.m.Y" }}</b></i></div>
-                     <i class="fa fa-quote-right" aria-hidden="true"></i>
+                    <div class="text-left mb-2"><i><b>{{ review.create_date|date:"d.m.Y" }}</b></i></div>
+                    <i class="fa fa-quote-right" aria-hidden="true"></i>
                     <div class="row review_header" ><p>{{review.title}}</p> </div>
                 </div>
                 <div class="row review_text">
                     <p>{{review.review_text}}</p>
                     
                 </div>
-               
+                
                 <div class="review_name">
-                     <i class="fa fa-quote-left" aria-hidden="true"></i>
+                    <i class="fa fa-quote-left" aria-hidden="true"></i>
                     <p>{{review.first_name}}</p>
-                   
+                    
                 </div>
                 
                 
-               
+                
             </div>
             {% endfor %}
             
-              <div class="row">
-                 <a href="{% url  'tour:reviewes' %}"><button type="button" class="btn btn-runner">  עוד המלצות באתר
-                 <i class="fa fa-chevron-circle-left arrow arrow2"></i></button></a>
-                 </div>
-                 <div class="row">
-                     <div class="review_facebook">וגם בפייסבוק</div>
-                 </div>
-                 <div class="row" width="80%">
-                      <div class="fb-page" data-href="https://www.facebook.com/cambridgeinhebrew"  data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="false"><blockquote cite="https://www.facebook.com/cambridgeinhebrew" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/cambridgeinhebrew">‎Cambridge In Hebrew קיימברידג&#039; בעברית‎</a></blockquote></div>
+            <div class="row">
+                <a href="{% url  'tour:reviewes' %}"><button type="button" class="btn btn-runner">  עוד המלצות באתר
+                    <i class="fa fa-chevron-circle-left arrow arrow2"></i></button></a>
                 </div>
+                
+                <div class="row">
+                       <a href="{% url  'blog:post_list' %}"><button type="button" class="btn btn-runner">  לבלוג
+                       <i class="fa fa-chevron-circle-left arrow arrow2"></i></button></a>
+                  </div>   
+                <!--
+                    
+                    <div class="row">
+                        <div class="review_facebook">וגם בפייסבוק</div>
+                    </div>
+    <div class="row" width="80%">
+        <div class="fb-page" data-href="https://www.facebook.com/cambridgeinhebrew"  data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="false"><blockquote cite="https://www.facebook.com/cambridgeinhebrew" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/cambridgeinhebrew">‎Cambridge In Hebrew קיימברידג&#039; בעברית‎</a></blockquote></div>
+    </div>
+-->
              
             
         </div><!-- col-md-3 col-lg-4 disapear_sm runner -->
@@ -88,78 +92,101 @@
             </p>
                 -->  
                   <p class="text1">
-            סיור פרטי בעיר העתיקה והקסומה של קיימברידג׳ 
-בואו לסיור מודרך בעברית ותהנו מיום בילוי מקסים וחוויתי.
-במרחק של כ-50 דק' נסיעה ברכבת מלונדון, מחכה לכם פנינה אמיתית. 
-סיור שלוקח אותכם אל תוך דפי ההיסטוריה בין המבנים המפוארים של הקולג׳ים.
-הסיור מלווה בהסברים וסיפורים על בני מלוכה ואנשים מעניינים וחשובים שחיו כאן.
-לבחירתכם מגוון סיורים פרטיים
+            קחו לכם יום הפוגה מהעיר הגדולה ותיהנו מיום בילוי מקסים וחוויתי. במרחק של כ-50
+דק' נסיעה ברכבת מלונדון, מחכה לכם פנינה אמיתית.<br>
+
+מדריכות ישראליות מקומיות יובילו אתכם בסמטאותיה הציוריות של העיר ותרגישו
+שאתם צועדים במרחבי מוזיאון פתוח.
+<br>
+המראות ילוו בסיפורים והסברים מעניינים הקשורים לעיר ולהיסטוריה של הממלכה
+כולה.
    
             <div class="row tips-row d-flex justify-content-center">
-                <div class="col-sm-12 col-md-2 tips  ">
+                <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>מגוון סיורים פרטיים.</p>
+                    <p>הסיורים מדורגים ב5 כוכבים בגוגל ,בטריפ אדוויזר ובפייסבוק</p>
                 </div>
-                <div class="col-sm-12 col-md-2 tips  ">
+                <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star  circle-icon "  style="color:white; font-size: 13px;"></i>
-                    <p>בנינו עבורכם מסלול מעניין ביותר, העובר במקומות נפלאים בעיר.</p>
+                    <p>קחו הפסקה מהמולת העיר הגדולה לונדון וכנסו אל תוך סיפור אגדה</p>
                 </div>
-                <div class="col-sm-12 col-md-2 tips  ">
+                <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>אין צורך להתלבט ולהסתבך - שאלו אותנו, אנחנו יודעים!</p>
+                    <p>פשוט וקל להגיע 50 דקות נסיעה ברכבת ממרכז לונדון</p>
                 </div>
-                <div class="col-sm-12 col-md-2 tips  ">
+                <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>הכי כיף לדבר עם המדריך ולהבין כל מילה - אין כמו עברית!</p>
+                    <p>יחס אישי ומסור ממדריכות ישראליות מקומיות</p>
                 </div>
-                <div class="col-sm-12 col-md-2 tips  ">
+                <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>ניתן לתאם איתנו איסוף מתחנת הרכבת.</p>
+                    <p>אם ברצונך להזמין סיור למחר, אנא כיתבי לנו לפני ביצוע ההזמנה.</p>
+                </div>
+                <div class="col-sm-12 col-md-3 tips  ">
+                    <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
+                    <p>ניתן לתאם איסוף בחינם מתחנת הרכבת</p>
                 </div>
             </div>
           </div>
            <hr class="short">
                  
+           <!--- Our tours row -->
            <div class="display-4">הסיורים שלנו</div>
-                    
-          
-<!--- Our tours row -->
-
-            {% for card in ourTours %}
-                <div class="row ">
-                    <div class="col-sm-4 ">
-                         <h4 class="card-title">{{card.title}}</h4>
-                         <img class="card-img-top" src="{{card.img.url}}">
-                    </div>
-                    <div class="col-sm-6 ">
-                        <div class="card-body">
-                            <p><b>{{card.headerShort1}}</b></p>
-                            <p>{{card.descriptionShort1}}</p>
-                            <p><u>למי הסיור מתאים?</u></p>
-                            <p>{{card.whoCanDoIt}}</p>
-                        </div>
-                    </div>
-                    <div class="col-xs-4 col-sm-1 align-self-end ">
-                    <a href="{% url  'tour:tour_details' card.trip_type %}" class="btn btn-tour reg-btn"> לפרטים והרשמה</a>
+           {% for card in ourTours %}
+           <div class="row ">
+               <div class="col-sm-4 ">
+                   <h4 class="card-title">{{card.title}}</h4>
+                   <img class="card-img-top" src="{{card.img.url}}">
+                </div>
+                <div class="col-sm-6 ">
+                    <div class="card-body">
+                        <p><b>{{card.headerShort1 |linebreaks }}</b></p>
+                        <p>{{card.descriptionShort1 |linebreaks }}</p>
+                        <p><u>למי הסיור מתאים?</u></p>
+                        <p>{{card.whoCanDoIt}}</p>
                     </div>
                 </div>
+                <div class="col-xs-4 col-sm-1 align-self-end ">
+                    <a href="{% url  'tour:tour_details' card.trip_abc_name %}" class="btn btn-tour reg-btn"> לפרטים והרשמה</a>
+                </div>
+            </div>
             {% endfor %}
             
             <div class="row">
-             <hr class="light">
-             </div>
-             
-            <div class="row  d-flex justify-content-center">
-            
-            <video width="80%" controls>
-            <source src="{% static 'tour/videos/Cambridge_In_Hebrew.mp4' type='video/mp4' %}">
-            Your browser does not support the video tag.
-            </video>
+                <hr class="light">
             </div>
-            
+            <div class="row  d-flex justify-content-center">
+                
+                <video width="80%" controls>
+                    <source src="{% static 'tour/videos/cambridge_in_hebrew_in_a_brief.mp4' type='video/mp4' %}">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+            </div><!-- col-sm-12 col-md-12 col-lg-8 order-0 order-lg-1 -->
+        </div><!-- jumbotron row  text-center .d-none .d-sm-block -->
+        
+        <!--- Posts-->
+        <div class=" row d-flex justify-content-center text-right">
+            <div class="row">
+                <hr class="light">
+            </div>
+            <div class="blog_name">
+                <h2> מתוך בלוג הטיולים שלנו</h2>
+            </div>
+        </div><!--  row d-flex justify-content-center order-2 -->
+        <div class=" row d-flex justify-content-center text-right">
+                    {% for post in latest_posts %}
+                    <div class="col-sm-12 col-md-8 col-lg-4">
+                        <a href="{% url  'blog:post_detail' url=post.url %}">{{post.title |linebreaks }}</a>
+                        <a href="{% url  'blog:post_detail' url=post.url %}"><img class="card-img-post" src="{{post.image.url}}"></a>
+                        {{post.text |linebreaks }}
+                    </div>
+                    {% endfor %}
+                
+            </div><!--  row d-flex justify-content-center order-2 -->
             
 <!--- Close previous div -->
-        </div><!-- jumbotron row  text-center .d-none .d-sm-block -->
     </div><!-- container-fluid -->
 <!--- Welcome Section -->
 

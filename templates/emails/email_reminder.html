@@ -2,7 +2,36 @@
 <html lang="he"
     dir = "rtl">
 <head>
+ <style type="text/css">
+ .btn-tour {
+    
+    background-color: Transparent;
+    border: 2px solid #124789!important;
+    color:     #124789;
+    text-align: right;
+    margin-bottom: 0.2rem!important;
+    margin-right: 0rem!important;
+    margin-top: 0.2rem!important;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+}
 
+.btn-tour:hover {
+
+    background-color: #124789;
+    border: 1px solid #124789;
+    color:     white;
+    text-align: right;
+    
+}
+
+.space {
+    margin:2rem;
+}
+
+ 
+ </style>
 </head>
 <body>
 
@@ -12,13 +41,28 @@
       <img width=50% src="https://cambridgeinhebrew.com/media/Gallery/2018/12/Cambridge_Kings_college.jpg">
       <h3><font color="blue"> הי {{client.first_name}}</font></h3>
       <h3><font color="blue"> איזה כיף הסיור שלנו מחר</font></h3>
+      {% if NotFree %}
+      <p></p>
+      {% else %}
+      <p>אנא ליחצו על הכפתור המתאים לאישור הסיור, לאחר מכן תוכלו לחזור לדוא"ל</p>
+      <div class="row space" align="right">
+      <a href="https://www.cambridgeinhebrew.com/can_make_it/{{client.id}}" class="btn btn-tour ">בטח שאנחנו מגיעים</a>
+     </div>
       
+     <div class="row space" align="right">
+      <a href="https://www.cambridgeinhebrew.com/cant_make_it/{{client.id}}" class="btn btn-tour ">לצערנו לא נוכל להגיע</a>
+     </div>
+      {% endif %}
       <p >אנו מזכירים לך להגיע בשעה {{trip_time|date:"H:i"}} למוזיאון הפיצווילאמס בקיימברידג׳</p>
+      <p><font color="blue">המדריכה ממתינה בכניסה הימנית של המוזיאון, מתחת לעמודי האבן הגבוהים</font></p>
       <p>:כתובת</p>
       <p class="lead">The Fitzwilliam Museum</p>
       <p>Trumpington St, Cambridge CB2 1RB</p>
-     
-       <p> אנא זיכרו להביא איתכם כסף מזומן כדי לשלם למדריך את יתרת התשלום {{more_to_pay}} פאונד</p>
+      {% if NotFree %}
+      <p> אנא זיכרו להביא איתכם כסף מזומן כדי לשלם למדריך את יתרת התשלום {{more_to_pay}} פאונד</p>
+      {% else %}
+      <p> הסיור מבוסס על טיפים לפי שביעות רצונכם</p>
+      {% endif %}
        <hr>
      
        <p>טלפון בזמן הטיול: {{client.phone_number}}</p>
@@ -26,9 +70,29 @@
        <p>מידע נוסף</p>  
        <p>{{client.text}}</p>
       <hr>
-      <p>(**שם המדריכה  שלכם יעל רימון (מכותבת למייל</p>
-       <p>מספר הטלפון של יעל: 07305317171</p>
+      <p>(** שם המדריכה  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותבת למייל</p>
+      <p>מספר הטלפון של {{ client.trip.guide.first_name }} : {{ client.trip.guide.phone }} </p>
+      
       <hr>
+      <p>      
+      לעידכונים והודעות ניתן לשלוח מייל<br>     
+         cambridgeinhebrew@gmail.com
+     </p>
+      <p>
+     עקבו אחרנו בפייסבוק
+<br>         www.facebook.com/cambridgeinhebrew/ 
+ </p>
+ <p>
+     ובאינסטגרם
+<br>         https://www.instagram.com/cambridgeinhebrew 
+ </p>
+     <h3>נתראה בסיור </h3>
+     {% if client.trip.trip_guide == 'YR' %}
+      <h3>יעל רימון</h3>
+      {% else %}
+      <h3>יעל גתי</h3>
+      {% endif %}
+     
       
       <h2>הוראות הגעה ברכבת מלונדון</h2>
       <p><strong>לעיתים יש שינויים בזמני הרכבות, שימו לב לשעות כשאתם מגיעים לתחנה</strong></p>

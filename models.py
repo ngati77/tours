@@ -2,14 +2,9 @@ from django.db import models
 import datetime
 from django.utils import timezone
 from django.db.models import Q
-
-
-
-
-
+from django.shortcuts import get_object_or_404
 
 TRIP_DAYS = (
-    ('Non', 'None'),    
     ('Sun', 'ראשון'),  
     ('Mon', 'שני'),  
     ('Tue', 'שלישי'),  
@@ -19,23 +14,6 @@ TRIP_DAYS = (
     ('Sat', 'שבת'), 
     ('All', 'כל יום'), 
 )
-
-TRIP_GUIDE = (
-    ('PE', 'Pending'),
-    ('YR', 'YaelR'),
-    ('GS', 'Gui'),
-    ('YG', 'YaelG'),
-)
-
-TRIP_TYPE = (
-        ('C', 'Classic'),
-        ('F', 'Family'),
-        ('W', 'Winter'),
-        ('B', 'Bus'),
-        ('P', 'Punting'),
-        ('A', 'All'),
-        )
-#TRIP_TYPE_HEB = {'C': 'סיור קלאסי','F': 'סיור משפחות','B': 'אוטובוס מלונדון','P': 'סיור פרטי'} 
 
 STATUS_TRIP = (
     ('n', 'New'),
@@ -48,50 +26,26 @@ STATUS_TRIP = (
 hebmonthdic = {'Jan': 'ינואר', 'Feb' : 'פברואר' , 'Mar' : 'מרץ', 'Apr': 'אפריל' , 'May' : 'מאי' , 'Jun' : 'יוני' , 'Jul' : 'יולי' , 'Aug' : 'אוגוסט' , 'Sep' : 'ספטמבר' , 'Oct' : 'אוקטובר' , 'Nov' : 'נובמבר' , 'Dec' : 'דצמבר' }
 
 class Guide(models.Model):
-    first_name         = models.CharField(max_length=20)
-    last_name          = models.CharField(max_length=20)
+    first_name         = models.CharField(max_length=20, default="")
+    last_name_en       = models.CharField(max_length=20, default="")
+    first_name_en      = models.CharField(max_length=20, default="")
+    last_name          = models.CharField(max_length=20, default="")
+    user_name          = models.CharField(max_length=20, default="")
+    phone              = models.CharField(max_length=20, default="")
+    email              = models.EmailField(blank=True, default="")
     image              = models.ImageField(blank = True, null = True, upload_to = 'Guide/%Y/%m/')
     order              = models.IntegerField(default=0)
     general_info       = models.TextField(max_length=600)
     confirm            = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.user_name
 
 class Guide_Background(models.Model):
     question       = models.TextField(max_length=600)
     answer         = models.TextField(max_length=600)
     trip           = models.ForeignKey(Guide, on_delete=models.CASCADE)
     
-    
-
-class TripAvailabilty(models.Model):
-    ava_trip_type   = models.CharField(
-        max_length=1,
-        choices=TRIP_TYPE,
-        default='C',
-    )
-    ava_select_day   = models.CharField(
-        max_length=3,
-        choices=TRIP_DAYS,
-        default='Non',
-    )
-    ava_time = models.TimeField('If every day trip enter time', blank=True, null=True)
-
-    ava_no_trip_day  = models.DateTimeField('Cancel trip option on this day',blank=True, null=True)
-    
-              
-        
-class GuideVacation(models.Model):
-    
-    guide_vacation = models.CharField(
-        max_length=2,
-        choices=TRIP_GUIDE,
-        default='YR',
-    )
-    vac_start_date    = models.DateField('First day guide on holiday') 
-    vac_end_date      = models.DateField('Last day guide on holiday') 
-    vac_cancel_classy = models.BooleanField(default=False)
-    vac_cancel_family = models.BooleanField(default=False)
-    vac_cancel_all    = models.BooleanField(default=False)
-
 
 class Review(models.Model):
    
@@ -119,21 +73,50 @@ class OurTours(models.Model):
     deposit            = models.IntegerField(default=0)
     img                = models.ImageField(blank = True, null = True, upload_to = 'Tours/%Y/%m/')
     confirm            = models.BooleanField(default=False)
-    trip_type          = models.CharField(
-                                        max_length=1,
-                                        choices=TRIP_TYPE,
-                                        default='C',
-                                        )
+
+    trip_abc_name     = models.CharField(max_length=20,default='Classic')
+
     order              = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.trip_abc_name
     
+class GuideVacation(models.Model):
+    guide           = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
+    ourTour         = models.ForeignKey(OurTours, on_delete=models.SET_NULL,  blank=True, null=True)
+    
+    vac_start_date    = models.DateField('First day guide on holiday',default=datetime.date.today) 
+    vac_end_date      = models.DateField('Last day guide on holiday', default=datetime.date.today) 
+    vac_cancel_all    = models.BooleanField(default=False)    
    
+
+class TripAvailabilty(models.Model):
+    
+    ourTour         = models.ForeignKey(OurTours, on_delete=models.SET_NULL,  blank=True, null=True)
+    ava_select_day   = models.CharField(
+        max_length=3,
+        choices=TRIP_DAYS,
+        default='All',
+    )
+    ava_time = models.TimeField('If every day trip enter time')
+
+
+    ava_trip_start_day  = models.DateField('Start day',blank=True, null=True)
+    ava_trip_end_day  = models.DateField('End day',blank=True, null=True)
+
     
 class Gallery(models.Model):
     img                = models.ImageField(blank = True, null = True, upload_to = 'Gallery/%Y/%m/')
     title              = models.CharField(max_length=200)
     text               = models.TextField(max_length=600)
     confirm            = models.BooleanField(default=True)
-    
+
+class FoundUs(models.Model):
+    title                   = models.CharField(max_length=200)
+    precentage              = models.IntegerField(default=0, blank=True, null=True)
+
+    def __str__(self):
+        return self.title 
 
 class Trip(models.Model):
     '''
@@ -142,36 +125,19 @@ class Trip(models.Model):
     '''
     trip_text   = models.CharField(max_length=200, blank=True)
     trip_date   = models.DateField('Tour date')
-    trip_time   = models.TimeField('Tour time', blank=True)
+    trip_time   = models.TimeField('Tour time')
     create_date = models.DateTimeField(default=timezone.now)
     
-    
-    
-    trip_type   = models.CharField(
-        max_length=1,
-        choices=TRIP_TYPE,
-        default='C',
-    )
-    
-    trip_guide = models.CharField(
-        max_length=2,
-        choices=TRIP_GUIDE,
-        default='YR',
-    )
+    guide              = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
+    ourTour            = models.ForeignKey(OurTours, on_delete=models.SET_NULL, blank=True, null=True)
     
     status = models.CharField(
             max_length=1, 
             choices=STATUS_TRIP,
             default='n',
             )
-    
+    total_payment      = models.IntegerField(default=0, blank=True, null=True)
     def __str__(self):
-#        print('Trip indo')
-#        print('Trip date: ')
-#        print(self.trip_date)
-#        print('Trip time: ')
-#        print(self.trip_time)
-#        print(type(self.trip_time))
         return str(self.id)
     
     
@@ -183,11 +149,61 @@ class Trip(models.Model):
             return True
         else:
             return False
+        
+    def get_trip_sum(self):
+        '''
+        This function summerise the total incomne of a trip
+        
+        '''
+        #reportEntry = ReportEntry(self.ourTour.title, self.trip_date.strftime("%d.%m.%y"), self.guide.name())
+        reportEntry = ReportEntry(self.ourTour.trip_abc_name, self.trip_date.strftime("%d.%m.%y"), self.guide.user_name)
+        # Get all cilents from a trip hopefully more than one
+        clientQuerey = self.clients_set.all()
+        # Scan all clients, in the futrue need to scan the invoice
+        reportEntry.trip_id         = self.id
+        for client in clientQuerey:
+            if client.status != 'a':
+                continue
+            reportEntry.total_people    += client.number_of_people
+            reportEntry.total_children  += client.number_of_children
+            reportEntry.total_deposit   += client.pre_paid
+            reportEntry.total_gross     += client.total_payment
+        
+        # If it is a free tour, then the anount is in the trip total amount
+        if (reportEntry.total_gross == 0):
+            reportEntry.total_gross = self.total_payment
+        # If Yael Gati is the guide for this tour. then we don't need to pay her!!!
+        if (self.guide.user_name == 'yaelg'):
+            reportEntry.total_guide_exp = 0
+            reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense
+            reportEntry.guide_payback = 0
+        else:
+            
+            # How much the guide earn from this tour
+            reportEntry.total_guide_exp = reportEntry.calc_guide_payment(
+                                                                    adult     = reportEntry.total_people,
+                                                                    children  = reportEntry.total_children,
+                                                                    ourTour   = self.ourTour)
+            # how much we earend
+            reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
+            # Now that we know how much the guide earn we can calculate home amount he needs to return
+            reportEntry.guide_payback   = reportEntry.total_neto - reportEntry.total_deposit
+        
+        
+        
+        return reportEntry
+        
+        
+        
     @staticmethod
-    def get_event(date):
+    def get_event(date,trip_abc_name):
+        trip_abc_name
+        ourTour = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
+
         return Trip.objects.filter(
                                 ~Q(status='b'),
-                                trip_date=date)
+                                trip_date=date,
+                                ourTour=ourTour)
      
     #was_published_recently.admin_order_field = 'pub_date'
     #was_published_recently.boolean = True
@@ -202,7 +218,9 @@ class Clients(models.Model):
     ('a', 'Confirmed'),
     ('b', 'Canceled'),
     ('c', 'Canceled and refund'),
-)
+    )
+    
+    
     trip             = models.ForeignKey(Trip, on_delete=models.CASCADE)
     first_name       = models.CharField(max_length=200)
     last_name        = models.CharField(max_length=200)
@@ -220,8 +238,10 @@ class Clients(models.Model):
                                         choices=STATUS_CLIENT,
                                         default='a',
                                         )
-    
-    text               = models.TextField(max_length=600)
+
+    foundUs             = models.ForeignKey(FoundUs,    on_delete=models.SET_NULL, blank=True, null=True)
+    text                = models.TextField(max_length=600, blank=True)
+    admin_comment       = models.TextField(max_length=120, blank=True)
     
     #create_date      = models.DateTimeField('date create')
     
@@ -264,6 +284,77 @@ class Contact(models.Model):
 
     
     #create_date      = models.DateTimeField('date create')
+
+ # This class is used in the report.html
+class ClientReportEntry: 
+    def __init__(self, client, precentage):
+        self.client   = client
+        self.comission   = client.total_payment * precentage / 100.0
+        
+    def __str__(self):
+        return (str(self.client.first_name) +'_'+ str(self.client.last_name)+'_'+ str(self.comission)) 
+# This class is used in the report.html
+class ReportEntry: 
+    def __init__(self, trip_abc_name, trip_date, guide):
+        self.trip_text   = trip_abc_name
+        self.trip_date   = trip_date
+        self.trip_guide  = guide
+
+        self.trip_time       = ''
+        self.trip_id         = 0
+        self.total_people    = 0
+        self.total_children  = 0
+
+        self.total_deposit   = 0
+        self.total_gross     = 0
+        self.total_guide_exp = 0
+        self.other_expense   = 0
+        self.guide_payback   = 0
+        self.total_neto      = 0
+        
+    def __str__(self):
+        return (str(self.trip_id) +'_'+ str(self.total_people)+'_'+ str(self.total_neto)) 
+
+    """
+    Return report between range of guides and according to the guide
+    """
+    # This function calculate how much money the guide owe the company
+    def calc_guide_payment(self ,adult, children, ourTour):
+        # Before calculating Guide salary check if children are paying
+
+        # If it is a payed our then
+        if ourTour.price > 0:
+            ChildAccount    = ourTour.priceChild > 0
+            # If children are account take the number of them otherwise set it to zero
+            childNum        = children if ChildAccount else 0
+            # Just add chidren to people
+            totalPeople     = adult +  childNum
+            # if more than 2 peole than we have extra to add
+            extraPeople     = (totalPeople-2) if totalPeople > 2 else 0
+            # Base amount 40 + 5 Pound per person
+            return (40 + 5 * extraPeople)
+        # It is a free tour, guide ge 50% with minimum of 40
+        
+        else:
+            if (self.total_gross < 80):
+                return 40
+            else:
+                return self.total_gross/2.0
+            
+
+    def __add__(self, reportEntry):
+        '''
+        New operator to add 
+        '''
+        self.total_people      += reportEntry.total_people
+        self.total_children    += reportEntry.total_children
+        self.total_deposit     += reportEntry.total_deposit
+        self.total_gross       += reportEntry.total_gross
+        self.guide_payback     += reportEntry.guide_payback   
+        self.total_guide_exp   += reportEntry.total_guide_exp
+        self.total_neto        += reportEntry.total_neto
+        return self
+        
 
 class Calendar:
     
@@ -348,11 +439,11 @@ class DayInCalendar:
     
     def __init__(self, request, dateInCalendar, today, view):
         self.events=[]
-        hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
         
         self.year  = dateInCalendar.year
         self.month = dateInCalendar.month
         self.day   = dateInCalendar.day 
+        min_adults = '2'
         
         # If client then bring the relevant day of avliable tours
         # Remove days were guide is on vacation and tour isn't possible
@@ -364,9 +455,7 @@ class DayInCalendar:
         else:
            self.fill =    ""
         
-#        if (dateInCalendar.day==1):
-#            self.dayNumStr     =  str(dateInCalendar.day) + '    .....   ' + hebmonthdic[dateInCalendar.strftime("%b")]
-#        else:
+
         if self.year == 1977:
             self.dayNumStr     =  ""
         else:
@@ -378,8 +467,11 @@ class DayInCalendar:
         self.attr = False
         self.vac = False
         # Only gor Managment
-        if (request.user.is_authenticated and view == 'A'):
-#        if (False):
+        today_full      = datetime.datetime.now()
+        
+
+
+        if (request.user.is_authenticated and view == 'All'):
             # If user then bring relevant data of:
             # Planned trips for user
             # Days off for user
@@ -397,65 +489,62 @@ class DayInCalendar:
             if len(guideVacationQuery)>0:
                 self.vac = True
             # Now print day off    
-#            for vac in guideVacationQuery:
-#                attr = "event d-block p-1 pl-2 pr-2 mb-1 rounded text-truncate small bg-info text-white"
-#                text  = 'Vaction ' + vac.guide_vacation
-#                link  = None  
-#                self.events.append(EventAttr(attr=attr, text=text, link=link, hour=11, trip_type='C', trip_id =1))
-            
-        
+
         elif (dateInCalendar > today):
-            
-            # Check specific day in the week
-            availableDateQuery0     = TripAvailabilty.objects.filter(Q(ava_select_day    =   dateInCalendar.strftime('%a')))
-            # Check for all days
-            availableDateQuery1     = TripAvailabilty.objects.filter(Q(ava_select_day    =   'All'))
-            availableDateQuery = availableDateQuery1 | availableDateQuery0
-            
-                   
+            # After 16:00 allow book a trip to the next day, if there is already one. Build the date here
+            days_add = 1 if today_full.hour > 14 else 0
+            today_check = today + datetime.timedelta(days=days_add)
+            # Bring all relevant tours
+            availableDateQuery       = TripAvailabilty.objects.filter(ourTour__trip_abc_name = view)     
             for tripAvailabilty in availableDateQuery:
-                #print(tripAvailabilty.ava_trip_type)
-                if (tripAvailabilty.ava_trip_type != 'A' and tripAvailabilty.ava_trip_type != view):
+
+                # Check if start day is bigger than the day in the calendar
+                if (tripAvailabilty.ava_trip_start_day != None and tripAvailabilty.ava_trip_start_day > dateInCalendar ):
                     continue
+                # Check if end day is smaller than the day in the calendar
+                if (tripAvailabilty.ava_trip_end_day != None and tripAvailabilty.ava_trip_end_day < dateInCalendar ):
+                    continue
+                # Now that we know trip is in the right dates, check if it run every day or on a prticular day
+                if (tripAvailabilty.ava_select_day != 'All' and tripAvailabilty.ava_select_day != dateInCalendar.strftime('%a') ):
+                    continue
+
                 canceled = False
-                # Check if the trip was canceld
-                noneAvailableDateQuery = TripAvailabilty.objects.filter(ava_no_trip_day__year  = dateInCalendar.year,
-                                                                        ava_no_trip_day__month = dateInCalendar.month,
-                                                                        ava_no_trip_day__day   = dateInCalendar.day,
-                                                                        ava_no_trip_day__hour  = tripAvailabilty.ava_time.hour
-                                                                        )
-                for noneAvailableDate in noneAvailableDateQuery:
-                    #print(noneAvailableDate.ava_no_trip_day.strftime("%Y-%M-%D-%H"))
-                    if noneAvailableDate.ava_trip_type == 'A' or noneAvailableDate.ava_trip_type == tripAvailabilty.ava_trip_type:
-                        #print("TRUE")
-                        # Break from nearset for
-                        canceled = True
-                        break
-                # As it was canceled move to the next item in the lisy
-                if (canceled):
-                    continue
                 
-                for vac in guideVacationQuery:
-                    if (vac.vac_cancel_all) or (vac.vac_cancel_family and view=='F') or (vac.vac_cancel_classy and view=='C'):
+
+                # Guide on holiday there is no tour on this day
+                for vac in guideVacationQuery:                     
+                    if ((vac.vac_cancel_all) or (vac.ourTour != None and vac.ourTour.trip_abc_name == view)):
                         canceled = True
                         break
-                # Guide on holiday there is no tour on this day
                 if (canceled):
+                    #print("Skip this tour no guides")
                     continue
                     
-                # Check if their is already a different trip on this day, we don't want two trips on the same day
+                # Check if there is already a different trip on this day, we don't want two trips on the same day
                 tripQuery = Trip.objects.filter(trip_date__year  = dateInCalendar.year,
                                                 trip_date__month = dateInCalendar.month,
                                                 trip_date__day   = dateInCalendar.day,
                                                 trip_time__hour  = tripAvailabilty.ava_time.hour,
+                                                trip_time__minute  = tripAvailabilty.ava_time.minute,
+                                                trip_time__second  = tripAvailabilty.ava_time.second
                                                 
                                                 )
-              
-                # We found a trip let's check if it is a different one.
+                # Set the default value, if looking on tommorow allow only if it before 16:00, or there is a trip exit
+                canceled = True if dateInCalendar == today_check else False
+
                 for trip in tripQuery:
-                    if (trip.status  != 'b' and trip.trip_type != view):
+
+                    # We found a trip let's check if it is a different one.
+                    if (trip.get_status_display  != 'Canceled' and trip.ourTour.trip_abc_name != view):
                         canceled = True
                         break
+                    
+                    # If it is after 16:00 - if trip exist then allow to book it
+                    if (trip.get_status_display  != 'Canceled' and trip.ourTour.trip_abc_name == view):
+                        min_adults = '1'
+                        canceled = False
+                        break
+
                 if (canceled):
                     continue
                     
@@ -464,13 +553,7 @@ class DayInCalendar:
                 self.attr = True
                 self.id   = dateInCalendar.strftime('%d_%m_%Y')
                 self.id   += "-"+ tripAvailabilty.ava_time.strftime('%H_%M')
-                
-            
-                
-                
-
-
-
+                self.id   += "-"+ min_adults
     
     def __str__(self):
         return self.first_name
