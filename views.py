@@ -518,11 +518,12 @@ def success (request,pk):
 def failure (request,pk):
     client = get_object_or_404(Clients, pk=pk)
     client.status = 'b'
+    client.admin_comment = 'Payment failed'
     client.save()
     # if a new trip was created then update the status to 'new' from 'pending'
     if client.trip.status == 'p':
         client.trip.status='b'
-        client.admin_comment = 'Payment failed'
+
         client.trip.save()
     
 
