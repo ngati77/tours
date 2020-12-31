@@ -310,6 +310,7 @@ def create_checkout_session(request, client_id, deposit):
                         'quantity': 1,
                         'currency': 'gbp',
                         'amount': deposit*100,
+                        'images':['https://cambridgeinhebrew.com/media/Gallery/2018/12/Cambridge_Kings_college.jpg'],
                     }
                 
                 ],
