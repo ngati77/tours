@@ -543,9 +543,6 @@ class DayInCalendar:
                     
 
                     if (trip.get_status_display()  != 'Canceled' and trip.ourTour.trip_abc_name != view):
-                        print(trip.get_status_display)
-                        print(trip.ourTour.trip_abc_name)
-                        print(view)
                         canceled = True
                         break
                     
