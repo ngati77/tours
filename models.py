@@ -547,7 +547,7 @@ class DayInCalendar:
                         break
                     
                     # This is a new tour, so we flag that we need at least two people, or beeter to say amonut above 60
-                    if (trip.get_status_display  != 'Canceled' and trip.ourTour.trip_abc_name == view):
+                    if (trip.get_status_display()  != 'Canceled' and trip.ourTour.trip_abc_name == view):
                         min_adults = '1'
                         break
 
