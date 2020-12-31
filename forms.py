@@ -17,33 +17,37 @@ from datetime import date, datetime, time
 from .models import Guide, FoundUs
        
 class BookingForm(forms.Form):
+    
+    first_name     = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
+    last_name      = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
+    phone          = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'מספר טלפון ביום הטיול'}))
+    email          = forms.CharField(max_length=100, label ='',
+                                        widget= forms.EmailInput
+                                        (attrs={'placeholder':'דוא"ל'}))
+
+    number_adults  = forms.IntegerField(max_value = 20, min_value =1, initial=0, label ='מספר מבוגרים' ) 
+    number_child   = forms.IntegerField(max_value = 10, min_value =0, initial=0, label ='מספר ילדים עד גיל 12')
+    confirm_use    = forms.BooleanField(label ='אני מסכים שפרטי ישמרו כדי ליצור קשר לגבי הסיור',label_suffix="")
+    send_emails    = forms.BooleanField(required=False, label ='אני מעוניין להצטרף לרשימת התפוצה',label_suffix="")
+    foundUs        = forms.ModelChoiceField(queryset=FoundUs.objects.all(), label='מצא אותנו')
+    text           = forms.CharField(required=False, label  ='', widget=forms.Textarea(attrs={'placeholder': 'שדה לא חובה - אנא הוסיפו כמה פרטים על עצמכם כדי שנדע את מי אנו פוגשים. אם ובתה / משפחה / פנסיונריות . כאן זה גם המקום לכתוב אם ישנה איזה מגבלה או משהו אחר שאנו צריכים להיות מודעים אליו. תודה'}))
+    deposit        = forms.IntegerField(min_value =30,initial=0,label =' תשלום מקדמה (לפחות 30 פאונד)')
+    price          = forms.IntegerField(widget = forms.HiddenInput())
+    min_adult      = forms.IntegerField(widget = forms.HiddenInput())
+    priceChild     = forms.IntegerField(widget = forms.HiddenInput())
+    paymentSum     = forms.IntegerField(widget = forms.HiddenInput())
     title          = forms.CharField(widget = forms.HiddenInput())
     trip_date      = forms.CharField(widget = forms.HiddenInput())
     trip_time      = forms.CharField(widget = forms.HiddenInput())
     trip_type      = forms.CharField(widget = forms.HiddenInput())
-    first_name     = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
-    last_name      = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
-    phone          = forms.CharField(label ='',  widget=forms.TextInput(attrs={'placeholder': 'מספר טלפון ביום הטיול'}))
-    email          = forms.EmailField(label ='' ,widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
-    number_adults  = forms.IntegerField(max_value = 20, min_value =0, initial=0, label ='מספר מבוגרים' ) 
-    number_child   = forms.IntegerField(max_value = 10, min_value =0, initial=0, label ='מספר ילדים עד גיל 12')
-    confirm_use    = forms.BooleanField(label ='אני מסכים שפרטי ישמרו כדי ליצור קשר לגבי הסיור',label_suffix="")
-    send_emails    = forms.BooleanField(required=False, label ='אני מעוניין להצטרף לרשימת התפוצה',label_suffix="")
-    #found_us       = forms.ChoiceField(choices=FOUND_US, label ='איך הגעתם אלינו',initial='f')
-    foundUs       = forms.ModelChoiceField(queryset=FoundUs.objects.all(), label='מצא אותנו')
-    text           = forms.CharField(required=False, label  ='', widget=forms.Textarea(attrs={'placeholder': 'שדה לא חובה - אנא הוסיפו כמה פרטים על עצמכם כדי שנדע את מי אנו פוגשים. אם ובתה / משפחה / פנסיונריות . כאן זה גם המקום לכתוב אם ישנה איזה מגבלה או משהו אחר שאנו צריכים להיות מודעים אליו. תודה'}))
-    deposit        = forms.IntegerField(widget = forms.HiddenInput())
-    price          = forms.IntegerField(widget = forms.HiddenInput())
-    priceChild     = forms.IntegerField(widget = forms.HiddenInput())
-    paymentSum     = forms.IntegerField(widget = forms.HiddenInput())
 
     
     def get_data(self):
         title           = self.data['title']
-        first_name      = self.cleaned_data['first_name']
         trip_date       = self.cleaned_data['trip_date']
         trip_time       = self.cleaned_data['trip_time']
         trip_type       = self.cleaned_data['trip_type']
+        first_name      = self.cleaned_data['first_name']
         last_name       = self.cleaned_data['last_name']
         phone           = self.cleaned_data['phone']
         email           = self.cleaned_data['email']
@@ -53,10 +57,39 @@ class BookingForm(forms.Form):
         paymentSum      = self.cleaned_data['paymentSum']
         confirm_use     = self.cleaned_data['confirm_use']
         send_emails     = self.cleaned_data['send_emails']
-        foundUs        = self.data['foundUs']
+        foundUs         = self.data['foundUs']
         text            = self.cleaned_data['text']
-        return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs, text  
-       
+        
+        return  [title,
+                trip_date, 
+                trip_time, 
+                trip_type, 
+                first_name, 
+                last_name, 
+                phone, 
+                email, 
+                number_adults, 
+                number_child, 
+                deposit, 
+                paymentSum, 
+                confirm_use, 
+                send_emails, 
+                foundUs, 
+                text]
+
+
+
+    def clean(self):
+        # Then call the clean() method of the super  class
+        cleaned_data = super().clean()
+        # Check that if this is a new tour we have enough people.
+        # If this is a new tour, we make sure the payment is above £60
+        if cleaned_data['price'] !=0 and cleaned_data['min_adult']==1 and cleaned_data['paymentSum']<60 :
+            raise ValidationError('סליחה, אבל כרגע אין משתתפים נוספים ולכן סכום מינימלי הוא 60 פאונד. אם ניתן נסו לשנות תאריך או צרו איתנו קשר שנוכל לעזור לכם.')
+        
+        return cleaned_data
+      
+'''  
 class PaymentForm(forms.Form):
     title          = forms.CharField(widget = forms.HiddenInput())
     trip_date      = forms.CharField(widget = forms.HiddenInput())
@@ -96,15 +129,16 @@ class PaymentForm(forms.Form):
         text            =self.data['text']
         return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs, text        
 
+'''
 
 class ContactForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
     last_name      = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
-    email          = forms.EmailField(label ='', widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
+    #email          = forms.EmailField(label ='', widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
+    email          = forms.CharField(max_length=100, label ='',
+                                        widget= forms.EmailInput
+                                        (attrs={'placeholder':'דוא"ל'}))
     text           = forms.CharField(label  ='', widget=forms.Textarea(attrs={'cols':26,'placeholder': 'נושא הפנייה'}))
-    
-    #textdummy           = forms.CharField(hidden=True,required=False, label  ='')
-    #captcha        = CaptchaField(label ='קצת חשבון',label_suffix="")
     
     def get_data(self):
         first_name      = self.cleaned_data['first_name']
@@ -150,7 +184,6 @@ class ReportForm(forms.Form):
    
     guide = forms.ModelChoiceField(queryset=Guide.objects.all(),required=False)
     foundUs       = forms.ModelChoiceField(queryset=FoundUs.objects.all(),required=False, label='מצא אותנו')
-    #found_us       = forms.ChoiceField(choices=FOUND_US, label ='מצא אותנו',initial='f')
 
     ORDER = (
     ('trip_date', 'Date'),
@@ -175,7 +208,4 @@ class ReportForm(forms.Form):
         return start_month, end_month, start_year, end_year, guide, foundUs,order, output  
 
     
-#    def clean_check_guide(self):
-#        print (self.data['check_guide'])
-#        print('validate checkbox')
-#        return self.data['check_guide']
+

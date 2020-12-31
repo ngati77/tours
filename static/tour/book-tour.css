@@ -56,6 +56,9 @@ ul {list-style-type: none;}
   color:     red;
 }
 
+.errorlist {
+  color:     red;
+}
 .weekdays li {
   display: inline-block;
   width: 12%;

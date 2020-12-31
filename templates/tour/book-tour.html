@@ -163,11 +163,16 @@
     
 
          <script>
-        
+      var x = document.getElementById("id_deposit");
+      var priceAdults = document.getElementById("id_price").value;
+      if (priceAdults == 0) {
+        x.style.display = "none";
+        $('label[for="id_deposit"]').hide();
+      }  
         
     	document.getElementById("id_number_adults").onchange = function() {myFunction()};
     	document.getElementById("id_number_child").onchange = function() {myFunction()};
-
+      document.getElementById("id_deposit").onchange = function() {myFunction()};
         function myFunction() {
             var adults_num = document.getElementById("id_number_adults").value;
             var childs_num = document.getElementById("id_number_child").value;
@@ -199,6 +204,7 @@
         //This function change the calendar color and update the time and date fields 
         function a1_onclick(id) {
             var all = document.querySelectorAll(".active");
+            var min_adult = document.getElementById("id_min_adult");
             for(var i=0;i<all.length;i++){
                 all[i].style.backgroundColor = "#eee";
                 all[i].style.color= "#124789";
@@ -212,9 +218,12 @@
             document.getElementById("time").innerHTML = "שעה: " + res[1].replace(/_/g,":");
             if (res[2]=='2'){
               document.getElementById("min_adults").innerHTML = "שימו לב - מספר מטיילים מינימלי ליום זה הוא : 2";
+              min_adult.value = 1;
+                                       
             }
             else{
               document.getElementById("min_adults").innerHTML = "";
+              min_adult.value = 0;
 
 
             }

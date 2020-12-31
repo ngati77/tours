@@ -21,6 +21,8 @@ STATUS_TRIP = (
     ('b', 'Canceled'),
     ('d', 'Done'),
     ('e', 'Completed'),
+    ('p', 'Payment Pending'),
+
 )
 
 hebmonthdic = {'Jan': 'ינואר', 'Feb' : 'פברואר' , 'Mar' : 'מרץ', 'Apr': 'אפריל' , 'May' : 'מאי' , 'Jun' : 'יוני' , 'Jul' : 'יולי' , 'Aug' : 'אוגוסט' , 'Sep' : 'ספטמבר' , 'Oct' : 'אוקטובר' , 'Nov' : 'נובמבר' , 'Dec' : 'דצמבר' }
@@ -134,7 +136,7 @@ class Trip(models.Model):
     status = models.CharField(
             max_length=1, 
             choices=STATUS_TRIP,
-            default='n',
+            default='p',
             )
     total_payment      = models.IntegerField(default=0, blank=True, null=True)
     def __str__(self):
@@ -194,10 +196,8 @@ class Trip(models.Model):
         return reportEntry
         
         
-        
     @staticmethod
     def get_event(date,trip_abc_name):
-        trip_abc_name
         ourTour = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
 
         return Trip.objects.filter(
@@ -218,6 +218,9 @@ class Clients(models.Model):
     ('a', 'Confirmed'),
     ('b', 'Canceled'),
     ('c', 'Canceled and refund'),
+    ('p', 'Payment Pending'),
+    
+
     )
     
     
@@ -236,7 +239,7 @@ class Clients(models.Model):
     status             = models.CharField(
                                         max_length=1,
                                         choices=STATUS_CLIENT,
-                                        default='a',
+                                        default='p',
                                         )
 
     foundUs             = models.ForeignKey(FoundUs,    on_delete=models.SET_NULL, blank=True, null=True)
@@ -258,7 +261,7 @@ class Transaction(models.Model):
     success           =  models.BooleanField(default=True)
     
     def __str__(self):
-        return str(self.client_id)
+        return str(self.client.pk)
 
   
                 

@@ -25,23 +25,22 @@ urlpatterns = [
     path('gallery',        views.gallery, name='gallery'),
     path('team',           views.team, name='team'),
     path('clients_in_tour/<int:pk>/',    views.ClientView.as_view(), name='clientview'),
-    path('success',         views.success, name="success"),
-    path('failure',         views.failure, name="failure"),
-    # path('update_transaction', views.update_transaction, name="update_transaction"),
+    path('success/<int:pk>/',         views.success, name="success"),
+    path('failure/<int:pk>/',         views.failure, name="failure"),
 
     path('contact',         views.contactUs, name="contact"),
     path('give_review',     views.GiveReview, name="give_review"),
     path('report-view',     views.reportView, name="report-view"),
     path('trip_view',       views.tripView, name="trip_view"),
     path('trip_pdf/<int:pk>/', views.tripPdf, name='trip_pdf'),
-    path('payment',          views.payment, name="payment"),
-    # path('checkout',          views.checkout, name="checkout"),
+    path('config/',          views.stripe_config),
+    path('create-checkout-session/<int:client_id>/<int:deposit>', views.create_checkout_session), # new
     path('tasks',            views.tasks, name="tasks"),
     path('links',            views.links, name="links"),
     path('privacy',          views.privacy, name="privacy"),
     path('cant_make_it/<int:pk>/',     views.CantMakeIt, name="cant_make_it"),
     path('can_make_it/<int:pk>/',      views.CanMakeIt, name="can_make_it"),
-    
+    path('webhook/',           views.stripe_webhook), # new
     path('tour_confirm/<int:pk>/',            views.tour_confirm, name="tour_confirm"),
     path('tour_complete/<int:pk>/',            views.tour_complete, name="tour_complete"),
     path('contact_confirm/<int:pk>/',            views.contact_confirm, name="contact_confirm"),

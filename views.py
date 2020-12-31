@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .forms import BookingForm, ContactForm, ReviewForm, ReportForm, PaymentForm
+from .forms import BookingForm, ContactForm, ReviewForm, ReportForm #, PaymentForm
 
 from django.contrib.auth.decorators import login_required
 
@@ -41,6 +41,11 @@ from threading import Thread, activeCount
 from django.db.models import Q
 
 from .decorators import check_recaptcha
+from django.http.response import JsonResponse, HttpResponse
+
+from django.views.decorators.csrf import csrf_exempt # new
+from django.views.generic.base import TemplateView
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -127,8 +132,8 @@ def reviewes(request):
     reviewesQuery = Review.objects.filter(confirm=True).order_by('-create_date')
     return render(request, 'tour/reviewes.html', {'page_title':'ממליצים עלינו', 
                                                    'meta_des':meta_des,
-                                                 'meta_key':meta_key,
-                                                  'reviewes':reviewesQuery})
+                                                   'meta_key':meta_key,
+                                                   'reviewes':reviewesQuery})
 
     
 def create_new_trip_client(*args):
@@ -164,6 +169,13 @@ def send_succes_email(request,client):
     children    = (client.number_of_children > 0)
     more_to_pay = (client.total_payment-client.pre_paid)
     dayHeb      = hebdict[client.trip.trip_date.strftime('%a')]
+    # Update the client status
+    client.status = 'a'
+    # if a new trip was created then update the status to 'new' from 'pending'
+    if client.trip.status == 'p':
+        client.trip.status='n'
+        client.trip.save()
+    client.save()
     try:
         msg_html = render_to_string('emails/email_success.html', { 
                                                                   'client':client, 
@@ -191,43 +203,7 @@ def send_succes_email(request,client):
                                                       'more_to_pay':more_to_pay, 
                                                       'day_in_hebrew':dayHeb
                                                       })
-            
-def payment(request):
-    form = PaymentForm(request.POST)
-    print('Debug')
-    if request.method == 'POST':
-        print('Debug1')
 
-        title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs, text = form.get_data() 
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        deposit = int(deposit)
-        try:
-            token  = request.POST['stripeToken']
-            charge = stripe.Charge.create(
-                amount=deposit*100,
-                currency='gbp',
-                description='Advance payment',
-                source=token,
-                receipt_email = email
-            )
-        except stripe.error.CardError as e:
-            messages.info(request, "Your card has been declined.")
-            return render(request, 'tour/failure.html', {'title':'failure', 'page_title':'failure'})
-        
-        # We made a payment, greaty lat's create trip and client
-        client = create_new_trip_client(title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text)
-               
-        transaction = Transaction(client=client,
-                            token=token, 
-                            charge_id = charge.id,
-                            amount=client.pre_paid,
-                            success=True)
-            # save the transcation (otherwise doesn't exist)
-        transaction.save()
-        return send_succes_email(request, client)
-
-    return render(request, 'tour/failure.html', {'title':'failure payment end', 'page_title':'failure'})
-    
 
 def tour_details(request, trip_abc_name='Classic'):
     
@@ -251,146 +227,157 @@ def tour_details(request, trip_abc_name='Classic'):
 def bookTourToday(request, trip_abc_name ):
      today = datetime.date.today()
      return bookTour(request,today.year, today.month, trip_abc_name )
+           
+'''
+class SuccessView(TemplateView):
+    template_name = 'tour/success.html'
+'''
 
-# def update_transaction(request):
-#     if request.method == 'POST':
-        
-#         client =  request.POST['client']
-#         create_date =  request.POST['create_date']
-#         token =  request.POST['token']
-#         amount =  request.POST['amount']
-#         charge_id =  request.POST['charge_id']
-#         success =  request.POST['success']
-#         print(client)
-#         print(create_date)
-#         print(charge_id)
-#         print(success)
-            
-            
-#         message = 'update successful'
-#     return HttpResponse(message)    
-#     #return  redirect('tour:about')
+'''
+class CancelledView(TemplateView):
+    template_name = 'tour/cancelled.html'
+'''
 
-# def checkout(request):
-#     stripe.api_key = settings.STRIPE_SECRET_KEY
-#     session = stripe.checkout.Session.create(
-#         payment_method_types=['card'],
-#         line_items=[{
-#             'price': 'price_1HKiSf2eZvKYlo2CxjF9qwbr',
-#             'quantity': 1,
-#         }],
-#         mode='subscription',
-#         success_url='https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
-#         cancel_url='https://example.com/cancel',
-#     )
-#     meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
-#     meta_des_en  = "cambridge in hebrew payment"
-#     meta_des = meta_des_heb + meta_des_en
-#     meta_key_heb = "תשלום "
-#     meta_key_en  = "payment "
-#     meta_key     = meta_key_heb + meta_key_en
+@csrf_exempt
+def stripe_config(request):
+    if request.method == 'GET':
+        stripe_config = {'publicKey': settings.STRIPE_PUBLISHABLE_KEY}
+        return JsonResponse(stripe_config, safe=False)
 
-
-#     # # stripe payment intent
-#     # stripe.api_key = settings.STRIPE_SECRET_KEY
-#     # customer = stripe.Customer.create()
-
+@csrf_exempt
+def stripe_webhook(request):
     
-#     # intent = stripe.PaymentIntent.create(
-#     #     amount=1099,
-#     #     currency='gbp',
-#     #     customer=customer['id'],
-#     #     metadata={
-#     #         'Name':'Noam',
-#     #         'Date':'23-01-1977',
-#     #         'email':'noam.gati@gmail.com',
-#     #     }
-#     #     )
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    endpoint_secret = settings.STRIPE_ENDPOINT_SECRET
+    payload = request.body
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    #print(f'payload= {payload}')
+    event = None
 
-#     return render(request, 'tour/checkout.html', {'title':'payment', 'page_title' : 'תשלום עבור סיור',
-#                                                   'meta_des':meta_des,
-#                                                   'meta_key':meta_key,                         
-#                                                  'stripe_public_key':settings.STRIPE_PUBLISHABLE_KEY,
-#                                                   'session': session, 
-#                                                 #   'intentId': intent.id,
-                                                 
-#                                                  })
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except ValueError as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return HttpResponse(status=400)
 
+    # Handle the checkout.session.completed event
+    if event['type'] == 'checkout.session.completed':
+        #print("Payment was successful.")
+        client = get_object_or_404(Clients, pk=event['data']['object']['client_reference_id'])
+        transaction = Transaction(client=client,
+                            token=event['data']['object']['id'], 
+                            charge_id = event['data']['object']['id'],
+                            amount=client.pre_paid,
+                            success=True)
+            # save the transcation (otherwise doesn't exist)
+        transaction.save()
+        
+        # TODO: run some custom code here
+
+    return HttpResponse(status=200)
+
+
+@csrf_exempt
+def create_checkout_session(request, client_id, deposit):
+    if request.method == 'GET':
+        domain_url      = settings.DOMAIN_URL
+        stripe.api_key  = settings.STRIPE_SECRET_KEY
+        try:
+            # Create new Checkout Session for the order
+            # Other optional params include:
+            # [billing_address_collection] - to display billing address details on the page
+            # [customer] - if you have an existing Stripe Customer ID
+            # [payment_intent_data] - capture the payment later
+            # [customer_email] - prefill the email input in the form
+            # For full details see https://stripe.com/docs/api/checkout/sessions/create
+
+            # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+            checkout_session = stripe.checkout.Session.create(
+                #success_url=domain_url + 'success?session_id={CHECKOUT_SESSION_ID}',
+                success_url=domain_url + f'success/{client_id}',
+                cancel_url=domain_url  + f'failure/{client_id}',
+                payment_method_types=['card'],
+                client_reference_id=client_id,
+                mode='payment',
+                line_items=[
+                    {
+                        'name': 'trip-deposit',
+                        'quantity': 1,
+                        'currency': 'gbp',
+                        'amount': deposit*100,
+                    }
+                
+                ],
+                #metadata={'trip_date': '67-35-20', 'time': '23', 'text': '23'}
+            )
+            return JsonResponse({'sessionId': checkout_session['id']})
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
 
 def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
     if request.method == 'POST':
         # Create a form instance and populate it with data from the request (binding):
         form = BookingForm(request.POST)
         # Check if the form is valid:
+        
+        
         if form.is_valid():
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
-            #book_inst.due_back = form.cleaned_data['renewal_date']
-           # Get all infortamtion from form
+            # book_inst.due_back = form.cleaned_data['renewal_date']
+            # Get all infortamtion from form
             title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text  = form.get_data()
-           
+            #form.save()
             # If it is  a free tour, no need to go to payment
             ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
+            client = create_new_trip_client(title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text)
+            # If it is pay as you go then send email success
             if (ourTours.price==0):
-                client = create_new_trip_client(title, trip_date, trip_time, trip_abc_name, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs ,text)
+                # For free tour override the deposit as it wasn't paid
+                client.pre_paid = 0
+                client.save()
                 return send_succes_email(request, client)
-            meta_des_heb = "סיורים בקיימברידג תשלום על סיור  "
-            meta_des_en  = "cambridge in hebrew payment"
-            meta_des = meta_des_heb + meta_des_en
-            meta_key_heb = "תשלום "
-            meta_key_en  = "payment "
-            meta_key     = meta_key_heb + meta_key_en
+            # go to payment page
+            return render(request, 'tour/payment.html', {'client_id':client.id, 'deposit':deposit})
+        else:
+            [year,month,day]         = [int(x) for x in form.cleaned_data['trip_date'].split("-")]
+            print(year, month,day)
+            trip_abc_name=form.cleaned_data['trip_type']
+    else:
+        year=pYear
+        month=pMonth
 
-            form = PaymentForm(initial={       'title':title,
-                                               'trip_date':trip_date,
-                                               'trip_time':trip_time,
-                                               'trip_type':trip_abc_name,
-                                               'first_name':first_name,
-                                               'last_name':last_name,
-                                               'phone':phone,
-                                               'email':email,
-                                               'number_adults':number_adults,
-                                               'number_child':number_child,
-                                               
-                                               'confirm_use': confirm_use, 
-                                               'send_emails': send_emails,
-                                               'foundUs'   : foundUs,
-                                               'text'       : text,
-                                               'deposit':deposit,
-                                               'paymentSum':paymentSum})
-
-            return render(request, 'tour/payment.html', {'title':title, 'page_title' : 'תשלום עבור סיור',
-                                                  'meta_des':meta_des,
-                                                  'meta_key':meta_key,
-                                                  'form':form,
-                                                 'tripdate': trip_date, 
-                                                 'triptime': trip_time, 
-                                                 'price':paymentSum, 
-                                                 'deposit':deposit, 
-                                                 'stripe_public_key':settings.STRIPE_PUBLISHABLE_KEY,
-                                                 })
-           
-    newCalendar= Calendar(request=request, year=pYear,  month=pMonth , view=trip_abc_name)
-    # If this is a POST request then process the Form data
-    # Bring the trip name in hebrew from db
+        # If this is a POST request then process the Form data
+        # Bring the trip name in hebrew from db
     TripTypeQuery = OurTours.objects.filter(trip_abc_name=trip_abc_name)
     
     if (len(TripTypeQuery)>0):
         ourTours    = TripTypeQuery[0]
         NotFree     = (ourTours.price != 0)
         title       = ourTours.title
-        deposit     = ourTours.deposit
+        # Force deposit to 30 as this is the minimum, for free tour it will be fixed once the form is returned.
+        deposit     = 30
         price       = ourTours.price
         priceChild  = ourTours.priceChild
         print_child = ourTours.priceChild > 0
     else:
-        title   = ''
-        deposit = 0
-        price =  0
-        priceChild =  0
+        title       = ''
+        deposit     = 0
+        price       = 0
+        priceChild  = 0
         print_child = 0
         NotFree     = True
+        
+    if request.method != 'POST':
 
-    form = BookingForm(initial={'title':title, 'trip_type':trip_abc_name,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+        form = BookingForm(initial={'title':title, 'trip_type':trip_abc_name,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+
+    
+    newCalendar= Calendar(request=request, year=year,  month=month , view=trip_abc_name)
 
     pageTitle=  'הזמנת ' +  title 
     meta_des_heb = "הזמנת סיור בקיימברידג בעברית  "
@@ -508,7 +495,7 @@ def GiveReview(request ):
                                                      'meta_key':meta_key,
                                                      'form': form})
 
-
+'''
 def success (request):
     meta_des_heb = "ההרשמה הסתיימה בהצלחה  "
     meta_des_en  = "Booking confirmed"
@@ -521,8 +508,24 @@ def success (request):
                                                 'meta_key':meta_key,
                                                 'page_title':'ההרשמה הצליחה'})
 
+'''
 
-def failure (request):
+def success (request,pk):
+    client = get_object_or_404(Clients, pk=pk)
+    
+    return send_succes_email(request, client)
+
+def failure (request,pk):
+    client = get_object_or_404(Clients, pk=pk)
+    client.status = 'b'
+    client.save()
+    # if a new trip was created then update the status to 'new' from 'pending'
+    if client.trip.status == 'p':
+        client.trip.status='b'
+        client.admin_comment = 'Payment failed'
+        client.trip.save()
+    
+
     meta_des_heb = "ההרשמה נכשלה  "
     meta_des_en  = "Booking failed"
     meta_des = meta_des_heb + meta_des_en
@@ -530,6 +533,7 @@ def failure (request):
     meta_key_en  = "booking failed Cambridge hebrew "
     meta_key     = meta_key_heb + meta_key_en 
     return render(request, 'tour/failure.html', {'title':'faiure',
+                                                'client_id':pk,
                                                 'meta_des':meta_des,
                                                 'meta_key':meta_key,
                                                 'page_title':'ההרשמה נכשלה'})
