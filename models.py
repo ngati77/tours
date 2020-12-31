@@ -519,6 +519,10 @@ class DayInCalendar:
                     if ((vac.vac_cancel_all) or (vac.ourTour != None and vac.ourTour.trip_abc_name == view)):
                         canceled = True
                         break
+
+                # Set the default value, if looking on tommorow allow only if it before 16:00, or there is a trip exit
+                canceled = True if dateInCalendar == today_check else False
+
                 if (canceled):
                     #print("Skip this tour no guides")
                     continue
@@ -532,20 +536,22 @@ class DayInCalendar:
                                                 trip_time__second  = tripAvailabilty.ava_time.second
                                                 
                                                 )
-                # Set the default value, if looking on tommorow allow only if it before 16:00, or there is a trip exit
-                canceled = True if dateInCalendar == today_check else False
 
                 for trip in tripQuery:
 
                     # We found a trip let's check if it is a different one.
-                    if (trip.get_status_display  != 'Canceled' and trip.ourTour.trip_abc_name != view):
+                    
+
+                    if (trip.get_status_display()  != 'Canceled' and trip.ourTour.trip_abc_name != view):
+                        print(trip.get_status_display)
+                        print(trip.ourTour.trip_abc_name)
+                        print(view)
                         canceled = True
                         break
                     
-                    # If it is after 16:00 - if trip exist then allow to book it
+                    # This is a new tour, so we flag that we need at least two people, or beeter to say amonut above 60
                     if (trip.get_status_display  != 'Canceled' and trip.ourTour.trip_abc_name == view):
                         min_adults = '1'
-                        canceled = False
                         break
 
                 if (canceled):
