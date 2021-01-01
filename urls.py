@@ -40,7 +40,7 @@ urlpatterns = [
     path('privacy',          views.privacy, name="privacy"),
     path('cant_make_it/<int:pk>/',     views.CantMakeIt, name="cant_make_it"),
     path('can_make_it/<int:pk>/',      views.CanMakeIt, name="can_make_it"),
-    path('webhook/',           views.stripe_webhook), # new
+    path('webhook',           views.stripe_webhook), # new
     path('tour_confirm/<int:pk>/',            views.tour_confirm, name="tour_confirm"),
     path('tour_complete/<int:pk>/',            views.tour_complete, name="tour_complete"),
     path('contact_confirm/<int:pk>/',            views.contact_confirm, name="contact_confirm"),
