@@ -346,7 +346,6 @@ def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
             return render(request, 'tour/payment.html', {'client_id':client.id, 'deposit':deposit})
         else:
             [year,month,day]         = [int(x) for x in form.cleaned_data['trip_date'].split("-")]
-            print(year, month,day)
             trip_abc_name=form.cleaned_data['trip_type']
     else:
         year=pYear
@@ -448,7 +447,7 @@ def contactUs(request ):
                                                  'page_title' : 'צור קשר', 
                                                   'meta_des':meta_des,
                                                   'meta_key':meta_key,
-                                                  'public_captcha': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY,
+                                                  'reCAPTCHA_site_key': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY,
                                                   'form': form})
 
 def GiveReview(request ):
