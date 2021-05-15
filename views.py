@@ -9,7 +9,7 @@ from django.views import generic
 
 from django.utils import timezone
 
-from .models import Trip, Clients, Review, Gallery, Calendar, ReportEntry,ClientReportEntry
+from .models import Trip, Clients, Review, Gallery, Calendar, ReportEntry,ClientReportEntry, Location, Instruction
 from .models import OurTours, Guide, Transaction, Contact, GuideVacation, FoundUs
 
 from .tour_emails import tour_emails 
@@ -143,13 +143,19 @@ def create_new_trip_client(*args):
     date         = [int(x) for x in trip_date.split("-")]
     dateClass    = datetime.date(date[0],date[1],date[2])
     tripQuerySet = Trip.get_event(dateClass, trip_abc_name)
-    guide        = get_object_or_404(Guide, user_name='yaelr')
+    # guide        = get_object_or_404(Guide, user_name='yaelg')
+    # location     = get_object_or_404(Location, title='Fitzwilliam')
     ourTour      = get_object_or_404(OurTours, trip_abc_name = trip_abc_name)
     foundUsPointer      = get_object_or_404(FoundUs, pk = foundUs)
+    
+    guide       = Guide.get_default()
+    location    = Location.get_default()
+    instruction = Instruction.get_default()
 
     # If need a new trip
     if (len(tripQuerySet)==0):
-        trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time, guide=guide, ourTour=ourTour)
+        trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time, guide=guide, ourTour=ourTour, location=location, instruction=instruction)
+        #trip = Trip(trip_text='', trip_date=dateClass, trip_time=trip_time, ourTour=ourTour,)
         trip.save()
     # Repeat to solve the time format in the email    
     tripQuerySet = Trip.get_event(dateClass, trip_abc_name)    
@@ -301,6 +307,7 @@ def create_checkout_session(request, client_id, deposit):
                 #success_url=domain_url + 'success?session_id={CHECKOUT_SESSION_ID}',
                 success_url=domain_url + f'success/{client_id}',
                 cancel_url=domain_url  + f'failure/{client_id}',
+                billing_address_collection= None,
                 payment_method_types=['card'],
                 client_reference_id=client_id,
                 mode='payment',
@@ -814,6 +821,9 @@ def tasks(request):
             vac_end_date__gte = today
             ).order_by('vac_start_date')
          
+    instruction = Instruction.objects.all()
+    location = Location.objects.all()
+    guide = Guide.objects.all()
     return render(request, 'tour/tasks.html', {'title':'Tasks',
                                                      'page_title' : 'משימות',
                                                      'meta_des':'קיימברידג בעברית משימות',
@@ -824,20 +834,41 @@ def tasks(request):
                                                      'new_contact':new_contact,
                                                      'new_review':new_review,
                                                      'next_tours':next_tours,
-                                                     'next_vacations':next_vacations
+                                                     'next_vacations':next_vacations,
+                                                     'instruction':instruction,
+                                                     'location':location,
+                                                     'guide':guide
                                                      
                                                      })
 
+def get_obj(Object,pk):
+    if pk == 0:
+        obj = None
+    else :
+        return(get_object_or_404(Object, pk=pk))
 
-def tour_confirm(request, pk):
+
+def tour_confirm(request, pk, loc, ins, guide_id):
     '''
     This function change trip status to confirm
     '''
     tours_query =  Trip.objects.filter(id  = pk)
+       
     if (len(tours_query)>0):
         tour = tours_query[0]
+        tour.location    = get_obj(Location,loc)
+        tour.instruction = get_obj(Instruction,ins)
+        tour.guide       = get_obj(Guide,guide_id)
         tour.status = 'a'
         tour.save()
+
+    clientQuerey = tour.clients_set.all()
+    emailTitle = "סיור בקיימברידג' - נקודת מפגש ופרטי מדריך "
+    emailType = 'emails/email_update.html'  
+    for client in clientQuerey:
+         tour_emails.send_email_again(request=request, emailTitle=emailTitle, client=client, emailType=emailType)
+     
+
     return  redirect('tour:tasks')
 
 # This class is used in the report.html

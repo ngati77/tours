@@ -39,9 +39,19 @@ class Guide(models.Model):
     order              = models.IntegerField(default=0)
     general_info       = models.TextField(max_length=600)
     confirm            = models.BooleanField(default=True)
+    default            = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user_name
+
+    @staticmethod
+    def get_default():
+        obj = Guide.objects.filter(default=True)
+        if (len(obj)==0):
+            return None
+        else:
+            return obj[0]
+
 
 class Guide_Background(models.Model):
     question       = models.TextField(max_length=600)
@@ -117,8 +127,44 @@ class FoundUs(models.Model):
     title                   = models.CharField(max_length=200)
     precentage              = models.IntegerField(default=0, blank=True, null=True)
 
+
     def __str__(self):
         return self.title 
+
+class Location(models.Model):
+    title                   = models.CharField(max_length=200)
+    text_html_style         = models.BooleanField(default=False)
+    text                    = models.TextField(max_length=1000)
+    default                 = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title 
+    
+    @staticmethod
+    def get_default():
+        obj = Location.objects.filter(default=True)
+        if (len(obj)==0):
+            return None
+        else:
+            return obj[0]
+
+class Instruction(models.Model):
+    title                   = models.CharField(max_length=200)
+    text_html_style         = models.BooleanField(default=False)
+    text                    = models.TextField(max_length=1000)
+    default                 = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title 
+
+    @staticmethod
+    def get_default():
+        obj = Instruction.objects.filter(default=True)
+        if (len(obj)==0):
+            return None
+        else:
+            return obj[0]
+
 
 class Trip(models.Model):
     '''
@@ -132,6 +178,8 @@ class Trip(models.Model):
     
     guide              = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
     ourTour            = models.ForeignKey(OurTours, on_delete=models.SET_NULL, blank=True, null=True)
+    location           = models.ForeignKey(Location,on_delete=models.SET_NULL, blank=True, null=True)
+    instruction        = models.ForeignKey(Instruction,on_delete=models.SET_NULL, blank=True, null=True)
     
     status = models.CharField(
             max_length=1, 

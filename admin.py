@@ -1,18 +1,16 @@
 from django.contrib import admin
 
 from .models import Trip, Clients, TripAvailabilty, GuideVacation, FoundUs
-from .models import Review, Gallery, OurTours, Guide, Guide_Background, Transaction
+from .models import Review, Gallery, OurTours, Guide, Guide_Background, Transaction, Location, Instruction
 from .models import Contact
 
 from django.contrib.admin import AdminSite
 from django.http import HttpResponse
 from .tour_emails import tour_emails 
-from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
-# Create your models here.
-hebdict = {'Sun':'ראשון', 'Mon':'שני', 'Tue':'שלישי', 'Wed':'רביעי', 'Thu':'חמישי', 'Fri':'שישי', 'Sat':'שבת'}
+
 
 
 class MyAdminSite(AdminSite):
@@ -60,53 +58,104 @@ class ClientAdmin(admin.ModelAdmin):
         emailTitle = "סיור בקיימברידג' - אישור הזמנה"
         emailType = 'emails/email_success.html'
         for client in queryset:
-            self.send_email_again(request, emailTitle, client, emailType)
+            message = tour_emails.send_email_again(request=request, emailTitle=emailTitle, client=client, emailType=emailType)
+            self.message_user(request, message)
+
             
     def send_update_trip_email(self, request, queryset):
         emailTitle = "סיור בקיימברידג' - עידכון הזמנה "
         emailType = 'emails/email_update.html'
         for client in queryset:
-            emailTitle = emailTitle
-            self.send_email_again(request, emailTitle, client,emailType)
+            message = tour_emails.send_email_again(request=request, emailTitle=emailTitle, client=client, emailType=emailType)
+            self.message_user(request, message)
+
             
     def send_cancelaion_trip_email(self, request, queryset):
         emailTitle = "סיור בקיימברידג' - ביטול סיור"
         emailType = 'emails/email_cancelation.html'
         for client in queryset:
-            emailTitle = emailTitle   
-            self.send_email_again(request, emailTitle, client,emailType)
+            message = tour_emails.send_email_again(request=request, emailTitle=emailTitle, client=client, emailType=emailType)
+            self.message_user(request, message)
             
-    def send_email_again(self, request, emailTitle, client, emailType):
-        trip = client.trip
-        NotFree = (trip.ourTour.price != 0)
-        #if len(OurToursQuery)!=1:
-        #    print('Raise exception')
-        #title = OurToursQuery[0].title
-        msg_plain   = 'DUMMY ONE'
-        children    = (client.number_of_children > 0)
-        more_to_pay =(client.total_payment-client.pre_paid)
-        dayHeb      = hebdict[client.trip.trip_date.strftime('%a')]
-        try:
-            msg_html = render_to_string(emailType, {
-                                                  'client':client, 
-                                                  'print_children':children, 
-                                                  'more_to_pay':more_to_pay,
-                                                  'day_in_hebrew':dayHeb,
-                                                  'NotFree':NotFree})
-            #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
-            #emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-            #cc =['yael.gati@cambridgeinhebrew.com']
-            emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
-        except:
-            print('Got an error... sending email...')
+    # def send_email_again(self, request, emailTitle, client, emailType):
+    #     trip = client.trip
+    #     NotFree = (trip.ourTour.price != 0)
+    #     #if len(OurToursQuery)!=1:
+    #     #    print('Raise exception')
+    #     #title = OurToursQuery[0].title
+    #     msg_plain   = 'DUMMY ONE'
+    #     children    = (client.number_of_children > 0)
+    #     more_to_pay =(client.total_payment-client.pre_paid)
+    #     dayHeb      = hebdict[client.trip.trip_date.strftime('%a')]
+    #     try:
+    #         msg_html = render_to_string(emailType, {
+    #                                               'emailTitle':emailTitle,
+    #                                               'client':client, 
+    #                                               'print_children':children, 
+    #                                               'more_to_pay':more_to_pay,
+    #                                               'day_in_hebrew':dayHeb,
+    #                                               'NotFree':NotFree})
+    #         #emailSuccess = tour_emails.send_success(trip_date=trip_date.strftime("%d-%m-%Y"), trip_time=trip_time.strftime("%H:%M"), deposit=deposit, more_to_pay=(paymentSum-deposit), idx=transaction.id, trip_type=tripType,first=first_name, last=last_name)
+    #         #emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+    #         #cc =['yael.gati@cambridgeinhebrew.com']
+    #         emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
+    #     except:
+    #         print('Got an error... sending email...')
 
-        self.message_user(request, "%s successfully send email to ." % client.email)
+    #     self.message_user(request, "%s successfully send email to ." % client.email)
  
     send_success_email.short_description        = "Resending confirmation email to a specific client"   
     send_update_trip_email.short_description    = "Update client details"   
     send_cancelaion_trip_email.short_description    = "Cancel trip email"
     actions = [send_success_email, send_update_trip_email, send_cancelaion_trip_email]
     
+class LocationAdmin(admin.ModelAdmin):
+    fieldsets = [
+        
+        (None,            {'fields': ['title']}),
+        (None,            {'fields': ['text_html_style']}), 
+        (None,            {'fields': ['text']}), 
+        (None,            {'fields': ['default']}), 
+        
+    ]
+    list_display    = ('id','title','text_html_style','default')
+    
+    def set_default(self, request, queryset):
+        objects = Location.objects.all()
+        the_obj_id = queryset[0].id
+        for obj in objects:
+            if obj.id == the_obj_id:
+                obj.default = True
+            else:
+                obj.default = False
+            obj.save()
+
+    set_default.short_description        = "Set it to be the default"   
+    actions = [set_default]    
+    
+class InstructionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        
+        (None,            {'fields': ['title']}),
+        (None,            {'fields': ['text_html_style']}), 
+        (None,            {'fields': ['text']}), 
+        (None,            {'fields': ['default']}), 
+        
+    ]
+    list_display    = ('id','title','text_html_style','default')
+
+    def set_default(self, request, queryset):
+        objects = Instruction.objects.all()
+        the_obj_id = queryset[0].id
+        for obj in objects:
+            if obj.id == the_obj_id:
+                obj.default = True
+            else:
+                obj.default = False
+            obj.save()
+
+    set_default.short_description        = "Set it to be the default"   
+    actions = [set_default]
 
 
 class FoundUsAdmin(admin.ModelAdmin):
@@ -151,20 +200,22 @@ class TripAdmin(admin.ModelAdmin):
     track_trip.short_description = "Mark selected trips as confirmed"
     fieldsets = [
         
-        ('Date information', {'fields': ['trip_date']}),
-        (None,               {'fields': ['trip_time']}),
-        ('Details',          {'fields': ['guide']}),
         ('Details',          {'fields': ['ourTour']}),
         (None,               {'fields': ['status']}),
+        (None,               {'fields': ['total_payment']}),
+        ('Date information', {'fields': ['trip_date']}),
+        (None,               {'fields': ['trip_time']}),
+        ('Make sure not empty',          {'fields': ['guide']}),
+        (None,          {'fields': ['location']}),
+        (None,          {'fields': ['instruction']}),
        
         ('Date information', {'fields': ['create_date'],'classes': ['collapse']}),
         ('Comments',         {'fields': ['trip_text']}),
-        (None,               {'fields': ['total_payment']}),
        
         
     ]
     inlines         = [ClientsInline]
-    list_display    = ('id','trip_date', 'trip_time'  ,'status','create_date','total_payment','ourTour','guide')
+    list_display    = ('id','trip_date', 'trip_time'  ,'status','create_date','total_payment','ourTour','guide','location')
     list_filter     = ['trip_date']
     search_fields   = ['trip_text']
     actions         = ['track_trip']
@@ -260,6 +311,7 @@ class GuideAdmin(admin.ModelAdmin):
         
         (None,               {'fields': ['first_name']}),
         (None,               {'fields': ['last_name']}),
+        (None,            {'fields': ['default']}), 
         (None,               {'fields': ['first_name_en']}),
         (None,               {'fields': ['last_name_en']}),
         (None,               {'fields': ['user_name']}),
@@ -272,9 +324,20 @@ class GuideAdmin(admin.ModelAdmin):
        
     ]
     inlines         = [GuideBackgroundInline]
-    list_display    = ('first_name', 'last_name', 'first_name_en', 'last_name_en', 'user_name', 'order', 'image', 'phone' , 'email', 'confirm')
+    list_display    = ('first_name', 'last_name', 'default','first_name_en', 'last_name_en', 'user_name', 'order', 'image', 'phone' , 'email', 'confirm')
     search_fields   = ['first_name']
-    
+    def set_default(self, request, queryset):
+        objects = Guide.objects.all()
+        the_obj_id = queryset[0].id
+        for obj in objects:
+            if obj.id == the_obj_id:
+                obj.default = True
+            else:
+                obj.default = False
+            obj.save()
+
+    set_default.short_description        = "Set it to be the default"   
+    actions = [set_default] 
     
 class ContactAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -302,6 +365,8 @@ admin.site.register(Clients, ClientAdmin)
 admin.site.register(Contact,ContactAdmin)
 admin.site.register(Transaction,TransactionAdmin)
 admin.site.register(FoundUs,FoundUsAdmin)
+admin.site.register(Location,LocationAdmin)
+admin.site.register(Instruction,InstructionAdmin)
 
 
 

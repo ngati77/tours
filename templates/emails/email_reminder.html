@@ -53,11 +53,21 @@
       <a href="https://www.cambridgeinhebrew.com/cant_make_it/{{client.id}}" class="btn btn-tour ">לצערנו לא נוכל להגיע</a>
      </div>
       {% endif %}
-      <p >אנו מזכירים לך להגיע בשעה {{trip_time|date:"H:i"}} למוזיאון הפיצווילאמס בקיימברידג׳</p>
-      <p><font color="blue">המדריכה ממתינה בכניסה הימנית של המוזיאון, מתחת לעמודי האבן הגבוהים</font></p>
-      <p>:כתובת</p>
-      <p class="lead">The Fitzwilliam Museum</p>
-      <p>Trumpington St, Cambridge CB2 1RB</p>
+      
+      <p >אנו מזכירים לך להגיע בשעה {{trip_time|date:"H:i"}}</p>
+    
+
+      {% if client.trip.location %}
+      <hr>
+      <h3><font color="blue">נקודת המפגש</font></h3>
+        {% if client.trip.location.text_html_style is True %}
+            {{ client.trip.location.text |safe}}
+        {% else %}
+        {{ client.trip.location.text | linebreaks }}
+        {% endif %}
+      {% endif %}
+
+
       {% if NotFree %}
       <p> אנא זיכרו להביא איתכם כסף מזומן כדי לשלם למדריך את יתרת התשלום {{more_to_pay}} פאונד</p>
       {% else %}
@@ -87,34 +97,19 @@
 <br>         https://www.instagram.com/cambridgeinhebrew 
  </p>
      <h3>נתראה בסיור </h3>
-     {% if client.trip.trip_guide == 'YR' %}
-      <h3>יעל רימון</h3>
-      {% else %}
-      <h3>יעל גתי</h3>
-      {% endif %}
      
+      <h3> {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }}</h3>
       
-      <h2>הוראות הגעה ברכבת מלונדון</h2>
-      <p><strong>לעיתים יש שינויים בזמני הרכבות, שימו לב לשעות כשאתם מגיעים לתחנה</strong></p>
- 
- <p> CBG עלו על רכבת שיוצאת  ב9:42 מתחנת קינגס קרוס בלונדון אל קימברידג<br> (ולא קיימברידג׳ צפון)</p>
- <p>משך הנסיעה 50 דקות.</p>
- <p><u>בבקשה אל תאחרו, תכננו לעצמכם מינימום הגעה לתחנה של חצי שעה מראש</u></p>
-<p>*ישנה עוד רכבת בשעה 10:04 בבקשה אל תעלו עליה כי היא רכבת מאספת ותגיעו לכאן רק ב11:30</p>
- <p><strong> :קניית הכרטיסים לרכבת</strong></p>
-
-<p>
-אם אתם מעל 3,
-מומלץ לרכוש את הכרטיסים בקופת הכרטיסים ברכבת<br>
-תבקשו כרטיס קבוצתי (מעל 3 זה קבוצה),זהו המחיר המשתם ביותר<br>
-אני לא ממליצה לרכוש כרטיסים מראש באף אתר<br>
-כדאי להגיע קצת לפני כי לפעמים יש תור בקופה 
-      </p>
- 
- <p>לאחר מכן, מונית מתחנת הרכבת בקיימברידג׳ לנקודת המפגש משך נסיעה של 7 דקות</p>
- 
- <p>עלות לזוג 5-6 פאונד, מ3 אנשים יגבו מכם 3 פאונדים נוספים</p>
+      {% if client.trip.instruction %}
+      <hr> 
       
+      
+       {% if client.trip.instruction.text_html_style is True %}
+         {{ client.trip.instruction.text |safe}}
+       {% else %}
+         {{ client.trip.instruction.text | linebreaks }}
+       {% endif %}
+     {% endif %}
 </div>
     
 </div>

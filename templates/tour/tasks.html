@@ -24,8 +24,10 @@
       <td>id</td>
       <td>תאריך סיור</td>
       <td>שעה</td>
-      <td>מדריך</td>
       <td>סוג סיור</td>
+      <td>מדריך</td>
+      <td>נקודת מפגש</td>
+      <td>הוראות הגעה</td>
       <td>נוצר בתאריך</td>
       <td>אישור</td>
     </tr>
@@ -35,10 +37,53 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
      <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{  entry.trip_time|date:'H:i'  }}</td>
-     <td>{{  entry.guide.user_name }}</td>
      <td>{{  entry.ourTour.trip_abc_name }}</td>
+     <td>
+     <select name="guide" id="guide_id_{{entry.id}}">
+        <option value=0>null</option>
+        {% for loc in guide %}
+         {% if entry.guide and entry.guide.id == loc.id %}
+           <option value={{loc.id}} selected>{{loc.user_name}}</option>
+         {% else %}
+           <option value={{loc.id}} >{{loc.user_name}}</option>
+         {% endif %}
+         {% endfor %}
+         </select>
+       </td>
+
+     <!-- <td>{{  entry.location }}</td> -->
+     <td>
+
+       <select name="location" id="location_id_{{entry.id}}">
+       <option value=0>null</option>
+       {% for loc in location %}
+        {% if entry.location and entry.location.id == loc.id %}
+          <option value={{loc.id}} selected>{{loc.title}}</option>
+        {% else %}
+          <option value={{loc.id}} >{{loc.title}}</option>
+        {% endif %}
+        {% endfor %}
+        </select>
+      </td>
+
+      <td>
+
+          <select name="instruction" id="instruction_id_{{entry.id}}">
+          <option value=0>null</option>
+          {% for loc in instruction %}
+           {% if entry.instruction and entry.instruction.id == loc.id %}
+             <option value={{loc.id}} selected>{{loc.title}}</option>
+           {% else %}
+             <option value={{loc.id}} >{{loc.title}}</option>
+           {% endif %}
+           {% endfor %}
+           </select>
+         </td>
+
+
      <td>{{  entry.create_date|date:'d.m.Y' }}</td>
-     <td><a href="{% url  'tour:tour_confirm' entry.id %}" class="btn btn-tour reg-btn"> אישור סיור</a></td>
+     <!--<td><a href="{% url  'tour:tour_confirm' entry.id %}" class="btn btn-tour reg-btn"> אישור סיור</a></td>-->
+     <td><a class="btn btn-tour reg-btn" onclick="return a1_onclick('{{entry.id}}')"> אישור סיור</a></td>
      </tr>
     {% endfor %}
  </table>  
@@ -65,8 +110,10 @@
       <td>id</td>
       <td>תאריך</td>
       <td>שעה</td>
-      <td>מדריך</td>
       <td>סוג סיור</td>
+      <td>מדריך</td>
+      <td>נקודת מפגש</td>
+      <td>הוראות הגעה</td>
       <td>אישור</td>
     </tr>
     
@@ -75,8 +122,10 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
      <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{  entry.trip_time|date:'H:i' }}</td>
-     <td>{{  entry.guide.user_name }}</td>
      <td>{{  entry.ourTour.trip_abc_name }}</td>
+     <td>{{  entry.guide }}</td>
+     <td>{{  entry.location }}</td>
+     <td>{{  entry.instruction }}</td>
      <td><a href="{% url  'tour:tour_complete' entry.id %}" class="btn btn-tour reg-btn"> סיום סיור</a></li>
      </tr>
     {% endfor %}
@@ -212,8 +261,10 @@
       <td>id</td>
       <td>תאריך סיור</td>
       <td>שעה</td>
-      <td>מדריך</td>
       <td>סוג סיור</td>
+      <td>מדריך</td>
+      <td>נקודת מפגש</td>
+      <td>הוראות הגעה</td>
       <td>נוצר בתאריך</td>
     </tr>
     
@@ -222,8 +273,10 @@
      <td><a href="{% url 'tour:clientview' entry.id %}">{{ entry.id }}</a></td>
      <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
      <td>{{ entry.trip_time|date:'H:i'  }}</td>
+      <td>{{ entry.ourTour.trip_abc_name }}</td>
      <td>{{  entry.guide.user_name }}</td>
-     <td>{{  entry.ourTour.trip_abc_name }}</td>
+     <td>{{  entry.location }}</td>
+     <td>{{  entry.instruction }}</td>
      <td>{{ entry.create_date|date:'d.m.Y' }}</td>
      </tr>
      </table>
@@ -306,5 +359,17 @@
 
  </div>
 {% endif %}
+
+<script>
+        //This function change the calendar color and update the time and date fields 
+        function a1_onclick(id) {
+          var location_val = document.getElementById("location_id_"+id).value
+          var instruction_val = document.getElementById("instruction_id_"+id).value
+          var guide_val = document.getElementById("guide_id_"+id).value
+          location.href="/tour_confirm/"+id+"/"+location_val+"/"+ instruction_val +"/"+ guide_val
+        }
+
+</script>
+
 {% endblock %}
 

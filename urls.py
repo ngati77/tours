@@ -42,6 +42,7 @@ urlpatterns = [
     path('can_make_it/<int:pk>/',      views.CanMakeIt, name="can_make_it"),
     path('webhook',           views.stripe_webhook), # new
     path('tour_confirm/<int:pk>/',            views.tour_confirm, name="tour_confirm"),
+    path('tour_confirm/<int:pk>/<int:loc>/<int:ins>/<int:guide_id>',            views.tour_confirm, name="tour_confirm"),
     path('tour_complete/<int:pk>/',            views.tour_complete, name="tour_complete"),
     path('contact_confirm/<int:pk>/',            views.contact_confirm, name="contact_confirm"),
     path('contact_not_spam/<int:pk>/',            views.contact_not_spam, name="contact_not_spam"),
