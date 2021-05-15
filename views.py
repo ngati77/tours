@@ -307,7 +307,7 @@ def create_checkout_session(request, client_id, deposit):
                 #success_url=domain_url + 'success?session_id={CHECKOUT_SESSION_ID}',
                 success_url=domain_url + f'success/{client_id}',
                 cancel_url=domain_url  + f'failure/{client_id}',
-                billing_address_collection= None,
+                #billing_address_collection= None,
                 payment_method_types=['card'],
                 client_reference_id=client_id,
                 mode='payment',
