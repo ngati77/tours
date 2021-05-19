@@ -41,6 +41,10 @@ def main():
     
     # Now find the clients and send an email 
     for trip in tripQuery:
+        if (trip.guide):
+            email_guide = trip.guide.email
+        else:
+            email_guide = ''
         NotFree = (trip.ourTour.price != 0)
         clientQuerey = trip.clients_set.filter(status = 'a')
         for client in clientQuerey:
@@ -55,7 +59,7 @@ def main():
                                                                       'NotFree':NotFree})
                 emailTitle = "תזכורת לסיור מחר"
                 #cc =['yael.gati@cambridgeinhebrew.com']
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
+                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email,email_guide], title=emailTitle, cc=settings.CC_EMAIL)
             except:
                 print('Got an error... sending email...')
 
