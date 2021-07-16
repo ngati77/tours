@@ -410,23 +410,29 @@ def contactUs(request ):
         # Create a form instance and populate it with data from the request (binding):
         form = ContactForm(request.POST)
         # Check if the form is valid:
-        if form.is_valid() and request.recaptcha_is_valid:
+        if form.is_valid():
+            if request.recaptcha_is_valid:
             
-            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
-            #book_inst.due_back = form.cleaned_data['renewal_date']
-           # Get all infortamtion from form
-            first_name, last_name,  email, text = form.get_data()
+                # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+                # book_inst.due_back = form.cleaned_data['renewal_date']
+                # Get all infortamtion from form
+                first_name, last_name,  email, text = form.get_data()
             
-            contact = Contact(first_name=first_name, last_name = last_name, email = email, text = text)
-            contact.save()
-            try:
-                msg_html = render_to_string('emails/email_contact.html', {'first_name':first_name,'last_name':last_name, 'email':email, 'id': contact.id, 'text':text})
-                msg_plain = str(contact.id) + "מישהו יצר קשר פניה "
-                emailTitle = "מישהו יצר קשר"
-                emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=settings.BCC_EMAIL, title=emailTitle, cc=[])
-            except:
-                print('Got an error...')
-            # Save contact here
+                contact = Contact(first_name=first_name, last_name = last_name, email = email, text = text)
+                contact.save()
+                try:
+                    msg_html = render_to_string('emails/email_contact.html', {'first_name':first_name,'last_name':last_name, 'email':email, 'id': contact.id, 'text':text})
+                    msg_plain = str(contact.id) + "מישהו יצר קשר פניה "
+                    emailTitle = "מישהו יצר קשר"
+                    emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=settings.BCC_EMAIL, title=emailTitle, cc=[])
+                except:
+                    print('Got an error...')
+                page_title = 'נחזור אלייך בהקדם'
+                message_id = contact.id
+            else:
+                page_title = 'לצערנו ההודעה זוהתה כספם ולא נשמרה במערכת!!!! - נסו שנית'
+                message_id = 0
+                # Save contact here
             meta_des_heb = "קיימברידג בעברית צור קשר  "
             meta_des_en  = "contact Cambridge in Hebrew"
             meta_des = meta_des_heb + meta_des_en
@@ -436,9 +442,9 @@ def contactUs(request ):
             return render(request, 'tour/contact_saved.html', {'title':'contact', 
                                                                'meta_des':meta_des,
                                                                'meta_key':meta_key,
-                                                               'page_title':'נחזור אלייך בהקדם', 
+                                                               'page_title':page_title, 
                                                                
-                                                               'id': contact.id})
+                                                               'id': message_id})
 
     # If this is a GET (or any other method) create the default form.
     # TODO, Double check date as avialable one, or already has a trip on that day. 
@@ -866,7 +872,9 @@ def tour_confirm(request, pk, loc, ins, guide_id):
     emailTitle = "סיור בקיימברידג' - נקודת מפגש ופרטי מדריך "
     emailType = 'emails/email_update.html'  
     for client in clientQuerey:
-         tour_emails.send_email_again(request=request, emailTitle=emailTitle, client=client, emailType=emailType)
+        # Check client status confirmed
+        if client.status == 'a':    
+            tour_emails.send_email_again(request=request, emailTitle=emailTitle, client=client, emailType=emailType)
      
 
     return  redirect('tour:tasks')
