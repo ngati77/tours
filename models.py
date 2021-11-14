@@ -33,6 +33,7 @@ class Guide(models.Model):
     first_name_en      = models.CharField(max_length=20, default="")
     last_name          = models.CharField(max_length=20, default="")
     user_name          = models.CharField(max_length=20, default="")
+    gender_female      = models.BooleanField(default=True)
     phone              = models.CharField(max_length=20, default="")
     email              = models.EmailField(blank=True, default="")
     image              = models.ImageField(blank = True, null = True, upload_to = 'Guide/%Y/%m/')

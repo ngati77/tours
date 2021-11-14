@@ -80,7 +80,10 @@
        <p>מידע נוסף</p>  
        <p>{{client.text}}</p>
       <hr>
+      {% if client.trip.guide.guide_female %}
       <p>(** שם המדריכה  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותבת למייל</p>
+      {% else %}
+      <p>(** שם המדריך  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותב למייל</p>
       <p>מספר הטלפון של {{ client.trip.guide.first_name }} : {{ client.trip.guide.phone }} </p>
       
       <hr>

@@ -36,7 +36,7 @@
       {% if NotFree %}
       <p>אל דאגה - אנחנו נשלח אליכם מייל תזכורת יום  לפני הסיור בשעה 11:00</p>
       {% else %}
-      <p>שימו לב - כדי למנוע מצב שהמדריכה מחכה ללקוח שאינו מגיע אנחנו ניצור איתכם קשר יום לפני הסיור ונבקש אישור הגעה נוסף, במידה ולא נקבל אישור השתתפותכם בסיור תבוטל.</p>
+      <p>שימו לב - כדי למנוע מצב שהמדריך/כה מחכה ללקוח שאינו מגיע אנחנו ניצור איתכם קשר יום לפני הסיור ונבקש אישור הגעה נוסף, במידה ולא נקבל אישור השתתפותכם בסיור תבוטל.</p>
       <p>{{client.text}}</p>
       {% endif %}
 
@@ -59,7 +59,11 @@
 
       {% if client.trip.guide %}
       <hr>
-      <p>(** שם המדריכה  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותבת למייל</p>
+      {% if client.trip.guide.gender_female %}
+         <p>(** שם המדריכה  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותבת למייל</p>
+      {% else %}
+          <p>(** שם המדריך  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותב למייל</p>
+      {% endif %}
       <p>מספר הטלפון של {{ client.trip.guide.first_name }} : {{ client.trip.guide.phone }} </p>
       
       {% endif %}

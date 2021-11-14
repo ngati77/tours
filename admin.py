@@ -311,9 +311,10 @@ class GuideAdmin(admin.ModelAdmin):
         
         (None,               {'fields': ['first_name']}),
         (None,               {'fields': ['last_name']}),
-        (None,            {'fields': ['default']}), 
+        (None,               {'fields': ['default']}), 
         (None,               {'fields': ['first_name_en']}),
         (None,               {'fields': ['last_name_en']}),
+        (None,               {'fields': ['gender_female']}),
         (None,               {'fields': ['user_name']}),
         (None,               {'fields': ['order']}),
         (None,               {'fields': ['image']}),
@@ -324,7 +325,7 @@ class GuideAdmin(admin.ModelAdmin):
        
     ]
     inlines         = [GuideBackgroundInline]
-    list_display    = ('first_name', 'last_name', 'default','first_name_en', 'last_name_en', 'user_name', 'order', 'image', 'phone' , 'email', 'confirm')
+    list_display    = ('first_name', 'last_name', 'default','first_name_en', 'last_name_en','gender_female', 'user_name', 'order', 'image', 'phone' , 'email', 'confirm')
     search_fields   = ['first_name']
     def set_default(self, request, queryset):
         objects = Guide.objects.all()
