@@ -558,9 +558,9 @@ class DayInCalendar:
                 # Now that we know trip is in the right dates, check if it run every day or on a prticular day
                 if (tripAvailabilty.ava_select_day != 'All' and tripAvailabilty.ava_select_day != dateInCalendar.strftime('%a') ):
                     continue
-
-                canceled = False
                 
+                # Set the default value, if looking on tommorow allow only if it before 16:00, or there is a trip exit
+                canceled = True if dateInCalendar == today_check else False
 
                 # Guide on holiday there is no tour on this day
                 for vac in guideVacationQuery:                     
@@ -568,8 +568,6 @@ class DayInCalendar:
                         canceled = True
                         break
 
-                # Set the default value, if looking on tommorow allow only if it before 16:00, or there is a trip exit
-                canceled = True if dateInCalendar == today_check else False
 
                 if (canceled):
                     #print("Skip this tour no guides")
