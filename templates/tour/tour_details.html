@@ -45,9 +45,9 @@
                         {% if NotFree %}
                             <p>{{ourTour.price}} פאונד למבוגר </p>
                             {% if print_child %}
-                            <p>{{ourTour.priceChild}} פאונד ילדים בגיל 3-12 </p>
+                            <p> ילד בגיל 3-{{ourTour.ChildAge}}: {{ourTour.priceChild}} פאונד</p>
                             {% else %}
-                            <p>ילדים עד גיל 12 חינם</p>
+                            <p>ילדים עד גיל {{ourTour.ChildAge}} חינם</p>
                             {% endif %}
                         {% else %}
                         <p>חינם</p>

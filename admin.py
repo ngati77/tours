@@ -292,13 +292,14 @@ class OurTourAdmin(admin.ModelAdmin):
         (None,               {'fields': ['duration']}),
         (None,               {'fields': ['price']}),
         (None,               {'fields': ['priceChild']}),
+        (None,               {'fields': ['ChildAge']}),
         (None,               {'fields': ['deposit']}),
         (None,               {'fields': ['trip_abc_name']}),      
         (None,               {'fields': ['img']}),
         (None,               {'fields': ['confirm']}),
         (None,               {'fields': ['order']}),
     ]
-    list_display    = ('title','price','img','confirm','order','priceChild','deposit','trip_abc_name')
+    list_display    = ('title','price','img','confirm','order','priceChild','ChildAge','deposit','trip_abc_name')
 
 class GuideBackgroundInline(admin.TabularInline):
     model = Guide_Background

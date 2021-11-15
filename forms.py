@@ -26,7 +26,7 @@ class BookingForm(forms.Form):
                                         (attrs={'placeholder':'דוא"ל'}))
 
     number_adults  = forms.IntegerField(max_value = 20, min_value =1, initial=0, label ='מספר מבוגרים' ) 
-    number_child   = forms.IntegerField(max_value = 10, min_value =0, initial=0, label ='מספר ילדים עד גיל 12')
+    number_child   = forms.IntegerField(max_value = 10, min_value =0, initial=0, label ='מספר ילדים')
     confirm_use    = forms.BooleanField(label ='אני מסכים שפרטי ישמרו כדי ליצור קשר לגבי הסיור',label_suffix="")
     send_emails    = forms.BooleanField(required=False, label ='אני מעוניין להצטרף לרשימת התפוצה',label_suffix="")
     foundUs        = forms.ModelChoiceField(queryset=FoundUs.objects.all(), label='מצא אותנו')

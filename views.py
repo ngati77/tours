@@ -370,18 +370,20 @@ def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
         deposit     = 30
         price       = ourTours.price
         priceChild  = ourTours.priceChild
+        ChildAge    = ourTours.ChildAge
         print_child = ourTours.priceChild > 0
     else:
         title       = ''
         deposit     = 0
         price       = 0
         priceChild  = 0
+        ChildAge    = 0
         print_child = 0
         NotFree     = True
         
     if request.method != 'POST':
 
-        form = BookingForm(initial={'title':title, 'trip_type':trip_abc_name,  'price':price, 'priceChild':priceChild, 'deposit':deposit})
+        form = BookingForm(initial={'title':title, 'trip_type':trip_abc_name,  'price':price, 'priceChild':priceChild, 'deposit':deposit,'ChildAge':ChildAge})
 
     
     newCalendar= Calendar(request=request, year=year,  month=month , view=trip_abc_name)
@@ -399,6 +401,7 @@ def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
                                                  'form': form, 
                                                  'price':price, 
                                                  'priceChild':priceChild, 
+                                                 'ChildAge':ChildAge, 
                                                  'deposit':deposit, 
                                                  'print_child': print_child,
                                                  'newCalendar':newCalendar,

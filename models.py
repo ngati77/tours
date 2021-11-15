@@ -83,6 +83,8 @@ class OurTours(models.Model):
     duration           = models.TextField(max_length=200)
     price              = models.IntegerField(default=0)
     priceChild         = models.IntegerField(default=0)
+    ChildAge           = models.IntegerField(default=12)
+
     deposit            = models.IntegerField(default=0)
     img                = models.ImageField(blank = True, null = True, upload_to = 'Tours/%Y/%m/')
     confirm            = models.BooleanField(default=False)

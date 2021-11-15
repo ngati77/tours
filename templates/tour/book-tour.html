@@ -42,9 +42,9 @@
              {% if NotFree %}
             <p> מחיר למבוגר: {{price}} פאונד</p>
              {% if print_child %}
-              <p>מחיר לילד בגיל 3-12: {{priceChild}} פאונד</p>
+              <p>מחיר לילד מגיל 3 ועד {{ChildAge}}: {{priceChild}} פאונד</p>
               {% else %}
-              <p>ילדים עד גיל 12 חינם</p>
+              <p>ילדים עד גיל {{ChildAge}} חינם</p>
               {% endif %}
               </p>
               {% endif %}
