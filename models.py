@@ -93,6 +93,9 @@ class OurTours(models.Model):
 
     order              = models.IntegerField(default=0)
 
+    base_payment       = models.IntegerField(default=40)
+
+
     def __str__(self):
         return self.trip_abc_name
     
@@ -236,7 +239,8 @@ class Trip(models.Model):
             reportEntry.total_guide_exp = reportEntry.calc_guide_payment(
                                                                     adult     = reportEntry.total_people,
                                                                     children  = reportEntry.total_children,
-                                                                    ourTour   = self.ourTour)
+                                                                    ourTour   = self.ourTour,
+                                                                    )
             # how much we earend
             reportEntry.total_neto      = reportEntry.total_gross - reportEntry.other_expense - reportEntry.total_guide_exp
             # Now that we know how much the guide earn we can calculate home amount he needs to return
@@ -386,12 +390,12 @@ class ReportEntry:
             # if more than 2 peole than we have extra to add
             extraPeople     = (totalPeople-2) if totalPeople > 2 else 0
             # Base amount 40 + 5 Pound per person
-            return (40 + 5 * extraPeople)
-        # It is a free tour, guide ge 50% with minimum of 40
+            return (ourTour.base_payment + 5 * extraPeople)
         
+        # If it is a free tour, the guide gets 50% with minimum of ourTour.base_payment
         else:
-            if (self.total_gross < 80):
-                return 40
+            if (self.total_gross < (ourTour.base_payment << 1)):
+                return ourTour.base_payment
             else:
                 return self.total_gross/2.0
             
