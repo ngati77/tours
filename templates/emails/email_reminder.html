@@ -84,6 +84,7 @@
       <p>(** שם המדריכה  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותבת למייל</p>
       {% else %}
       <p>(** שם המדריך  שלכם  {{ client.trip.guide.first_name }}  {{ client.trip.guide.last_name }} (מכותב למייל</p>
+      {% endif %}
       <p>מספר הטלפון של {{ client.trip.guide.first_name }} : {{ client.trip.guide.phone }} </p>
       
       <hr>

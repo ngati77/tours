@@ -68,6 +68,12 @@
                  </div>
             </li>
             {% endif %}
+           
+            {% if request.user|has_group:"Guides" %} 
+            <li class="nav-item">
+                <a class="nav-link nav-index-blog" href="{% url  'tour:tasks'  %}">מדריך</a>
+            </li>
+            {% endif %}
             
            
         </ul>

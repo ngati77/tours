@@ -247,7 +247,11 @@
      </div>
 {% endif %}
 
-
+</div>
+{% endif %}
+<!-- Allow guide to see the tours-->
+{% if request.user.is_superuser or request.user|has_group:"Guides" %}
+<div class="container-fluid">
 <!-- show for future tours
 -->
 {% if next_tours %}
@@ -326,7 +330,7 @@
      </div>
 {% endif %}
 
-<!-- show for future tours
+<!-- show future vacations
 -->
 {% if next_vacations %}
 <div class="row p-1 bg-light text-blue">
