@@ -44,11 +44,15 @@
       {% endif %}
       <p>מספר הטלפון של {{ client.trip.guide.first_name }} : {{ client.trip.guide.phone }} </p>
       
-      {% if client.trip.location.text_html_style is True %}
+      {% if client.trip.location %}
+      <hr>
+      <h3><font color="blue">נקודת המפגש</font></h3>
+        {% if client.trip.location.text_html_style is True %}
             {{ client.trip.location.text |safe}}
         {% else %}
-            {{ client.trip.location.text |linebreaks }}
+        {{ client.trip.location.text | linebreaks }}
         {% endif %}
+      {% endif %}
       
       <div class="space"></div>
       {% if NotFree %}
