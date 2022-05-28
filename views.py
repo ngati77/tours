@@ -41,6 +41,7 @@ from threading import Thread, activeCount
 from django.db.models import Q
 
 from .decorators import check_recaptcha
+from .decorators import group_required
 from django.http.response import JsonResponse, HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt # new
@@ -803,7 +804,8 @@ def privacy(request):
                                                      'meta_des':'מדיניות פרטיות ',
                                                      'meta_key':'מדיניות פרטיות'
                                                      })
-    
+@login_required
+@group_required('Guides')
 def tasks(request):
     today           = datetime.date.today()
     new_tours =  Trip.objects.filter(
