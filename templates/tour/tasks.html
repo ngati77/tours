@@ -23,6 +23,7 @@
     <tr class="title">
       <td>id</td>
       <td>תאריך סיור</td>
+      <td>יום</td>
       <td>שעה</td>
       <td>סוג סיור</td>
       <td>מדריך</td>
@@ -31,11 +32,12 @@
       <td>נוצר בתאריך</td>
       <td>אישור</td>
     </tr>
-    
+
     {% for entry in new_tours %}
      <tr class="data">
      <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
      <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
+     <td>{{  entry.trip_date|date:'l' |DayEn2Heb }}</td>
      <td>{{  entry.trip_time|date:'H:i'  }}</td>
      <td>{{  entry.ourTour.trip_abc_name }}</td>
      <td>
@@ -109,6 +111,7 @@
     <tr class="title">
       <td>id</td>
       <td>תאריך</td>
+      <td>יום</td>
       <td>שעה</td>
       <td>סוג סיור</td>
       <td>מדריך</td>
@@ -121,6 +124,7 @@
      <tr class="data">
      <td><a href="{% url 'tour:clientview' entry.id %}">{{  entry.id }}</a></td>
      <td>{{  entry.trip_date|date:'d.m.Y' }}</td>
+     <td>{{  entry.trip_date|date:'l'|DayEn2Heb }}</td>
      <td>{{  entry.trip_time|date:'H:i' }}</td>
      <td>{{  entry.ourTour.trip_abc_name }}</td>
      <td>{{  entry.guide }}</td>
@@ -264,6 +268,7 @@
     <tr class="title">
       <td>id</td>
       <td>תאריך סיור</td>
+      <td>יום</td>
       <td>שעה</td>
       <td>סוג סיור</td>
       <td>מדריך</td>
@@ -276,6 +281,7 @@
      <tr class="data">
      <td><a href="{% url 'tour:clientview' entry.id %}">{{ entry.id }}</a></td>
      <td>{{ entry.trip_date|date:'d.m.Y' }}</td>
+     <td>{{  entry.trip_date|date:'l'|DayEn2Heb }}</td>
      <td>{{ entry.trip_time|date:'H:i'  }}</td>
       <td>{{ entry.ourTour.trip_abc_name }}</td>
      <td>{{  entry.guide.user_name }}</td>

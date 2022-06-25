@@ -183,6 +183,10 @@ def send_succes_email(request,client):
         client.trip.status='n'
         client.trip.save()
     client.save()
+    if (client.trip.guide):
+        email_guide = client.trip.guide.email
+    else:
+        email_guide = ''
     try:
         msg_html = render_to_string('emails/email_success.html', { 
                                                                   'client':client, 
@@ -192,7 +196,7 @@ def send_succes_email(request,client):
                                                                   'NotFree':NotFree})
 
         emailTitle = "סיור בקיימברידג' - אישור הזמנה"
-        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email], title=emailTitle, cc=settings.CC_EMAIL)
+        emailSuccess = tour_emails.send_email(msg_html=msg_html, msg_plain=msg_plain, to=[client.email,email_guide], title=emailTitle, cc=settings.CC_EMAIL)
     except:
         print('Got an error... sending email...')
     #print(f'Debug {emailSuccess}')
