@@ -106,7 +106,8 @@
                 <th>Deposit</th>
                 <th>Income</th>
                 <th>Guide Exp</th>
-                <th>Other Exp</th>
+                <th>Exp</th>
+                <th>Exp des</th>
                 <th>Neto</th>
                  {% if filter_check_guide %}
                 <th>To Yael</th>
@@ -126,6 +127,7 @@
                     <td>{{ entry.total_gross }}</td>
                     <td>{{ entry.total_guide_exp }}</td>
                     <td>{{ entry.other_expense }}</td>
+                    <td>{{ entry.other_expense_des }}</td>
                     <td>{{ entry.total_neto }}</td>
                     {% if filter_check_guide %}
                      <td>{{ entry.guide_payback }}</td>

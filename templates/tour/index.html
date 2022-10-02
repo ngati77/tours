@@ -19,7 +19,7 @@
        
             <div class="row">
                 <div class="title2">
-                    המלצות
+                    {{page_text.review}}
                 </div>
                 
             </div>
@@ -49,12 +49,12 @@
             {% endfor %}
             
             <div class="row">
-                <a href="{% url  'tour:reviewes' %}"><button type="button" class="btn btn-runner">  עוד המלצות באתר
+                <a href="{% url  'tour:reviewes' %}"><button type="button" class="btn btn-runner">  {{page_text.button_review}}
                     <i class="fa fa-chevron-circle-left arrow arrow2"></i></button></a>
                 </div>
                 
                 <div class="row">
-                       <a href="{% url  'blog:post_list' %}"><button type="button" class="btn btn-runner">  לבלוג
+                       <a href="{% url  'blog:post_list' %}"><button type="button" class="btn btn-runner">  {{page_text.button_blog}}
                        <i class="fa fa-chevron-circle-left arrow arrow2"></i></button></a>
                   </div>   
              
@@ -63,41 +63,39 @@
         
         <div class="col-sm-12 col-md-12 col-lg-8 order-0 order-lg-1">
         <div class="row main_text">
-            <p class="title1">תתכוננו להתאהב בקיימברידג', פנינה קסומה שנכנסת ישר ללב </p>
+            <p class="title1">{{page_text.title}}
            
-                  <p class="text1">
-           יום טיול מדהים ופסטורלי מחוץ ללונדון העמוסה, תוך 50 דק' נסיעה ברכבת אתם מגיעים למקום שהוא שילוב מושלם של עיר יפיפיה וטבע.
+                  <p class="text1">{{page_text.phrase1}}
  <br>
- נטייל אתכם/ן בסמטאותיה של העיר והקולג'ים העתיקים, תרגישו שאתם צועדים במרחבי מוזיאון פתוח.
+ {{page_text.phrase2}}
  <br>
-
-           הסיור ילווה בסיפורים מעניינים על האוניברסיטה היוקרתית, על המדענים המפורסמים שלמדו בה, וההיסטוריה של הממלכה כולה.
+ {{page_text.phrase3}}
    </p>
 
          
                 <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>הסיורים מדורגים ב5 כוכבים בגוגל ,בטריפ אדוויזר ובפייסבוק</p>
+                    <p>{{page_text.star1}}</p>
                 </div>
                 <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star  circle-icon "  style="color:white; font-size: 13px;"></i>
-                    <p>קחו הפסקה מהמולת העיר הגדולה לונדון וכנסו אל תוך סיפור אגדה</p>
+                    <p>{{page_text.star2}}</p>
                 </div>
                 <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>פשוט וקל להגיע 50 דקות נסיעה ברכבת ממרכז לונדון</p>
+                    <p>{{page_text.star3}}</p>
                 </div>
                 <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>יחס אישי ומסור ממדריכות ישראליות מקומיות</p>
+                    <p>{{page_text.star4}}</p>
                 </div>
                 <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>אם ברצונך להזמין סיור למחר, אנא כיתבי לנו לפני ביצוע ההזמנה.</p>
+                    <p>{{page_text.star5}}.</p>
                 </div>
                 <div class="col-sm-12 col-md-3 tips  ">
                     <i class="fa fa-star circle-icon"  style="color:white; font-size: 13px;"></i>
-                    <p>תהליך הזמנה קל ונח</p>
+                    <p>{{page_text.star6}}</p>
                 </div>
             
           </div>
@@ -105,7 +103,7 @@
            <hr class="short">
                  
            <!--- Our tours row -->
-           <div class="display-4">הסיורים שלנו</div>
+           <div class="display-4">{{page_text.ourTours}}</div>
            {% for card in ourTours %}
            <div class="row ">
                <div class="col-sm-4 ">
@@ -116,12 +114,12 @@
                     <div class="card-body">
                         <p><b>{{card.headerShort1 |linebreaks }}</b></p>
                         <p>{{card.descriptionShort1 |linebreaks }}</p>
-                        <p><u>למי הסיור מתאים?</u></p>
+                        <p><u>{{page_text.who_can_do_it}}</u></p>
                         <p>{{card.whoCanDoIt}}</p>
                     </div>
                 </div>
                 <div class="col-xs-4 col-sm-1 align-self-end ">
-                    <a href="{% url  'tour:tour_details' card.trip_abc_name %}" class="btn btn-tour reg-btn"> לפרטים והרשמה</a>
+                    <a href="{% url  'tour:tour_details' card.trip_abc_name %}" class="btn btn-tour reg-btn"> {{page_text.details_and_review}} </a>
                 </div>
             </div>
             {% endfor %}
@@ -146,7 +144,7 @@
                 <hr class="light">
             </div>
             <div class="blog_name">
-                <h2> מתוך בלוג הטיולים שלנו</h2>
+                <h2>{{page_text.from_blog}}</h2>
             </div>
         </div><!--  row d-flex justify-content-center order-2 -->
         <div class=" row d-flex justify-content-center text-right">

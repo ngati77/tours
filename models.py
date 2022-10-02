@@ -15,6 +15,13 @@ TRIP_DAYS = (
     ('All', 'כל יום'), 
 )
 
+SUPPORTED_LANG = (
+
+    ('heb', 'עברית'),
+    ('en', 'English'),
+)
+
+
 STATUS_TRIP = (
     ('n', 'New'),
     ('a', 'Confirmed'),
@@ -70,6 +77,37 @@ class Review(models.Model):
     create_date      = models.DateTimeField(default=timezone.now)
     confirm          = models.BooleanField(default=False)
     
+
+class PageText(models.Model):
+   
+    page       = models.CharField(max_length=20)
+    
+    language   = models.CharField(
+        max_length=20,
+        choices=SUPPORTED_LANG,
+        default='heb',
+    )
+
+    def __str__(self):
+        return str(self.page + ': ' + self.language)
+
+    @staticmethod
+    def get_page_by_title_and_lan(page, lan):
+        return  PageText.objects.filter(page=page, language=lan)[0]
+
+
+class InPageText(models.Model):
+    title                   = models.CharField(max_length=200)
+    text_html_style         = models.BooleanField(default=False)
+    text                    = models.TextField(max_length=1000)
+    pageText               = models.ForeignKey(PageText,    on_delete=models.SET_NULL, blank=True, null=True)
+    order           = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['order']
+        
+
+
 class OurTours(models.Model):
 
     title              = models.CharField(max_length=200)
@@ -157,7 +195,7 @@ class Location(models.Model):
 class Instruction(models.Model):
     title                   = models.CharField(max_length=200)
     text_html_style         = models.BooleanField(default=False)
-    text                    = models.TextField(max_length=1000)
+    text                    = models.TextField(max_length=2000)
     default                 = models.BooleanField(default=False)
 
     def __str__(self):
@@ -181,7 +219,10 @@ class Trip(models.Model):
     trip_date   = models.DateField('Tour date')
     trip_time   = models.TimeField('Tour time')
     create_date = models.DateTimeField(default=timezone.now)
-    
+    expense     = models.IntegerField(default=0)
+    expense_des = models.CharField(max_length=200, blank=True)
+
+
     guide              = models.ForeignKey(Guide,    on_delete=models.SET_NULL, blank=True, null=True)
     ourTour            = models.ForeignKey(OurTours, on_delete=models.SET_NULL, blank=True, null=True)
     location           = models.ForeignKey(Location,on_delete=models.SET_NULL, blank=True, null=True)
@@ -217,6 +258,8 @@ class Trip(models.Model):
         clientQuerey = self.clients_set.all()
         # Scan all clients, in the futrue need to scan the invoice
         reportEntry.trip_id         = self.id
+        reportEntry.other_expense   = self.expense
+        reportEntry.other_expense_des  = self.expense_des
         for client in clientQuerey:
             if client.status != 'a':
                 continue
@@ -304,7 +347,7 @@ class Clients(models.Model):
     #create_date      = models.DateTimeField('date create')
     
     def __str__(self):
-        return self.first_name
+        return str(self.id)
     
 # create a transaction
 class Transaction(models.Model):
@@ -367,6 +410,7 @@ class ReportEntry:
         self.total_gross     = 0
         self.total_guide_exp = 0
         self.other_expense   = 0
+        self.other_expense_des   = ""
         self.guide_payback   = 0
         self.total_neto      = 0
         
@@ -410,9 +454,41 @@ class ReportEntry:
         self.total_gross       += reportEntry.total_gross
         self.guide_payback     += reportEntry.guide_payback   
         self.total_guide_exp   += reportEntry.total_guide_exp
+        self.other_expense     += reportEntry.other_expense
         self.total_neto        += reportEntry.total_neto
         return self
         
+
+class HomePageText:
+    def __init__(self, request, lan):
+        pageText = PageText.get_page_by_title_and_lan(page='home',lan=lan)
+        self.title =  self.get_text(pageText, 'home_title') 
+        self.phrase1 = self.get_text(pageText,'home_phrase1')
+        self.phrase2 = self.get_text(pageText,'home_phrase2')
+        self.phrase3 = self.get_text(pageText,'home_phrase3')
+        self.star1 = self.get_text(pageText,'home_star1')
+        self.star2 = self.get_text(pageText,'home_star2')
+        self.star3 = self.get_text(pageText,'home_star3')
+        self.star4 = self.get_text(pageText,'home_star4')
+        self.star5 = self.get_text(pageText,'home_star5')
+        self.star6 = self.get_text(pageText,'home_star6')
+        
+        self.ourTours = self.get_text(pageText,'home_ourtours')
+        self.button_blog = self.get_text(pageText,'home_button_blog')
+        self.button_review = self.get_text(pageText,'home_button_review')
+        self.from_blog = self.get_text(pageText,'home_from_blog')
+        self.who_can_do_it = self.get_text(pageText,'home_who_can_do_it')
+        self.review = self.get_text(pageText,'home_review')
+        self.details_and_review = self.get_text(pageText,'home_details_and_review')
+
+    def get_text(self, pageText, title):
+        #print(title)
+        return(pageText.inpagetext_set.filter(title=title)[0].text)
+        #return get_object_or_404(InPageText, title=title).text
+
+    def __str__(self):
+        return(','.join([self.title,self.phrase1,self.phrase2,self.star1,self.star2,self.star3,self.star4,self.star5,self.star6,self.ourTours]))
+
 
 class Calendar:
     

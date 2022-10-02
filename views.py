@@ -10,7 +10,7 @@ from django.views import generic
 from django.utils import timezone
 
 from .models import Trip, Clients, Review, Gallery, Calendar, ReportEntry,ClientReportEntry, Location, Instruction
-from .models import OurTours, Guide, Transaction, Contact, GuideVacation, FoundUs
+from .models import OurTours, Guide, Transaction, Contact, GuideVacation, FoundUs, HomePageText, PageText, InPageText
 
 from .tour_emails import tour_emails 
 import datetime
@@ -68,7 +68,11 @@ def home(request):
     """
     Show home page
     """
+    lan = 'heb'
     #return render(request, 'tour/index.html', {'page_title':'home'})
+    page_text = HomePageText(request,lan=lan)
+    #print(page_text)
+    print(page_text.title)
 
     OurToursQuery = OurTours.objects.filter(confirm=True).order_by('order')
     reviewesQuery = Review.objects.filter(confirm=True).order_by('-create_date')[:5]
@@ -79,7 +83,9 @@ def home(request):
     meta_key_heb = "סיור קיימברידג' קימברידג' קמברידג' אנגליה מחוץ ללונדון  "
     meta_key_en  = "Cambridge hebrew Guided tours"
     meta_key     = meta_key_heb + meta_key_en
-    return render(request, 'tour/index.html', {'page_title':"Cambridge In Hebrew טיול בקיימברידג", 
+    return render(request, 'tour/index.html', { 'lan':lan,
+                                                'page_title':"Cambridge In Hebrew טיול בקיימברידג", 
+                                               'page_text':page_text,
                                                'meta_des':meta_des,
                                                'meta_key':meta_key,
                                                'ourTours':OurToursQuery,
@@ -602,7 +608,7 @@ def reportView(request):
             sum_commision = 0
             if (foundUs != None):
                 for trip in tripQuerey: 
-                    if trip.trip_date.month >= start_month and trip.trip_date.month <= end_month:
+                    if trip.trip_date.month >= int(start_month) and trip.trip_date.month <= int(end_month):
                         continue
                     for client in trip.clients_set.all():
                         if client.foundUs == foundUs:

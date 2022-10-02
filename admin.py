@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import Trip, Clients, TripAvailabilty, GuideVacation, FoundUs
 from .models import Review, Gallery, OurTours, Guide, Guide_Background, Transaction, Location, Instruction
-from .models import Contact
+from .models import Contact, PageText, InPageText
 
 from django.contrib.admin import AdminSite
 from django.http import HttpResponse
@@ -10,6 +10,13 @@ from .tour_emails import tour_emails
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
+class InPageTextInline(admin.TabularInline):
+    model = InPageText
+    extra = 3
+    
+
+class PageTextAdmin(admin.ModelAdmin):
+    inlines         = [InPageTextInline]
 
 
 
@@ -208,6 +215,8 @@ class TripAdmin(admin.ModelAdmin):
         ('Make sure not empty',          {'fields': ['guide']}),
         (None,          {'fields': ['location']}),
         (None,          {'fields': ['instruction']}),
+        (None,               {'fields': ['expense']}),
+        (None,               {'fields': ['expense_des']}),
        
         ('Date information', {'fields': ['create_date'],'classes': ['collapse']}),
         ('Comments',         {'fields': ['trip_text']}),
@@ -215,7 +224,7 @@ class TripAdmin(admin.ModelAdmin):
         
     ]
     inlines         = [ClientsInline]
-    list_display    = ('id','trip_date', 'trip_time'  ,'status','create_date','total_payment','ourTour','guide','location')
+    list_display    = ('id','trip_date', 'trip_time'  ,'status','create_date','total_payment','ourTour','guide','location','expense','expense_des')
     list_filter     = ['trip_date']
     search_fields   = ['trip_text']
     actions         = ['track_trip']
@@ -371,6 +380,9 @@ admin.site.register(Transaction,TransactionAdmin)
 admin.site.register(FoundUs,FoundUsAdmin)
 admin.site.register(Location,LocationAdmin)
 admin.site.register(Instruction,InstructionAdmin)
+admin.site.register(PageText,PageTextAdmin)
+
+
 
 
 
