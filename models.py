@@ -529,7 +529,7 @@ class Calendar:
         #Start from previous month
         dayCount = LastDayInPrevMonth.day - daydict[firstDayOfMonth.strftime("%a")] + 2
         _month =   LastDayInPrevMonth.month
-        _year  =   1977
+        _year  =   LastDayInPrevMonth.year
         
         for i in range (1,43):
             # Moving to current month
@@ -543,8 +543,8 @@ class Calendar:
                 monthCount = 'nextMonth'
                 dayCount =1
                 _month =   self.nextMonth
-                _year  =   1977
-            
+                _year  =   LastDayInPrevMonth.year
+           
             dayInMonth = datetime.date(_year, _month, dayCount)
                 
             dayInCalendar.append(DayInCalendar(request=request, dateInCalendar=dayInMonth, today= today, view=view))
