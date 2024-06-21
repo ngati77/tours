@@ -182,6 +182,9 @@ def send_succes_email(request,client):
     children    = (client.number_of_children > 0)
     more_to_pay = (client.total_payment-client.pre_paid)
     dayHeb      = hebdict[client.trip.trip_date.strftime('%a')]
+    # Solve the double confirmation emails, by first check the client status  
+    if client.status == 'a':
+        return
     # Update the client status
     client.status = 'a'
     # if a new trip was created then update the status to 'new' from 'pending'
