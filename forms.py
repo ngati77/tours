@@ -130,6 +130,29 @@ class PaymentForm(forms.Form):
         return title, trip_date, trip_time, trip_type, first_name, last_name, phone, email, number_adults, number_child, deposit, paymentSum, confirm_use, send_emails, foundUs, text        
 
 '''
+class PdfGuideForm(forms.Form):
+    first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
+    last_name      = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
+    #email          = forms.EmailField(label ='', widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
+    email          = forms.CharField(max_length=100, label ='',
+                                        widget= forms.EmailInput
+                                        (attrs={'placeholder':'דוא"ל'}))
+    last_day    = forms.IntegerField(widget=forms.HiddenInput, initial=15)
+    payment     = forms.IntegerField(widget=forms.HiddenInput, initial=15)
+    offer     = forms.IntegerField(widget=forms.HiddenInput, initial=15)
+
+    tour_name   = forms.CharField(widget=forms.HiddenInput, initial=15)
+
+    def get_data(self):
+        first_name      = self.cleaned_data['first_name']
+        last_name       = self.cleaned_data['last_name']
+        email           = self.cleaned_data['email']
+        last_day        = self.cleaned_data['last_day']
+        payment         = self.cleaned_data['payment']
+        tour_name       = self.cleaned_data['tour_name']
+        offer       = self.cleaned_data['offer']
+
+        return first_name, last_name, email, last_day, payment, offer, tour_name
 
 class ContactForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))

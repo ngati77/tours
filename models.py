@@ -133,6 +133,9 @@ class OurTours(models.Model):
 
     base_payment       = models.IntegerField(default=40)
 
+    has_private_page   = models.BooleanField(default=False)  
+
+
 
     def __str__(self):
         return self.trip_abc_name
@@ -318,11 +321,9 @@ class Clients(models.Model):
     ('c', 'Canceled and refund'),
     ('p', 'Payment Pending'),
     
-
     )
-    
-    
-    trip             = models.ForeignKey(Trip, on_delete=models.CASCADE)
+        
+    trip             = models.ForeignKey(Trip, on_delete=models.CASCADE,  null=True)
     first_name       = models.CharField(max_length=200)
     last_name        = models.CharField(max_length=200)
     phone_number     = models.CharField(max_length=20) 
@@ -343,12 +344,15 @@ class Clients(models.Model):
     foundUs             = models.ForeignKey(FoundUs,    on_delete=models.SET_NULL, blank=True, null=True)
     text                = models.TextField(max_length=600, blank=True)
     admin_comment       = models.TextField(max_length=120, blank=True)
+    other_payment       = models.BooleanField(default=False)  
+
     
     #create_date      = models.DateTimeField('date create')
     
     def __str__(self):
         return str(self.id)
-    
+
+
 # create a transaction
 class Transaction(models.Model):
     client            =  models.ForeignKey(Clients, on_delete=models.CASCADE)

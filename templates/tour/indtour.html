@@ -1,0 +1,122 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+
+{% block head %}
+
+  <!-- CSS for each example: -->
+  <link rel="stylesheet" type="text/css" href="{% static 'tour/tour_details.css' %}" data-rel-css="" />
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+        <div class="row d-flex justify-content-center">
+            <div class="col-sm-12 col-md-10 col-lg-8 order-0 order-md-1">
+                <div class="card-body">
+
+        <h1>בעקבות הסיפורים – מסע בקיימברידג' ההיסטורית</h1>
+                </div>
+    <div class="card-body">
+        <p>מלאו את הפרטים לרכישת מדריך שמע לסיור עצמאי:</p>
+        <form action="{% url 'tour:pdf_guide' 'indtour'  %}" method="post" >
+                {% csrf_token %}
+                 
+                <table >
+                {{ form.as_p }}
+                </table>
+                <button type="submit" class="save btn btn-tour">לרכישה</button>
+                </form>
+    </div>
+</div>
+<div class="col-sm-12 col-md-10 col-lg-8 order-0 order-md-1">
+
+    <div class="card-body">
+        <p>במקום לשוטט בין בלוגים, פייסבוק ואינסטגרם – קבלו מדריך אחד, מסודר, שיחסוך לכם זמן, בלבול ובעיקר... יגרום לכם להתאהב בקיימברידג'.</p>
+    </div>
+
+    <div class="card-body">
+        <h2>מה תמצאו במדריך?</h2>
+        <ul>
+            <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;מסלול הליכה מעגלי בין כל נקודות העניין המרכזיות של כ-3 שעות בעיר (כולל זמני הליכה)</li>
+            <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;הסברי שמע קצרים, ברורים וידידותיים</li>
+            <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;המלצות אוכל שנבדקו באופן אישי</li>
+            <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;נקודות אינסטגרם 📸 איפה כדאי להצטלם?</li>
+            <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;טיפים פרקטיים כמו מה לעשות אם יורד גשם</li>
+            <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;המלצות לשופינג ובתי מלון</li>
+        </ul>
+    </div>
+
+    <div class="card-body">
+        <h2>איך זה עובד?</h2>
+        
+            <p>ממלאים את הפרטים לרכישת המדריך:</p>
+        <form action="{% url 'tour:pdf_guide' 'indtour'  %}" method="post" >
+                {% csrf_token %}
+                 
+                <table >
+                {{ form.as_p }}
+                </table>
+      
+      
+                <button type="submit" class="save btn btn-tour">לרכישה</button>
+                </form>
+            </div>
+
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-8 order-0 order-md-1">
+                <div class="card-body">
+
+        <p>&gt;&gt; מקבלים מיד מייל עם הקישור וסיסמה למדריך ויוצאים לדרך!</p>
+        <p><strong>שימו לב:</strong> הקישור תקף ל־ {{last_day}} יום מרגע הרכישה</p>
+    </div>
+
+    <div class="card-body">
+        <h2>כמה זה עולה?</h2>
+        <p>{{payment}} פאונד בלבד</p>
+        <p>מלאו את הפרטים לרכישה:</p>
+        <form action="{% url 'tour:pdf_guide' 'indtour'  %}" method="post" >
+                {% csrf_token %}
+                 
+                <table >
+                {{ form.as_p }}
+                </table>
+      
+      
+                <button type="submit" class="save btn btn-tour">לרכישה</button>
+                </form>
+        <!--<div class="image-placeholder">[תמונה עם סימן שאלה]</div>-->
+    </div>
+</div>
+<div class="col-sm-12 col-md-10 col-lg-8 order-0 order-md-1">
+        <div class="card-body">
+
+    <hr>
+
+        <h2>רוצים לקבל טעימה מהמדריך לפני שרוכשים?</h2>
+        <p>קבלו  ללא עלות מדריך לסיור עם הסברי שמע ומפת מסלול לשלוש נקודות מעניינות לביקור.</p>
+        <p><a href="{% url 'tour:tour_details' 'indtour_free'  %}">קישור למדריך הטעימה</a></p>
+
+    </div>
+    <hr>
+    <div class="card-body">
+        <p>
+            המדריך הדיגיטלי, מפת גוגל, ופלייליסט האודיו הינם לשימוש אישי בלבד של רוכש/ת המוצר.
+            אין להעביר, לשכפל, להעלות לאינטרנט, להפיץ או למסור את הקבצים או הקישורים לכל צד שלישי.
+            כל העברה או הפצה מהוות הפרת זכויות יוצרים ויפעלו בניגוד לחוק.
+        </p>
+        <p><strong>אנו סומכים עליך ומודים לך על רכישה הוגנת שתומכת בעסק קטן ועצמאי ❤️</strong></p>
+    </div>
+
+
+</div>
+</div>
+
+    
+</div>
+
+
+{% endblock %}
+
+

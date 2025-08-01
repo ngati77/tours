@@ -1,0 +1,90 @@
+{% extends 'tour/base.html' %}
+{% load static %}
+
+
+{% block head %}
+
+  <!-- CSS for each example: -->
+  <link rel="stylesheet" type="text/css" href="{% static 'tour/tour_details.css' %}" data-rel-css="" />
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row d-flex justify-content-center">
+        <div class="col-sm-12 col-md-10 col-lg-8 order-0 order-md-1">
+            <div class="card-body">
+        
+            <h2>גלו את קיימברידג' עם מפת מסלול ומדריך שמע בעברית – חינם!</h2>
+            <p>
+                שלום! אני יעל וכבר קרוב ל-10 שנים, מפעילה סיורים בעיר תחת המותג 'קיימברידג' בעברית'.
+            </p><p>
+                 עכשיו, אני מזמינה אתכם להכיר את העיר בדרך הכי חווייתית שיש – מדריך שמע
+                  לסיור עצמאי, חינמי, ובשפה שלכם.
+
+            </p>
+            <h2>            מה מחכה לכם במדריך הטעימה?
+            </h2>
+                <ul>
+                <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;שלושה אתרים איקוניים שאסור לפספס בקיימברידג'.</li>
+                <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;בית קפה מקומי מומלץ שאני אישית לוקחת אליו קבוצות.</li>
+
+                <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;קבצי שמע קצרים וברורים – פשוט לוחצים ומאזינים בכל נקודה.</li>
+                <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;            מפת גוגל מוכנה עם כל הנקודות.</li>
+        </ul>
+    </div>
+        <div class="card-body">
+
+<p>            מלאו את הפרטים וקבלו מיידית מייל עם המדריך ללא עלות</p>
+<form action="{% url 'tour:pdf_guide' 'indtour_free'  %}" method="post" >
+    {% csrf_token %}
+     
+    <table >
+    {{ form.as_p }}
+    </table>
+    <button type="submit" class="save btn btn-tour">להורדה</button>
+    </form>
+</div>
+<div class="card-body">
+
+<hr>
+<h3>    רוצים להמשיך ולגלות את האתרים האייקונים של קיימברידג'?</h3>
+<p>            הכנתי לכם סיור בעקבות הסיפורים בקיימברידג' ההיסטורית
+</p>
+
+            <p><a href="{% url 'tour:tour_details' 'indtour'  %}" class="button">הורידו עכשיו את מדריך השמע לסיור המלא של 3 שעות בעיר.</a></p>
+            
+         
+            <h2>מה כולל המדריך המלא?</h2>
+            <ul>
+              <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;סיור מעגלי בעשר נקודות מומלצות לביקור עם הסברי שמע</li>
+              <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;המלצות ללינה, מסעדות וחנויות איכותיות</li>
+              <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;טיפים חשובים: דרכי תחבורה, מזג אוויר ועוד</li>
+              <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;נקודות צילום מושלמות לאינסטגרם</li>
+              <li>&#9679;&nbsp;&nbsp;&nbsp;&nbsp;מפת גוגל עם ציוני מקום</li>
+            </ul>
+          
+            <h2>למי מתאים הסיור?</h2>
+            <p>החל מגיל 10 ילדים מוצאים את הסיור הזה מעניין. שילוב של הליכה בחוץ במדשאות, גשרים לאורך הנהר וקולג’ים עתיקים בסגנון “הארי פוטר”.</p>
+            <p>למבוגרים הסיור מעניין מאד. ההליכה היא מישורית אך יכולה להיות ארוכה למי שמתקשה בהליכה. אין אפשרות לשלב תחבורה במהלך המסלול.</p>
+          
+            <p><strong>הצטרפו אלי לחוויה בלתי נשכחת בעיר!</strong></p>
+            <p><strong>וכל זאת ב-20 פאונד בלבד</strong></p>
+            <p>הקישור לסיור תקף ל-30 יום מרגע הרכישה.</p>
+            <!--
+            <a href="{% url 'tour:pdf_guide' 'indtour_free' %}" class="button">לחצו כאן לרכישת המדריך</a>
+             -->
+            <hr>
+
+       
+</div>
+</div>
+
+    </div>
+</div>
+
+
+{% endblock %}
+
+

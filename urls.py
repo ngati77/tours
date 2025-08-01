@@ -20,7 +20,8 @@ urlpatterns = [
     path('tour_details/<str:trip_abc_name>', views.tour_details, name='tour_details'),
     path('tour_details', views.tour_details, name='tour_details'),
 
-    
+    #path('paid_pdf_tour',       views.PaidPdfTour, name='paid_pdf_tour'),
+
     path('reviewes',       views.reviewes, name='reviewes'),
     path('gallery',        views.gallery, name='gallery'),
     path('team',           views.team, name='team'),
@@ -28,6 +29,8 @@ urlpatterns = [
     path('success/<int:pk>/',         views.success, name="success"),
     path('failure/<int:pk>/',         views.failure, name="failure"),
 
+    
+    path('pdf_guide/<str:trip_abc_name>',         views.pdfGuide, name="pdf_guide"),
     path('contact',         views.contactUs, name="contact"),
     path('give_review',     views.GiveReview, name="give_review"),
     path('report-view',     views.reportView, name="report-view"),

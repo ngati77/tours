@@ -51,13 +51,16 @@ class ClientAdmin(admin.ModelAdmin):
         (None,               {'fields': ['total_payment']}),
         (None,               {'fields': ['text']}),
         (None,               {'fields': ['status']}),
+        (None,               {'fields': ['other_payment']}),
+
         ('Admin',            {'fields': ['admin_comment']}),
         ('Trip',             {'fields': ['trip']}),
         
         
+        
     ]
     inlines         = [TransactionInline]
-    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','foundUs','text','status','admin_comment')
+    list_display    = ('id','first_name', 'last_name', 'email' ,'number_of_people' , 'number_of_children', 'pre_paid', 'total_payment', 'confirm_use', 'send_emails','foundUs','text','status','admin_comment','other_payment')
     list_filter     = ['first_name']
     search_fields   = ['first_name','last_name']
     
@@ -308,9 +311,11 @@ class OurTourAdmin(admin.ModelAdmin):
         (None,               {'fields': ['confirm']}),
         (None,               {'fields': ['order']}),
         (None,               {'fields': ['base_payment']}),
+        (None,               {'fields': ['has_private_page']}),
+
 
     ]
-    list_display    = ('title','price','img','confirm','order','priceChild','ChildAge','deposit','trip_abc_name','base_payment')
+    list_display    = ('title','price','img','confirm','order','priceChild','ChildAge','deposit','trip_abc_name','base_payment','has_private_page')
 
 class GuideBackgroundInline(admin.TabularInline):
     model = Guide_Background
@@ -381,6 +386,7 @@ admin.site.register(FoundUs,FoundUsAdmin)
 admin.site.register(Location,LocationAdmin)
 admin.site.register(Instruction,InstructionAdmin)
 admin.site.register(PageText,PageTextAdmin)
+
 
 
 

@@ -12,20 +12,21 @@ from django.utils import timezone
 from .models import Trip, Clients, Review, Gallery, Calendar, ReportEntry,ClientReportEntry, Location, Instruction
 from .models import OurTours, Guide, Transaction, Contact, GuideVacation, FoundUs, HomePageText, PageText, InPageText
 
+import os
 from .tour_emails import tour_emails 
 import datetime
 from django.template.loader import render_to_string
 
-
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 
 from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .forms import BookingForm, ContactForm, ReviewForm, ReportForm #, PaymentForm
+from .forms import BookingForm, ContactForm, ReviewForm, ReportForm, PdfGuideForm #, PaymentForm
 
 from django.contrib.auth.decorators import login_required
-
 
 import stripe
 
@@ -41,11 +42,13 @@ from threading import Thread, activeCount
 from django.db.models import Q
 
 from .decorators import check_recaptcha
-from .decorators import group_required
+from .decorators import group_required, group_required_in_date
 from django.http.response import JsonResponse, HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt # new
 from django.views.generic.base import TemplateView
+
+from django.templatetags.static import static
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -124,7 +127,19 @@ def gallery(request):
                                                  'meta_des':meta_des,
                                                  'meta_key':meta_key,
                                                  'images':galleryQuery})
-
+#@login_required
+#@group_required_in_date('independence_tour')      
+#def PaidPdfTour(request):
+#    """
+#    Show Paid PDF page
+#    """
+#    print(f'Static dir: {settings.STATICFILES_DIRS}')
+#    file_path = os.path.join(settings.STATICFILES_DIRS, 'independence_paid.pdf')
+#    print(f'file_path = {file_path}')
+#    #file_path = '/Users/owner/cambridge/tours/static/tour/pdf/independence_tour_paid.pdf'
+#    with open(file_path, 'rb') as pdf_file:
+#           response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+#           return response
 
 def reviewes(request):
     """
@@ -224,9 +239,10 @@ def send_succes_email(request,client):
                                                       'day_in_hebrew':dayHeb
                                                       })
 
-
 def tour_details(request, trip_abc_name='Classic'):
-    
+    '''
+    Show the details of a specific tour
+    '''
     ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
 
     meta_des_heb = "סיורים בקיימברידג' אנגליה"
@@ -237,12 +253,20 @@ def tour_details(request, trip_abc_name='Classic'):
     meta_key     = meta_key_heb + meta_key_en
     print_child = (ourTours.priceChild) > 0
     NotFree = (ourTours.price != 0)
+    # If the tour has a private page
+    if ourTours.has_private_page:
+        return pdfGuide(request,trip_abc_name )
+
+
+
+
     return render(request, 'tour/tour_details.html', {'page_title':ourTours.title,
                                                    'meta_des':meta_des,
                                                    'meta_key':meta_key,
                                                    'print_child':print_child,
                                                    'ourTour':ourTours,
                                                    'NotFree':NotFree})
+
     
 def bookTourToday(request, trip_abc_name ):
      today = datetime.date.today()
@@ -421,6 +445,49 @@ def bookTour(request,pYear=1977, pMonth=1, trip_abc_name='Classic' ):
                                                  'newCalendar':newCalendar,
                                                  'NotFree':NotFree})
 
+
+def pdfGuide(request,trip_abc_name):
+    if request.method == 'POST':
+        form = PdfGuideForm(request.POST)
+
+        if form.is_valid():
+            if True:
+
+                # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+                # book_inst.due_back = form.cleaned_data['renewal_date']
+                # Get all infortamtion from form
+                first_name, last_name,  email, last_day, payment,offer, tour_name = form.get_data()
+
+                client = Clients(trip=None,first_name=first_name,last_name=last_name, other_payment=True, phone_number=0, email=email, number_of_people=0, 
+                     number_of_children=last_day, pre_paid = offer, total_payment = payment, confirm_use = False, send_emails = True, text = tour_name, foundUs = None)
+#            
+                client.save()  
+                # If it is a free tour, send an email thank you with the pdf file.
+                if payment == 0:
+                    return email_pdf(request, client, payment, last_day)
+                # Payment is needed.
+                else:
+                    return render(request, 'tour/payment.html', {'client_id':client.id, 'deposit':payment})       
+    else:
+        ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
+        form = PdfGuideForm(initial={'last_day':ourTours.ChildAge, 'payment':ourTours.price, 'offer':ourTours.priceChild,'tour_name':ourTours.trip_abc_name}  ) 
+        
+        meta_des_heb = "קיימברידג בעברית הורד מדריך  "
+        meta_des_en  = "pdf guide Cambridge in Hebrew"
+        meta_des = meta_des_heb + meta_des_en
+        meta_key_heb = meta_des_heb
+        meta_key_en  = "pdf guide cambridge hebrew "
+        meta_key     = meta_key_heb + meta_key_en    
+
+        return render(request, f'tour/{trip_abc_name}.html', {'title':'PDF GUIDE', 
+                                                 'page_title' : "מדריך לקיימברידג' ", 
+                                                  'meta_des':meta_des,
+                                                  'form':form,
+                                                  'last_day':ourTours.ChildAge,
+                                                  'payment':ourTours.deposit,
+                                                  'meta_key':meta_key})
+
+
 @check_recaptcha
 def contactUs(request ):
     if request.method == 'POST':
@@ -542,19 +609,162 @@ def success (request):
 
 def success (request,pk):
     client = get_object_or_404(Clients, pk=pk)
+    if not client.other_payment:
+        return send_succes_email(request, client)
+    else:
+        # Create new user
+        if client.status == 'a':
+            return
+        # Update the client status
+        client.status = 'a'
+        client.save()
+        return create_new_user(request, client)
+
+
+def create_new_user(request, client):
+        today = datetime.date.today()
+
+        final_day = today + datetime.timedelta(days=client.number_of_children)
+        last_object = User.objects.latest('id')
+        last_id = last_object.id
+        username = f'{client.first_name}_{last_id+1}'
+        password = '1234'
+        user = User.objects.create_user(username=username, email=client.email, password=password, first_name=final_day.strftime("%Y-%m-%d"))
+
+        tour_group = Group.objects.get(name=client.text) 
+        tour_group.user_set.add(user)
+        tour_group.save()
     
-    return send_succes_email(request, client)
+        return email_new_user(request=request, client=client,  username=username, password=password, final_day=final_day.strftime("%d-%m-%Y"),link=f'{settings.DOMAIN_URL}blog/{client.text}')
+
+def email_new_user(request, client, username, password,final_day,link ):
+    '''
+    A new user has booked a pdf tour, this function creates a pdf reciept and send an email with the passord and confirmation
+    '''
+
+    title = "קיימברידג' בעברית- תודה שבחרתם בנו"
+ 
+    transactionArray = []
+                       
+    tType = 'Card / אשראי'
+                  
+    tranEntry = TransactionEntry(   payment_type   = tType,
+                                    payment_date   = datetime.datetime.now(),
+                                    payment_amount = client.total_payment ,
+                                    payment_id     = client.id )  
+                    
+    transactionArray.append(tranEntry)
+                # create sum 
+    tranEntry = TransactionEntry(payment_type   = 'סיכום',
+                                                 payment_date   = datetime.datetime.now(),
+                                                 payment_amount = client.total_payment ,
+                                                 payment_id     = client.id  )
+   
+    # Ready to create invoice
+    params = {
+        'report'   : transactionArray,
+        'sum'      : tranEntry, 
+        'client'   : client,
+        'request'  : request
+    }
+    # Check if need to send the pdf    
+    file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
+    file = Render.render_to_file('pdf/client.html', file_name, params)
+
+
+    msg_html = render_to_string('emails/email_new_user.html', { 
+                                                                  'first_name':client.first_name, 
+                                                                  'username':username, 
+                                                                  'pass':password,
+                                                                  'final_day':final_day,
+                                                                  'link':link
+                                                                  })
+    msg_plain = 'תודה שהזמנתם דרכנו סיור'
+
+    emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+    tour_emails.send_email_msg_pdf( to=[client.email, settings.EMAIL_GMAIL_YAEL],
+                                                msg_html=msg_html, 
+                                                msg_plain=msg_plain, 
+                                                file=file, 
+                                                file_name=file_name, 
+                                                cc=[], 
+                                                title=title)
+
+
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
+    meta_des_en  = ""
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "הרשמה הצלחה "
+    meta_key_en  = " "
+    meta_key     = meta_key_heb + meta_key_en
+    #print(trip)
+    return render(request,'tour/success_ind_tour.html', {'title':'תשלום הצליח', 'page_title':'ההרשמה הסתיימה בהצלחה', 
+                                                      'meta_des':  meta_des,
+                                                      'meta_key':  meta_key,
+                                                      'client':    client,
+                                                      'username':username, 
+                                                      'password':password,
+                                                      'final_day':final_day,
+                                                      'link':link
+                                                      })
+
+def email_pdf(request,client, payment, last_day):
+
+    #relative_pdf_path = f'tour/pdf/{client.text}.pdf'
+   
+    #print(f'static dir {settings.BASE_DIR}')
+    #static_pdf_path = os.path.join(settings.BASE_DIR,'tours/static/' , relative_pdf_path)
+    #print(f'full path {static_pdf_path}')
+    #file = []
+    #file.append(static_pdf_path)
+    #file.append(static_pdf_path)
+
+    #file = open(static_pdf_path, 'rb')
+    msg_html = render_to_string('emails/email_pdf_user.html', { 
+                                                                  'first_name':client.first_name, 
+                                                                  'payment':client.pre_paid,
+                                                                  'last_day':last_day,
+                                                                  'link_free':f'{settings.DOMAIN_URL}blog/indtour_free',
+                                                                  'link':f'{settings.DOMAIN_URL}tour_details/indtour',
+                                                                  })
+
+    msg_plain = 'תודה שהזמנתם דרכנו סיור'
+    title = "סיור בקיימברידג' - אישור הזמנה"
+    emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+    meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
+    meta_des_en  = ""
+    meta_des = meta_des_heb + meta_des_en
+    meta_key_heb = "הרשמה הצלחה "
+    meta_key_en  = " "
+    meta_key     = meta_key_heb + meta_key_en
+    tour_emails.send_email( to=[client.email, settings.EMAIL_GMAIL_YAEL],
+                                                msg_html=msg_html, 
+                                                msg_plain=msg_plain, 
+                          #                      file=file, 
+                           #                     file_name=static_pdf_path, 
+                                                cc=[], 
+                                                title=title)
+    return render(request,'tour/success_pdf_tour.html', {'title':'הרישןם הצליח', 'page_title':'ההרשמה הסתיימה בהצלחה', 
+                                                      'meta_des':  meta_des,
+                                                      'meta_key':  meta_key,
+                                                      'first_name':    client.first_name,
+                                                      'payment':client.pre_paid,
+                                                      'last_day':last_day,
+                                                      'link':f'{settings.DOMAIN_URL}tour_details/indtour',
+                                                      'link_free':f'{settings.DOMAIN_URL}blog/indtour_free'
+                                                      })
 
 def failure (request,pk):
     client = get_object_or_404(Clients, pk=pk)
     client.status = 'b'
     client.admin_comment = 'Payment failed'
     client.save()
-    # if a new trip was created then update the status to 'new' from 'pending'
-    if client.trip.status == 'p':
-        client.trip.status='b'
+    if not client.other_payment:
+        # if a new trip was created then update the status to 'new' from 'pending'
+        if client.trip.status == 'p':
+            client.trip.status='b'
 
-        client.trip.save()
+            client.trip.save()
     
 
     meta_des_heb = "ההרשמה נכשלה  "
@@ -792,7 +1002,7 @@ def tripView(request):
                                                      'report': tripQuerey,
                                                      'filter_check_guide': check_guide
                                                      })
-                
+          
 def tripPdf(request, pk):
     '''
     This function generate a pdf document  - there is a problem with the name in hebrew...
@@ -905,10 +1115,6 @@ class TransactionEntry:
         self.payment_amount    = payment_amount
         self.payment_id        = payment_id
 
-    
-
-
-
 def tour_complete(request, pk):
     '''
     This function change trip status to complete:
@@ -993,7 +1199,6 @@ def tour_complete(request, pk):
                 file_name='Cambridge_in_hebrew_invoice_' + str(client.id)  + '.pdf'
                 file = Render.render_to_file('pdf/client.html', file_name, params)
 
-
                 
                 tour_emails.send_email_msg_pdf( to=[client.email, settings.EMAIL_GMAIL_YAEL],
                                                 msg_html=msg_html, 
@@ -1044,7 +1249,6 @@ def contact_confirm(request, pk):
     contact.save()
     return  redirect('tour:tasks')
 
-
 def review_confirm(request, pk):
     review_query = Review.objects.filter(id  = pk)
     if (len(review_query)>0):
@@ -1052,7 +1256,6 @@ def review_confirm(request, pk):
         review.confirm = True
         review.save()
     return  redirect('tour:tasks')
-
 
 def CanMakeIt(request, pk ):
     return CanMakeItFuncion(request, pk, True )
