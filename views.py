@@ -710,16 +710,6 @@ def email_new_user(request, client, username, password,final_day,link ):
 
 def email_pdf(request,client, payment, last_day):
 
-    #relative_pdf_path = f'tour/pdf/{client.text}.pdf'
-   
-    #print(f'static dir {settings.BASE_DIR}')
-    #static_pdf_path = os.path.join(settings.BASE_DIR,'tours/static/' , relative_pdf_path)
-    #print(f'full path {static_pdf_path}')
-    #file = []
-    #file.append(static_pdf_path)
-    #file.append(static_pdf_path)
-
-    #file = open(static_pdf_path, 'rb')
     msg_html = render_to_string('emails/email_pdf_user.html', { 
                                                                   'first_name':client.first_name, 
                                                                   'payment':client.pre_paid,
