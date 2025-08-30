@@ -18,7 +18,9 @@
 
         <h1>בעקבות הסיפורים – מסע בקיימברידג' ההיסטורית</h1>
                 </div>
+
     <div class="card-body">
+            <p>בעלות של {{payment}} פאונד בלבד</p>
         <p>מלאו את הפרטים לרכישת מדריך שמע לסיור עצמאי:</p>
         <form action="{% url 'tour:pdf_guide' 'indtour'  %}" method="post" >
                 {% csrf_token %}
@@ -72,23 +74,6 @@
         <p>&gt;&gt; מקבלים מיד מייל עם הקישור וסיסמה למדריך ויוצאים לדרך!</p>
         <p><strong>שימו לב:</strong> הקישור תקף ל־ {{last_day}} יום מרגע הרכישה</p>
     </div>
-
-    <div class="card-body">
-        <h2>כמה זה עולה?</h2>
-        <p>{{payment}} פאונד בלבד</p>
-        <p>מלאו את הפרטים לרכישה:</p>
-        <form action="{% url 'tour:pdf_guide' 'indtour'  %}" method="post" >
-                {% csrf_token %}
-                 
-                <table >
-                {{ form.as_p }}
-                </table>
-      
-      
-                <button type="submit" class="save btn btn-tour">לרכישה</button>
-                </form>
-        <!--<div class="image-placeholder">[תמונה עם סימן שאלה]</div>-->
-    </div>
 </div>
 <div class="col-sm-12 col-md-10 col-lg-8 order-0 order-md-1">
         <div class="card-body">
@@ -97,7 +82,7 @@
 
         <h2>רוצים לקבל טעימה מהמדריך לפני שרוכשים?</h2>
         <p>קבלו  ללא עלות מדריך לסיור עם הסברי שמע ומפת מסלול לשלוש נקודות מעניינות לביקור.</p>
-        <p><a href="{% url 'tour:tour_details' 'indtour_free'  %}">קישור למדריך הטעימה</a></p>
+        <p><a href="{% url 'tour:tour_details' 'indtour_free'  %}">קישור למדריך לדוגמא</a></p>
 
     </div>
     <hr>
