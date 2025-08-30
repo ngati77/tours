@@ -193,7 +193,23 @@ html, body {
     margin-right: 0.1rem!important;
     margin-top: 0.2rem!important;
 }
-
+.btn-blue {
+    background-color: #124789; /* Bootstrap-like blue */
+    color: white;              /* White text */
+    border: 2px solid #124789;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth hover effect */
+  }
+  
+  .btn-blue:hover {
+    background-color: white;   /* Turn white on hover */
+    color: #124789;            /* Switch text to blue */
+    border-color: #124789;
+  }
 .btn-runner1:hover,
 .btn-runner:hover {
 

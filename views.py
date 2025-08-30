@@ -25,7 +25,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from .forms import BookingForm, ContactForm, ReviewForm, ReportForm, PdfGuideForm #, PaymentForm
-
+from django import forms
 from django.contrib.auth.decorators import login_required
 
 import stripe
@@ -456,28 +456,43 @@ def pdfGuide(request,trip_abc_name):
                 # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
                 # book_inst.due_back = form.cleaned_data['renewal_date']
                 # Get all infortamtion from form
-                first_name, last_name,  email, last_day, payment,offer, tour_name = form.get_data()
+                first_name, last_name,  email, last_day, payment,offer, tour_name, copun = form.get_data()
 
                 client = Clients(trip=None,first_name=first_name,last_name=last_name, other_payment=True, phone_number=0, email=email, number_of_people=0, 
                      number_of_children=last_day, pre_paid = offer, total_payment = payment, confirm_use = False, send_emails = True, text = tour_name, foundUs = None)
-#            
+           
                 client.save()  
                 # If it is a free tour, send an email thank you with the pdf file.
                 if payment == 0:
                     return email_pdf(request, client, payment, last_day)
                 # Payment is needed.
+                
                 else:
-                    return render(request, 'tour/payment.html', {'client_id':client.id, 'deposit':payment})       
+                    discount_payment = payment 
+                    print(f'DEBUG3 set discount price: {discount_payment}')
+                    if copun == 'CIH30':
+                        print(f'DEBUG4 visit copun price: {discount_payment}')
+
+                        discount_payment = int(payment * .7)
+                        client.total_payment = discount_payment
+                        client.admin_comment = "Copun was used"
+                        client.save()  
+                    print(f'DEBUG5 new price: {discount_payment}')
+
+                    return render(request, 'tour/payment.html', {'client_id':client.id, 'deposit':discount_payment})       
     else:
         ourTours = get_object_or_404(OurTours, trip_abc_name=trip_abc_name)
-        form = PdfGuideForm(initial={'last_day':ourTours.ChildAge, 'payment':ourTours.price, 'offer':ourTours.priceChild,'tour_name':ourTours.trip_abc_name}  ) 
+        form = PdfGuideForm(initial={'last_day':ourTours.ChildAge, 'payment':ourTours.price, 'offer':ourTours.priceChild,'tour_name':ourTours.trip_abc_name, 'copun':''}  ) 
         
         meta_des_heb = "קיימברידג בעברית הורד מדריך  "
         meta_des_en  = "pdf guide Cambridge in Hebrew"
         meta_des = meta_des_heb + meta_des_en
         meta_key_heb = meta_des_heb
         meta_key_en  = "pdf guide cambridge hebrew "
-        meta_key     = meta_key_heb + meta_key_en    
+        meta_key     = meta_key_heb + meta_key_en 
+
+        if ourTours.price!=0:
+            form.fields['copun'].widget = forms.TextInput(attrs={'placeholder':'קוד קופון'})
 
         return render(request, f'tour/{trip_abc_name}.html', {'title':'PDF GUIDE', 
                                                  'page_title' : "מדריך לקיימברידג' ", 
@@ -719,8 +734,9 @@ def email_pdf(request,client, payment, last_day):
                                                                   })
 
     msg_plain = 'תודה שהזמנתם דרכנו סיור'
-    title = "סיור בקיימברידג' - אישור הזמנה"
-    emailTitle = "סיור בקיימברידג' - אישור הזמנה"
+    emailTitle = "המשך המסע שלך בקיימברידג'"
+    title = "המשך המסע שלך בקיימברידג'"
+
     meta_des_heb = "סיורים בקיימברידג' אנגליה - ההרשמה לסיור הסתיימה בהצלחה  "
     meta_des_en  = ""
     meta_des = meta_des_heb + meta_des_en

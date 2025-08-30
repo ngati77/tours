@@ -133,10 +133,10 @@ class PaymentForm(forms.Form):
 class PdfGuideForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
     last_name      = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם משפחה'}))
-    #email          = forms.EmailField(label ='', widget=forms.TextInput(attrs={'placeholder': 'דוא"ל'}))
     email          = forms.CharField(max_length=100, label ='',
                                         widget= forms.EmailInput
                                         (attrs={'placeholder':'דוא"ל'}))
+    copun      = forms.CharField(widget=forms.HiddenInput(), required = False, label='')
     last_day    = forms.IntegerField(widget=forms.HiddenInput, initial=15)
     payment     = forms.IntegerField(widget=forms.HiddenInput, initial=15)
     offer     = forms.IntegerField(widget=forms.HiddenInput, initial=15)
@@ -150,9 +150,13 @@ class PdfGuideForm(forms.Form):
         last_day        = self.cleaned_data['last_day']
         payment         = self.cleaned_data['payment']
         tour_name       = self.cleaned_data['tour_name']
-        offer       = self.cleaned_data['offer']
+        offer           = self.cleaned_data['offer']
+        copun           = self.cleaned_data['copun']
 
-        return first_name, last_name, email, last_day, payment, offer, tour_name
+        return first_name, last_name, email, last_day, payment, offer, tour_name, copun
+
+        
+
 
 class ContactForm(forms.Form):
     first_name     = forms.CharField(label  ='', widget=forms.TextInput(attrs={'placeholder': 'שם פרטי'}))
