@@ -469,15 +469,12 @@ def pdfGuide(request,trip_abc_name):
                 
                 else:
                     discount_payment = payment 
-                    print(f'DEBUG3 set discount price: {discount_payment}')
                     if copun == 'CIH30':
-                        print(f'DEBUG4 visit copun price: {discount_payment}')
 
                         discount_payment = int(payment * .7)
                         client.total_payment = discount_payment
                         client.admin_comment = "Copun was used"
                         client.save()  
-                    print(f'DEBUG5 new price: {discount_payment}')
 
                     return render(request, 'tour/payment.html', {'client_id':client.id, 'deposit':discount_payment})       
     else:
